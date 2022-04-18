@@ -1,0 +1,51 @@
+{
+  "name": "vue-material-3",
+  "version": "0.1.0",
+  "description": "Material Design 3 styled components for Vue 3",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mylmz10/vue-material-3.git"
+  },
+  "author": "muammer.yilmaz.x@gmail.com",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "material",
+    "material design 3",
+    "material you",
+    "web",
+    "components"
+  ],
+  "bugs": {
+    "url": "https://github.com/mylmz10/vue-material-3/issues"
+  },
+  "homepage": "https://github.com/mylmz10/vue-material-3#readme",
+  "dependencies": {
+    "vue": "^3.2.33"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@rushstack/eslint-patch": "^1.1.0",
+    "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-essentials": "^6.4.22",
+    "@storybook/addon-links": "^6.4.22",
+    "@storybook/vue3": "^6.4.22",
+    "@vitejs/plugin-vue": "^2.3.1",
+    "@vue/eslint-config-prettier": "^7.0.0",
+    "babel-loader": "^8.2.4",
+    "eslint": "^8.5.0",
+    "eslint-plugin-vue": "^8.2.0",
+    "prettier": "^2.5.1",
+    "sass": "^1.50.0",
+    "storybook-addon-sass-postcss": "^0.1.1",
+    "vite": "^2.9.5",
+    "vue-loader": "^16.8.3"
+  }
+}
