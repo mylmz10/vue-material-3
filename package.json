@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "deploy-storybook": "gh-pages -d storybook-static"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/mylmz10/vue-material-3/issues"
   },
-  "homepage": "https://github.com/mylmz10/vue-material-3#readme",
+  "homepage": "https://mylmz10.github.io/vue-material-3",
   "dependencies": {
     "vue": "^3.2.33"
   },
@@ -42,6 +43,7 @@
     "babel-loader": "^8.2.4",
     "eslint": "^8.5.0",
     "eslint-plugin-vue": "^8.2.0",
+    "gh-pages": "^3.2.3",
     "prettier": "^2.5.1",
     "sass": "^1.50.0",
     "storybook-addon-sass-postcss": "^0.1.1",
