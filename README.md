@@ -17,7 +17,7 @@
 
 > IMPORTANT: Vue Material 3 is a work in progress and subject to major changes until 1.0 release.
 
-The Vue Material 3 provides Vue 3 components which implement the Material You (Material Design 3) specs and tools for building beautiful apps.
+The Vue Material 3 provides Vue 3 components which implement the [Material You](https://material.io/blog/announcing-material-you) (Material Design 3) specs and tools for building beautiful apps.
 
 ### Components
 - [ ] Buttons [WIP]
