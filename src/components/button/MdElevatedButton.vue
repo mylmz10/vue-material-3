@@ -7,17 +7,14 @@
   </MdButtonBase>
 </template>
 
-<script>
+<script setup>
 import MdButtonBase from "./MdButtonBase.vue";
 
-export default {
-  components: { MdButtonBase },
-  props: {
-    label: {
-      type: String,
-    },
+defineProps({
+  label: {
+    type: String,
   },
-};
+});
 </script>
 
 <style lang="scss">

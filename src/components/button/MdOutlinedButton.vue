@@ -1,5 +1,5 @@
 <template>
-  <MdButtonBase class="md-filled-button">
+  <MdButtonBase class="md-outlined-button">
     <template v-if="label">
       {{ label }}
     </template>
@@ -21,9 +21,9 @@ defineProps({
 @use "sass:map";
 @use "../../styles/tokens";
 
-$theme: tokens.md-comp-filled-button-values();
+$theme: tokens.md-comp-outlined-button-values();
 
-.md-filled-button {
+.md-outlined-button {
   background-color: map.get($theme, container-color);
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
@@ -34,6 +34,7 @@ $theme: tokens.md-comp-filled-button-values();
   letter-spacing: map.get($theme, label-text-tracking);
   line-height: map.get($theme, label-text-line-height);
   box-shadow: none;
+  outline: map.get($theme, outline-color) solid map.get($theme, outline-width);
 
   &:hover {
     box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
