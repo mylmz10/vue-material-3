@@ -1,5 +1,6 @@
 <template>
   <MdButtonBase class="md-text-button" v-bind="$attrs">
+    <MdRipple />
     <template v-if="label">
       {{ label }}
     </template>
@@ -8,7 +9,8 @@
 </template>
 
 <script setup>
-import MdButtonBase from "./MdButtonBase.vue";
+import MdButtonBase from './MdButtonBase.vue';
+import MdRipple from '../ripple/MdRipple.vue';
 
 defineProps({
   label: {
@@ -18,8 +20,8 @@ defineProps({
 </script>
 
 <style lang="scss">
-@use "sass:map";
-@use "../../styles/tokens";
+@use 'sass:map';
+@use '../../styles/tokens';
 
 $theme: tokens.md-comp-text-button-values();
 
@@ -34,5 +36,10 @@ $theme: tokens.md-comp-text-button-values();
   letter-spacing: map.get($theme, label-text-tracking);
   line-height: map.get($theme, label-text-line-height);
   box-shadow: none;
+
+  .md-ripple {
+    --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
+    border-radius: var(--md-text-button-container-shape, 100px);
+  }
 }
 </style>
