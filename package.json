@@ -49,5 +49,9 @@
     "storybook-addon-sass-postcss": "^0.1.1",
     "vite": "^2.9.5",
     "vue-loader": "^16.8.3"
+  },
+  "prettier": {
+    "printWidth": 200,
+    "singleQuote": true
   }
 }
