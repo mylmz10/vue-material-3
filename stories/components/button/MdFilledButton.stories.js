@@ -1,8 +1,8 @@
-import MdFilledButton from "../../../src/components/button/MdFilledButton.vue";
+import MdFilledButton from '../../../src/components/button/MdFilledButton.vue';
 
 // More on default export: https://storybook.js.org/docs/vue/writing-stories/introduction#default-export
 export default {
-  title: "Components/Buttons",
+  title: 'Components/Buttons',
   component: MdFilledButton,
   // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
   argTypes: {},
@@ -23,5 +23,5 @@ const Template = (args) => ({
 export const FilledButton = Template.bind({});
 // More on args: https://storybook.js.org/docs/vue/writing-stories/args
 FilledButton.args = {
-  label: "Button",
+  label: 'Button',
 };

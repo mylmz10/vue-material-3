@@ -1,21 +1,16 @@
-const path = require("path");
-
 module.exports = {
-  stories: [
-    "../stories/components/**/*.stories.mdx",
-    "../stories/components/**/*.stories.@(js|jsx|ts|tsx)",
-  ],
+  stories: ['../stories/components/**/*.stories.mdx', '../stories/components/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
     {
-      name: "storybook-addon-sass-postcss",
+      name: '@storybook/preset-scss',
       options: {
         sassLoaderOptions: {
-          implementation: require("sass"),
+          implementation: require('sass'),
         },
       },
     },
   ],
-  framework: "@storybook/vue3",
+  framework: '@storybook/vue3',
 };
