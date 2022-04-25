@@ -38,8 +38,13 @@ $theme: tokens.md-comp-outlined-button-values();
   box-shadow: none;
   outline: map.get($theme, outline-color) solid map.get($theme, outline-width);
 
-  &:hover {
+  &:not(:disabled):hover {
     box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  }
+
+  &:disabled {
+    outline-color: rgba(map.get($theme, disabled-outline-color), map.get($theme, disabled-outline-opacity));
+    color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
   }
 
   .md-ripple {
