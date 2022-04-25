@@ -209,20 +209,5 @@ function handleRippleDeactivate() {
       transition-duration: 105ms;
     }
   }
-
-  //&::after {
-  //  transition: opacity 375ms linear 0s;
-  //  transform-origin: center center;
-  //}
-}
-
-@keyframes slidein {
-  from {
-    transform: translate(38.93px, 19.5px) scale(1);
-  }
-
-  to {
-    transform: translate(36.42px, 11px) scale(10.23);
-  }
 }
 </style>
