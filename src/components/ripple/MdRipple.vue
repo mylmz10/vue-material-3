@@ -193,15 +193,31 @@ function handleRippleDeactivate() {
     outline: 0px;
     -webkit-tap-highlight-color: transparent;
 
-    &::after {
-      background: radial-gradient(closest-side, var(--md-ripple-pressed-state-layer-color, #000) max(100% - 70px, 65%), transparent 100%);
+    &::before, &::after {
       position: absolute;
       opacity: 0;
       pointer-events: none;
       z-index: -1;
-      content: '';
+      content: "";
+    }
+
+    &::after {
+      transition: opacity 375ms linear 0s;
+      transform-origin: center center;
+    }
+
+    &::after {
+      background: radial-gradient(closest-side, var(--md-ripple-pressed-state-layer-color, black) max(100% - 70px, 65%), transparent 100%);
+    }
+
+    &::before {
       transition: opacity 15ms linear 0s, background-color 15ms linear 0s;
       inset: 0px;
+    }
+
+    &--hovered::before {
+      opacity: var(--md-ripple-hover-state-layer-opacity, 0.08);
+      background-color: var(--md-ripple-hover-state-layer-color, black);
     }
 
     &--pressed::after {

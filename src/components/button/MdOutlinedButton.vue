@@ -39,7 +39,7 @@ $theme: tokens.md-comp-outlined-button-values();
   outline: map.get($theme, outline-color) solid map.get($theme, outline-width);
 
   &:not(:disabled):hover {
-    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: none;
   }
 
   &:disabled {
@@ -48,7 +48,12 @@ $theme: tokens.md-comp-outlined-button-values();
   }
 
   .md-ripple {
+    --md-ripple-hover-state-layer-color: #{map.get($theme, hover-state-layer-color)};
+    --md-ripple-focus-state-layer-color: #{map.get($theme, focus-state-layer-color)};
     --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
+    --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
+    --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
+    --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
     border-radius: var(--md-outlined-button-container-shape, 100px);
   }
 }

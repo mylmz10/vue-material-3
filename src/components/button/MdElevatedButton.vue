@@ -51,8 +51,13 @@ $theme: tokens.md-comp-elevated-button-values();
   }
 
   .md-ripple {
+    --md-ripple-hover-state-layer-color: #{map.get($theme, hover-state-layer-color)};
+    --md-ripple-focus-state-layer-color: #{map.get($theme, focus-state-layer-color)};
     --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
-    border-radius: var(--md-elevated-button-container-shape, 100px);
+    --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
+    --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
+    --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
+    border-radius: var(--md-outlined-button-container-shape, 100px);
   }
 }
 </style>

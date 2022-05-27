@@ -37,14 +37,23 @@ $theme: tokens.md-comp-text-button-values();
   line-height: map.get($theme, label-text-line-height);
   box-shadow: none;
 
+  &:not(:disabled):hover {
+    box-shadow: none;
+  }
+
   &:disabled {
     background-color: rgba(map.get($theme, disabled-container-color), map.get($theme, disabled-container-opacity));
     color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
   }
 
   .md-ripple {
+    --md-ripple-hover-state-layer-color: #{map.get($theme, hover-state-layer-color)};
+    --md-ripple-focus-state-layer-color: #{map.get($theme, focus-state-layer-color)};
     --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
-    border-radius: var(--md-text-button-container-shape, 100px);
+    --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
+    --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
+    --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
+    border-radius: var(--md-outlined-button-container-shape, 100px);
   }
 }
 </style>
