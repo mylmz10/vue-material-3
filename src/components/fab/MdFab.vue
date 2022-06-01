@@ -1,5 +1,5 @@
 <template>
-  <button class="md-fab" :disabled="disabled">
+  <button class="md-fab" :class="{ 'md-fab--small': size === 'small', 'md-fab--large': size === 'large' }" :disabled="disabled">
     <MdRipple></MdRipple>
     <i class="material-icons md-fab__icon">{{ icon }}</i>
     <MdElevationOverlay></MdElevationOverlay>
@@ -13,8 +13,8 @@ import MdRipple from '../ripple/MdRipple.vue';
 
 defineProps({
   icon: { type: String },
-  label: { type: String },
   disabled: { type: Boolean },
+  size: { type: String },
 });
 </script>
 
@@ -24,11 +24,7 @@ defineProps({
 @use '../elevation/surface';
 @use '../elevation/elevation';
 
-$theme: tokens.md-comp-fab-primary-values();
-
-@debug map.get($theme, container-elevation);
-
-.md-fab {
+@mixin root-static-styles($theme) {
   @include surface.root-static-styles;
   display: inline-flex;
   border: none;
@@ -71,5 +67,21 @@ $theme: tokens.md-comp-fab-primary-values();
     --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
     border-radius: map.get($theme, container-shape);
   }
+}
+
+@mixin label_styles($theme) {
+  &__label {
+    padding-inline-start: 12px;
+  }
+}
+
+.md-fab {
+  @include root-static-styles(tokens.md-comp-fab-primary-values());
+}
+.md-fab--small.md-fab {
+  @include root-static-styles(tokens.md-comp-fab-primary-small-values());
+}
+.md-fab--large.md-fab {
+  @include root-static-styles(tokens.md-comp-fab-primary-large-values());
 }
 </style>
