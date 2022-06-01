@@ -69,12 +69,6 @@ defineProps({
   }
 }
 
-@mixin label_styles($theme) {
-  &__label {
-    padding-inline-start: 12px;
-  }
-}
-
 .md-fab {
   @include root-static-styles(tokens.md-comp-fab-primary-values());
 }
