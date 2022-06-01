@@ -1,24 +1,20 @@
 <template>
-  <MdButtonBase :disabled="disabled" class="md-elevated-button">
-    <MdRipple />
-    <template v-if="label">
-      {{ label }}
-    </template>
-    <slot v-else />
-  </MdButtonBase>
+  <button class="md-fab" :disabled="disabled">
+    <MdRipple></MdRipple>
+    <i class="material-icons md-fab__icon">{{ icon }}</i>
+    <MdElevationOverlay></MdElevationOverlay>
+  </button>
 </template>
 
 <script setup>
-import MdButtonBase from './MdButtonBase.vue';
+import { computed, onMounted, onBeforeUnmount, ref, defineProps } from 'vue';
+import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
 defineProps({
-  label: {
-    type: String,
-  },
-  disabled: {
-    type: Boolean,
-  },
+  icon: { type: String },
+  label: { type: String },
+  disabled: { type: Boolean },
 });
 </script>
 
@@ -28,19 +24,25 @@ defineProps({
 @use '../elevation/surface';
 @use '../elevation/elevation';
 
-$theme: tokens.md-comp-elevated-button-values();
+$theme: tokens.md-comp-fab-primary-values();
 
-.md-elevated-button {
+@debug map.get($theme, container-elevation);
+
+.md-fab {
   @include surface.root-static-styles;
+  display: inline-flex;
+  border: none;
+  outline: none;
+  vertical-align: middle;
+  text-decoration: none;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+
   background-color: map.get($theme, container-color);
-  height: map.get($theme, container-height);
+  width: map.get($theme, container-height);
+  height: map.get($theme, container-width);
   border-radius: map.get($theme, container-shape);
-  color: map.get($theme, label-text-color);
-  font-family: map.get($theme, label-text-font);
-  font-size: map.get($theme, label-text-size);
-  font-weight: map.get($theme, label-text-weight);
-  letter-spacing: map.get($theme, label-text-tracking);
-  line-height: map.get($theme, label-text-line-height);
 
   box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
 
@@ -48,10 +50,16 @@ $theme: tokens.md-comp-elevated-button-values();
     box-shadow: elevation.resolve-box-shadow(map.get($theme, hover-container-elevation), map.get($theme, container-shadow-color));
   }
 
-  &:disabled {
-    background-color: rgba(map.get($theme, disabled-container-color), map.get($theme, disabled-container-opacity));
-    color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
-    box-shadow: none;
+  &__icon {
+    color: map.get($theme, icon-color);
+    width: map.get($theme, icon-size);
+    height: map.get($theme, icon-size);
+    font-size: map.get($theme, icon-size);
+    --mdc-icon-size: map.get($theme, icon-size);
+  }
+
+  &:hover {
+    cursor: pointer;
   }
 
   .md-ripple {
@@ -61,7 +69,7 @@ $theme: tokens.md-comp-elevated-button-values();
     --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
     --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
     --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
-    border-radius: var(--md-outlined-button-container-shape, 100px);
+    border-radius: map.get($theme, container-shape);
   }
 }
 </style>

@@ -1,0 +1,11 @@
+// Thanks https://github.com/material-components/material-web/
+$duration: 280ms;
+$easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+@mixin root-static-styles() {
+  position: relative;
+  transition: border #{$duration} #{$easing}, box-shadow #{$duration} #{$easing};
+  // used for interacting with overlays
+  z-index: 0;
+  --mdc-ripple-z-index: -1;
+}
