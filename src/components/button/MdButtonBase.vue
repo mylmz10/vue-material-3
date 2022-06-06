@@ -9,11 +9,10 @@ export default {
 </script>
 
 <style lang="scss">
+@use '../elevation/surface';
+
 .md-button {
-  position: relative;
-  transition: border 280ms cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
-  z-index: 0;
-  --mdc-ripple-z-index: -1;
+  @include surface.root-static-styles;
   display: inline-flex;
   align-items: center;
   justify-content: center;
