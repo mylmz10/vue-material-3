@@ -11,6 +11,7 @@
 
 <style lang="scss">
 @use 'sass:map';
+@use '../elevation/elevation';
 @use '../../styles/tokens';
 
 $theme: tokens.md-comp-elevated-card-values();
@@ -20,7 +21,7 @@ $theme: tokens.md-comp-elevated-card-values();
   border-radius: map.get($theme, container-shape);
   margin: 0 8px;
   width: 360px;
-  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
 
   $this: &;
 
@@ -32,6 +33,7 @@ $theme: tokens.md-comp-elevated-card-values();
     overflow: hidden;
     z-index: 0;
     border-radius: inherit;
+    height: 100%;
 
     &:before {
       background: map.get($theme, container-color);
@@ -59,6 +61,8 @@ $theme: tokens.md-comp-elevated-card-values();
   }
 
   &:hover {
+    box-shadow: elevation.resolve-box-shadow(map.get($theme, hover-container-elevation), map.get($theme, container-shadow-color));
+
     #{$this}__state-layer {
       visibility: visible;
       background-color: map.get($theme, hover-state-layer-color);
