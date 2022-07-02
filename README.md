@@ -21,14 +21,17 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 
 ### Components
 - [ ] Buttons [WIP]
-- [ ] Cards
+- [ ] Cards [WIP]
 - [ ] Chips
 - [ ] Dialogs
-- [ ] FABs
+- [ ] FABs [WIP]
+- [ ] Icon [WIP]
+- [ ] IconButton [WIP]
 - [ ] Menu
 - [ ] Navigation Bars
 - [ ] Navigation Drawer
 - [ ] Navigation Rail
+- [ ] Text Fields [WIP]
 - [ ] Top App Bar
 
 ### Quick Start

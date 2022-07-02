@@ -1,5 +1,5 @@
 <template>
-  <span class="md-field md-field--filled" :class="{ 'md-field--focused': focused }" @focusin="onFocusin" @focusout="onFocusout">
+  <span class="md-field md-field--filled" :class="{ 'md-field--focused': focused || populated }" @focusin="onFocusin" @focusout="onFocusout">
     <span class="md-field__container">
       <span class="md-field__outline"></span>
       <span class="md-field__state-layer"></span>
@@ -47,7 +47,6 @@ let focused = ref(false);
 
 const onFocusin = () => {
   focused.value = true;
-  console.log(focused);
 };
 const onFocusout = () => {
   focused.value = false;
