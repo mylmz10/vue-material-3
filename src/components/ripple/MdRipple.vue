@@ -9,7 +9,7 @@ import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 
 const mdRipple = ref(null);
 const mdRippleSurface = ref(null);
-const hovered = ref(true);
+const hovered = ref(false);
 const focused = ref(false);
 const pressed = ref(false);
 const unbounded = ref(false);
