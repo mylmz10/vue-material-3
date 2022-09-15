@@ -6,19 +6,19 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Material 3
-// Design system version name: v0.75
+// Design system version name: v0.96
 //
 
-@use "sass:map";
+@use 'sass:map';
 
-@use "./md-sys-color";
+@use './md-sys-color';
 
-@use "./md-sys-shape";
+@use './md-sys-shape';
 
-@use "./md-sys-typescale";
+@use './md-sys-typescale';
 
 $_default: (
-  md-sys-color: md-sys-color.values-light(),
+  md-sys-color: md-sys-color.values-light-dynamic(),
   md-sys-shape: md-sys-shape.values(),
   md-sys-typescale: md-sys-typescale.values(),
 );
