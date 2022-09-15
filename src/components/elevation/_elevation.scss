@@ -1,5 +1,6 @@
 // Thanks https://github.com/material-components/material-web/
 @use 'sass:map';
+@use 'sass:string';
 
 $_key-opacity: 0.3;
 $_ambient-opacity: 0.15;
@@ -60,6 +61,94 @@ $_dp-to-level-map: (
   @return $level;
 }
 
+@function is-var($string) {
+  @if (str-index(string.quote($string), 'var(')) {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
+
+// Trims the start/left of the string:
+@function str-trimStart($str) {
+  @if (str-slice($str, 1, 1) == ' ') {
+    @return str-trimStart(str-slice($str, 2));
+  } @else {
+    @return $str;
+  }
+}
+
+// Trims the end/right of the string:
+@function str-trimEnd($str) {
+  @if (str-slice($str, str-length($str), -1) == ' ') {
+    @return str-trimEnd(str-slice($str, 1, -2));
+  } @else {
+    @return $str;
+  }
+}
+
+// Trims both the start and end of the string:
+@function str-trim($str) {
+  @return str-trimStart(str-trimEnd($str));
+}
+
+@function get-var-fallback($var) {
+  $var: string.quote($var);
+  $var: str-replace($var, 'var(');
+  $var: str-replace($var, ')');
+  $indexStart: str-index($var, '--');
+  $indexEnd: str-index($var, ',');
+  @return unquote(str-trim(str-replace($var, str-slice($var, $indexStart, $indexEnd))));
+}
+
+@function hex-to-dec($string) {
+  $hex: '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f';
+  $string: to-lower-case($string);
+  $length: str-length($string);
+
+  $dec: 0;
+  @for $i from 1 through $length {
+    $factor: 1 + (15 * ($length - $i));
+    $index: index($hex, str-slice($string, $i, $i));
+    $dec: $dec + $factor * ($index - 1);
+  }
+
+  @return $dec;
+}
+
+@function hex-to-color($string, $opacity: 1) {
+  @return rgba(hex-to-dec(str-slice($string, 1, 2)), hex-to-dec(str-slice($string, 3, 4)), hex-to-dec(str-slice($string, 5, 6)), $opacity);
+}
+
+@function color-var-hex-to-rgba($var, $opacity: 1) {
+  $hexColor: get-var-fallback($var);
+
+  @if str-length($hexColor) == 4 {
+    $first: str-slice($hexColor, 2, 2);
+    $second: str-slice($hexColor, 3, 3);
+    $third: str-slice($hexColor, 4, 4);
+    $hexColor: unquote('#{$first}#{$first}#{$second}#{$second}#{$third}#{$third}');
+  }
+  @if str-length($hexColor) == 7 {
+    $hexColor: unquote(str-replace($hexColor, '#', ''));
+  }
+
+  @return hex-to-color($hexColor, $opacity);
+}
+
+//@debug color-var-hex-to-rgba(var(--md-sys-color-primary, #6750a4));
+//@debug color-var-hex-to-rgba(var(--md-sys-color-primary, #000));
+
 /// Returns the appropriate box-shadow for the given level and shadow color.
 ///
 /// @throw If level or shadow-color are provided and one is null.
@@ -91,14 +180,10 @@ $_dp-to-level-map: (
   $key-color: rgba($shadow-color, $_key-opacity);
   $ambient-color: rgba($shadow-color, $_ambient-opacity);
 
-  //@if var.is-var($shadow-color) {
-  //  // TODO(b/213331407): Convert color from hex to rgba CSS color format to
-  //  // enable mixing rgb value with alpha using custom properties.
-  //  // (e.g., rgb(var(--foo-sys-color-on-surface-rgb, 31,31,31), 0.38))
-  //  // Remove once the attached bug is resolved.
-  //  $key-color: color.color-var-hex-to-rgba($shadow-color, $_key-opacity);
-  //  $ambient-color: color.color-var-hex-to-rgba($shadow-color, $_ambient-opacity);
-  //}
+  @if is-var($shadow-color) {
+    $key-color: color-var-hex-to-rgba($shadow-color, $_key-opacity);
+    $ambient-color: color-var-hex-to-rgba($shadow-color, $_ambient-opacity);
+  }
 
   @return (#{$key-spread} #{$key-color}, #{$ambient-spread} #{$ambient-color});
 }

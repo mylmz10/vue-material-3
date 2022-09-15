@@ -6,23 +6,23 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Material 3
-// Design system version name: v0.75
+// Design system version name: v0.96
 //
 
-@use "sass:map";
+@use 'sass:map';
 
-@use "./md-sys-color";
+@use './md-sys-color';
 
-@use "./md-sys-elevation";
+@use './md-sys-elevation';
 
-@use "./md-sys-shape";
+@use './md-sys-shape';
 
-@use "./md-sys-state";
+@use './md-sys-state';
 
-@use "./md-sys-typescale";
+@use './md-sys-typescale';
 
 $_default: (
-  md-sys-color: md-sys-color.values-light(),
+  md-sys-color: md-sys-color.values-light-dynamic(),
   md-sys-elevation: md-sys-elevation.values(),
   md-sys-shape: md-sys-shape.values(),
   md-sys-state: md-sys-state.values(),
@@ -64,7 +64,7 @@ $_default: (
     container-shadow-color: map.get($deps, md-sys-color, shadow),
     container-shape: map.get($deps, md-sys-shape, corner-small),
     container-surface-tint-layer-color:
-      map.get($deps, md-sys-elevation, surface-tint-color),
+      map.get($deps, md-sys-color, surface-tint),
     subhead-color: map.get($deps, md-sys-color, on-surface-variant),
     subhead-font: map.get($deps, md-sys-typescale, title-small-font),
     subhead-line-height:

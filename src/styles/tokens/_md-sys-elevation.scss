@@ -6,15 +6,15 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Material 3
-// Design system version name: v0.75
+// Design system version name: v0.96
 //
 
-@use "sass:map";
+@use 'sass:map';
 
-@use "./md-sys-color";
+@use './md-sys-color';
 
 $_default: (
-  md-sys-color: md-sys-color.values-light(),
+  md-sys-color: md-sys-color.values-light-dynamic(),
 );
 
 @function values($deps: $_default, $exclude-hardcoded-values: false) {

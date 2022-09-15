@@ -1,0 +1,22 @@
+@use 'sass:map';
+
+$_default: (
+  hover-state-layer-color: hover-state-layer-color,
+  focus-state-layer-color: focus-state-layer-color,
+  pressed-state-layer-color: pressed-state-layer-color,
+  hover-state-layer-opacity: hover-state-layer-opacity,
+  focus-state-layer-opacity: focus-state-layer-opacity,
+  pressed-state-layer-opacity: pressed-state-layer-opacity,
+);
+
+@mixin ripple($theme, $vars: $_default) {
+  .md-ripple {
+    --md-ripple-hover-state-layer-color: #{map.get($theme, map.get($vars, hover-state-layer-color))};
+    --md-ripple-focus-state-layer-color: #{map.get($theme, map.get($vars, focus-state-layer-color))};
+    --md-ripple-pressed-state-layer-color: #{map.get($theme, map.get($vars, pressed-state-layer-color))};
+    --md-ripple-hover-state-layer-opacity: #{map.get($theme, map.get($vars, hover-state-layer-opacity))};
+    --md-ripple-focus-state-layer-opacity: #{map.get($theme, map.get($vars, focus-state-layer-opacity))};
+    --md-ripple-pressed-state-layer-opacity: #{map.get($theme, map.get($vars, pressed-state-layer-opacity))};
+    border-radius: var(--md-ripple-state-layer-shape, 9999px);
+  }
+}
