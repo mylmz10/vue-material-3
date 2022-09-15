@@ -70,12 +70,25 @@ defineProps({
 }
 
 .md-fab--extended {
-  @include root-static-styles(tokens.md-comp-extended-fab-primary-values());
+  $theme: tokens.md-comp-extended-fab-surface-values();
+  @include root-static-styles($theme);
 
   padding: 16px;
 
+  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  --overlay-opacity: 0.11;
+
   .md-fab__icon {
     margin-right: 12px;
+  }
+
+  .md-fab__label {
+    color: map.get($theme, label-text-color);
+    font-family: map.get($theme, label-text-font);
+    line-height: map.get($theme, label-text-line-height);
+    font-size: map.get($theme, label-text-size);
+    letter-spacing: map.get($theme, label-text-tracking);
+    font-weight: map.get($theme, label-text-weight);
   }
 }
 </style>

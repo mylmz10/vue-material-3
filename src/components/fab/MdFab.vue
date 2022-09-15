@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref, defineProps } from 'vue';
+import { defineProps } from 'vue';
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
@@ -70,12 +70,16 @@ defineProps({
 }
 
 .md-fab {
-  @include root-static-styles(tokens.md-comp-fab-primary-values());
+  $theme: tokens.md-comp-fab-surface-values();
+  @include root-static-styles($theme);
+
+  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  --overlay-opacity: 0.11;
 }
 .md-fab--small.md-fab {
-  @include root-static-styles(tokens.md-comp-fab-primary-small-values());
+  @include root-static-styles(tokens.md-comp-fab-surface-small-values());
 }
 .md-fab--large.md-fab {
-  @include root-static-styles(tokens.md-comp-fab-primary-large-values());
+  @include root-static-styles(tokens.md-comp-fab-surface-large-values());
 }
 </style>
