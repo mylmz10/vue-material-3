@@ -1,5 +1,5 @@
 <template>
-  <MdButtonBase class="md-text-button" v-bind="$attrs">
+  <MdButtonBase class="md-text-button" :disabled="disabled">
     <MdRipple />
     <template v-if="label">
       {{ label }}
@@ -15,6 +15,9 @@ import MdRipple from '../ripple/MdRipple.vue';
 defineProps({
   label: {
     type: String,
+  },
+  disabled: {
+    type: Boolean,
   },
 });
 </script>

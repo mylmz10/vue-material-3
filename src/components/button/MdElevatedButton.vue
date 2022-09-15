@@ -1,5 +1,5 @@
 <template>
-  <MdButtonBase :disabled="disabled" class="md-elevated-button">
+  <MdButtonBase class="md-elevated-button" :disabled="disabled">
     <MdRipple />
     <template v-if="label">
       {{ label }}

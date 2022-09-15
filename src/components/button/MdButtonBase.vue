@@ -1,11 +1,16 @@
 <template>
-  <button class="md-button"><slot /></button>
+  <button class="md-button" :disabled="disabled"><slot /></button>
 </template>
 
-<script>
-export default {
-  name: 'MdButtonBase',
-};
+<script setup>
+defineProps({
+  label: {
+    type: String,
+  },
+  disabled: {
+    type: Boolean,
+  },
+});
 </script>
 
 <style lang="scss">

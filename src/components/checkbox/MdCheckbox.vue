@@ -1,5 +1,5 @@
 <template>
-  <div class="md-checkbox" :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--selected': _selected, 'md-checkbox--indeterminate': _indeterminate }" @click="toggle">
+  <div class="md-checkbox" :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }" @click="toggle">
     <MdRipple />
     <input type="checkbox" />
     <div class="md-checkbox__background">
@@ -15,14 +15,14 @@
 import { ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-const _selected = ref(false);
+const _checked = ref(false);
 const _indeterminate = ref(false);
 
 const props = defineProps({
   disabled: {
     type: Boolean,
   },
-  selected: {
+  checked: {
     type: Boolean,
   },
   indeterminate: {
@@ -31,9 +31,9 @@ const props = defineProps({
 });
 
 watch(
-  () => props.selected,
+  () => props.checked,
   (newValue) => {
-    _selected.value = newValue;
+    _checked.value = newValue;
   },
   { immediate: true }
 );
@@ -47,7 +47,7 @@ watch(
 
 const toggle = () => {
   if (!props.disabled) {
-    _selected.value = !_selected.value;
+    _checked.value = !_checked.value;
     _indeterminate.value = false;
   }
 };
@@ -138,14 +138,14 @@ $theme: tokens.md-comp-checkbox-values();
       }
     }
 
-    &#{$this}--selected {
+    &#{$this}--checked {
       #{$this}__background {
         svg {
           opacity: 1;
         }
       }
     }
-    &#{$this}--selected {
+    &#{$this}--checked {
       #{$this}__background {
         #{$this}__indeterminate-mark {
           color: map.get($theme, selected-icon-color);
@@ -156,7 +156,7 @@ $theme: tokens.md-comp-checkbox-values();
     }
   }
 
-  &--selected {
+  &--checked {
     #{$this}__background {
       background-color: map.get($theme, selected-container-color);
       border-color: map.get($theme, selected-container-color);
@@ -177,7 +177,7 @@ $theme: tokens.md-comp-checkbox-values();
       border-color: map.get($theme, unselected-disabled-outline-color);
       border-width: map.get($theme, unselected-disabled-outline-width);
     }
-    &#{$this}--selected,
+    &#{$this}--checked,
     &#{$this}--indeterminate {
       #{$this}__background {
         background-color: map.get($theme, selected-disabled-container-color);
