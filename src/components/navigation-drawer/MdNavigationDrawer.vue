@@ -12,7 +12,7 @@ import { ref, onMounted, watch } from 'vue';
 
 const _opened = ref(false);
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['change']);
 
 const props = defineProps({
   opened: {
