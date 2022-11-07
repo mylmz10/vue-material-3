@@ -207,7 +207,7 @@ function handleRippleDeactivate() {
     }
 
     &::after {
-      background: radial-gradient(closest-side, var(--md-ripple-pressed-state-layer-color, black) max(100% - 70px, 65%), transparent 100%);
+      background: radial-gradient(closest-side, var(--md-ripple-pressed-state-layer-color, black) 93%, transparent 100%);
     }
 
     &::before {

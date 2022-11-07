@@ -20,17 +20,23 @@
 The Vue Material 3 provides Vue 3 components which implement the [Material You](https://material.io/blog/announcing-material-you) (Material Design 3) specs and tools for building beautiful apps.
 
 ### Components
-- [ ] Buttons [WIP]
-- [ ] Cards [WIP]
-- [ ] Chips
+- [ ] Autocomplete
+- [ ] Badge
+- [x] Buttons
+- [x] Cards 
+- [x] Checkbox 
+- [ ] Chips [WIP]
 - [ ] Dialogs
-- [ ] FABs [WIP]
-- [ ] Icon [WIP]
-- [ ] IconButton [WIP]
+- [x] FABs 
+- [x] Icon
+- [x] IconButton
+- [x] List
 - [ ] Menu
 - [ ] Navigation Bars
-- [ ] Navigation Drawer
+- [x] Navigation Drawer
 - [ ] Navigation Rail
+- [x] Radio Button
+- [x] Switch
 - [ ] Text Fields [WIP]
 - [ ] Top App Bar
 

@@ -25,6 +25,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../ripple/ripple';
 
 $theme: tokens.md-comp-outlined-button-values();
 
@@ -40,6 +41,7 @@ $theme: tokens.md-comp-outlined-button-values();
   line-height: map.get($theme, label-text-line-height);
   box-shadow: none;
   outline: map.get($theme, outline-color) solid map.get($theme, outline-width);
+  @include ripple.ripple($theme, null, 100px);
 
   &:not(:disabled):hover {
     box-shadow: none;
@@ -50,14 +52,5 @@ $theme: tokens.md-comp-outlined-button-values();
     color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
   }
 
-  .md-ripple {
-    --md-ripple-hover-state-layer-color: #{map.get($theme, hover-state-layer-color)};
-    --md-ripple-focus-state-layer-color: #{map.get($theme, focus-state-layer-color)};
-    --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
-    --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
-    --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
-    --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
-    border-radius: var(--md-outlined-button-container-shape, 100px);
-  }
 }
 </style>
