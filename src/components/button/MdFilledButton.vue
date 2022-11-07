@@ -25,6 +25,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../ripple/ripple';
 
 $theme: tokens.md-comp-filled-button-values();
 
@@ -39,6 +40,7 @@ $theme: tokens.md-comp-filled-button-values();
   letter-spacing: map.get($theme, label-text-tracking);
   line-height: map.get($theme, label-text-line-height);
   box-shadow: none;
+  @include ripple.ripple($theme, null, 100px);
 
   &:not(:disabled):hover {
     box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
@@ -47,16 +49,6 @@ $theme: tokens.md-comp-filled-button-values();
   &:disabled {
     background-color: rgba(map.get($theme, disabled-container-color), map.get($theme, disabled-container-opacity));
     color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
-  }
-
-  .md-ripple {
-    --md-ripple-hover-state-layer-color: #{map.get($theme, hover-state-layer-color)};
-    --md-ripple-focus-state-layer-color: #{map.get($theme, focus-state-layer-color)};
-    --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
-    --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
-    --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
-    --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
-    border-radius: var(--md-outlined-button-container-shape, 100px);
   }
 }
 </style>
