@@ -40,6 +40,8 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [ ] Text Fields [WIP]
 - [ ] Top App Bar
 
+![](screenshots/components.png)
+
 ### Quick Start
 
 Install vue-material-3 using npm or yarn:
