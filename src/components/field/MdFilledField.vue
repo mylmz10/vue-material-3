@@ -1,5 +1,5 @@
 <template>
-  <MdField class="md-field--outlined" v-bind="$props">
+  <MdField class="md-field--filled" v-bind="$props">
     <template v-for="(_, slot) in $slots" v-slot:[slot]>
       <slot :name="slot"></slot>
     </template>
@@ -24,17 +24,20 @@ defineProps({
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$theme: tokens.md-comp-outlined-text-field-values();
+$theme: tokens.md-comp-filled-text-field-values();
 
 .md-field {
   position: relative;
   $this: &;
 
-  &--outlined {
+  &--filled {
     #{$this}__outline {
       border-style: solid;
-      border-color: map.get($theme, outline-color);
-      border-width: map.get($theme, outline-width);
+      border-color: map.get($theme, active-indicator-color);
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom-width: map.get($theme, active-indicator-height);
       border-radius: map.get($theme, container-shape);
       width: 100%;
       height: 100%;
@@ -45,6 +48,8 @@ $theme: tokens.md-comp-outlined-text-field-values();
     }
 
     #{$this}__container {
+      background-color: map.get($theme, container-color);
+      border-radius: map.get($theme, container-shape);
       #{$this}__label {
         font-size: map.get($theme, label-text-size);
         line-height: map.get($theme, label-text-line-height);
@@ -52,6 +57,13 @@ $theme: tokens.md-comp-outlined-text-field-values();
         font-weight: map.get($theme, label-text-weight);
         letter-spacing: map.get($theme, label-text-tracking);
         color: map.get($theme, label-text-color);
+      }
+    }
+
+    #{$this}__container:hover {
+      .md-field__state-layer {
+        background-color: map.get($theme, hover-state-layer-color);
+        opacity: map.get($theme, hover-state-layer-opacity);
       }
     }
 
@@ -64,10 +76,11 @@ $theme: tokens.md-comp-outlined-text-field-values();
       padding-top: 4px;
     }
 
-    #{$this}--focused {
+    &#{$this}--focused {
       #{$this}__outline {
-        border-color: map.get($theme, focus-outline-color);
-        border-width: map.get($theme, focus-outline-width);
+        @debug &;
+        border-color: map.get($theme, focus-active-indicator-color);
+        border-bottom-width: map.get($theme, focus-active-indicator-height);
       }
 
       #{$this}__middle {

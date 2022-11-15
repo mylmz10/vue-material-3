@@ -1,5 +1,5 @@
 <template>
-  <span class="md-field md-field--filled" :class="{ 'md-field--focused': focused, 'md-field--populated': populated }" @focusin="onFocusin" @focusout="onFocusout">
+  <span class="md-field" :class="{ 'md-field--focused': focused, 'md-field--populated': populated }" @focusin="onFocusin" @focusout="onFocusout">
     <span class="md-field__container">
       <span class="md-field__outline"></span>
       <span class="md-field__state-layer"></span>
@@ -108,18 +108,7 @@ const onFocusout = () => {
     }
   }
 
-  &--focused {
-    #{$this}__middle {
-      #{$this}__label {
-        padding: 0 6px;
-        transform: translateY(-27px) translateX(-15%) scale(0.75);
-        background-color: #ffffff;
-      }
-      #{$this}__content {
-      }
-    }
-  }
-
+  &--focused,
   &--populated {
     #{$this}__middle {
       #{$this}__label {
@@ -132,8 +121,31 @@ const onFocusout = () => {
     }
   }
 
+  &#{$this}--focused,
+  &#{$this}--populated {
+    &#{$this}--filled {
+      #{$this}__middle {
+        #{$this}__label {
+          @debug &;
+          padding: 0 6px;
+          transform: translateY(-13px) translateX(-21%) scale(0.75);
+          background: none;
+        }
+        #{$this}__content {
+          transform: translateY(6px) translateX(0);
+        }
+      }
+    }
+  }
+
   &__end {
     width: 16px;
+  }
+
+  &__state-layer {
+    width: 100%;
+    height: 100%;
+    position: absolute;
   }
 }
 </style>
