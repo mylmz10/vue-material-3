@@ -1,5 +1,5 @@
 <template>
-  <div class="md-divider" :class="{ 'md-divider--vertical': vertical }"></div>
+  <component :is="tag" class="md-divider" :class="{ 'md-divider--vertical': vertical }"></component>
 </template>
 
 <script setup>
@@ -7,6 +7,7 @@ import { defineProps } from 'vue';
 
 defineProps({
   vertical: { type: Boolean },
+  tag: { type: String, default: 'div' },
 });
 </script>
 

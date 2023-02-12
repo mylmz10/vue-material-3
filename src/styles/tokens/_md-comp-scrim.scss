@@ -19,7 +19,7 @@ $_default: (
 
 @function values($deps: $_default, $exclude-hardcoded-values: false) {
   @return (
-    'color': map.get($deps, 'md-sys-color', 'outline-variant'),
-    'thickness': if($exclude-hardcoded-values, null, 1px)
+    'container-color': map.get($deps, 'md-sys-color', 'scrim'),
+    'container-opacity': if($exclude-hardcoded-values, null, 0.32)
   );
 }

@@ -25,6 +25,9 @@ const props = defineProps({
   justify-content: center;
   align-items: center;
 
+  --md-avatar-container-color: #6750a4;
+  --md-avatar-text-color: #ffffff;
+
   img {
     width: 100%;
     height: 100%;
@@ -39,8 +42,8 @@ const props = defineProps({
     font-weight: 400;
     width: 100%;
     height: 100%;
-    background-color: #6750a4;
-    color: #ffffff;
+    background-color: var(--md-avatar-container-color);
+    color: var(--md-avatar-text-color);
     border-radius: 50%;
   }
 }

@@ -68,7 +68,6 @@ const props = defineProps({
 
 .md-card {
   margin: 0 8px;
-  width: 360px;
   cursor: default;
 
   $this: &;
@@ -79,7 +78,6 @@ const props = defineProps({
   overflow: hidden;
   z-index: 0;
   border-radius: inherit;
-  height: 100%;
 
   &:before {
     border-radius: inherit;
