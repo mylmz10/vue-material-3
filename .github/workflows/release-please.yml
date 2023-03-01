@@ -1,0 +1,44 @@
+on:
+  push:
+    branches:
+      - master
+name: release-please
+env:
+  ACTION_NAME: release-please-action
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      #- name: install
+      #  run: npm ci
+      #- name: build
+      #  run: npm run build
+  release-please-pr:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - id: release
+        uses: GoogleCloudPlatform/release-please-action@main
+        with:
+          release-type: node
+          node-version: 16
+          package-name: ${{env.ACTION_NAME}}
+          bump-minor-pre-major: true
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        if: ${{ steps.release.outputs.release_created }}
+
+      - name: Setupt Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+        if: ${{ steps.release.outputs.release_created }}
+      - name: Publish package on NPM 📦
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: ${{ steps.release.outputs.release_created }}
