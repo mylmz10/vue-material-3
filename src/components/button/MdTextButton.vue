@@ -47,8 +47,8 @@ $theme: tokens.md-comp-text-button-values();
   }
 
   &:disabled {
-    background-color: rgba(map.get($theme, disabled-container-color), map.get($theme, disabled-container-opacity));
-    color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
+    //background-color: rgba(map.get($theme, disabled-container-color), map.get($theme, disabled-container-opacity));
+    //color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
   }
 }
 </style>

@@ -78,7 +78,7 @@ $theme: tokens.md-comp-navigation-drawer-values();
     padding: 12px;
 
     .md-list-item {
-      padding: 16px;
+      padding: 12px 16px;
       box-sizing: border-box;
 
       &:hover {

@@ -19,7 +19,7 @@ const rippleScale = ref('');
 const delayedEndPressHandle = ref(null);
 
 // https://github.com/material-components/material-web/blob/master/components/ripple/lib/ripple.ts
-const PRESS_GROW_MS = 450;
+const PRESS_GROW_MS = 330;
 const MINIMUM_PRESS_MS = 225;
 const INITIAL_ORIGIN_SCALE = 0.2;
 const PADDING = 10;
@@ -184,6 +184,7 @@ function handleRippleDeactivate() {
   pointer-events: none;
   overflow: hidden;
   display: flex;
+  z-index: 0;
 
   &-surface {
     position: absolute;
@@ -207,7 +208,7 @@ function handleRippleDeactivate() {
     }
 
     &::after {
-      background: radial-gradient(closest-side, var(--md-ripple-pressed-state-layer-color, black) 93%, transparent 100%);
+      background: radial-gradient(closest-side, var(--md-ripple-pressed-state-layer-color, black) max(100% - 70px, 65%), transparent 100%);
     }
 
     &::before {
