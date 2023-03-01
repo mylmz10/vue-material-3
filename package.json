@@ -1,6 +1,6 @@
 {
   "name": "vue-material-3",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Material Design 3 styled components for Vue 3",
   "main": "src/main.js",
   "scripts": {
