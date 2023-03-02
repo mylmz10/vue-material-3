@@ -27,15 +27,18 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [x] Checkbox 
 - [ ] Chips [WIP]
 - [ ] Dialogs
+- [x] Divider
 - [x] FABs 
 - [x] Icon
-- [x] IconButton
+- [x] Icon Button
 - [x] List
 - [ ] Menu
 - [ ] Navigation Bars
 - [x] Navigation Drawer
 - [ ] Navigation Rail
+- [x] Progress Indicator
 - [x] Radio Button
+- [x] Segmented Button
 - [x] Switch
 - [ ] Text Fields [WIP]
 - [ ] Top App Bar
