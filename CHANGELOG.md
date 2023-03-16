@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/mylmz10/vue-material-3/compare/v0.2.0...v0.3.0) (2023-03-02)
+
+
+### Features
+
+* **segmentedbutton:** segmentedButton and SegmentedButtonSet implementation ([c562e27](https://github.com/mylmz10/vue-material-3/commit/c562e278106a98029faa2c94ffd0b6bda7179415))
+
 ## [0.2.0](https://github.com/mylmz10/vue-material-3/compare/v0.1.0...v0.2.0) (2023-03-01)
 
 
