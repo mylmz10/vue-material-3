@@ -21,26 +21,32 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 
 ### Components
 - [ ] Autocomplete
-- [ ] Badge
+- [x] Badge
 - [x] Buttons
 - [x] Cards 
 - [x] Checkbox 
 - [ ] Chips [WIP]
-- [ ] Dialogs
+- [ ] Date Picker
+- [x] Dialog
 - [x] Divider
 - [x] FABs 
 - [x] Icon
 - [x] Icon Button
 - [x] List
 - [ ] Menu
-- [ ] Navigation Bars
+- [x] Navigation Bars
 - [x] Navigation Drawer
 - [ ] Navigation Rail
 - [x] Progress Indicator
 - [x] Radio Button
+- [ ] Search
 - [x] Segmented Button
+- [ ] Slider
+- [ ] Snackbar
 - [x] Switch
-- [ ] Text Fields [WIP]
+- [ ] Tabs
+- [x] Text Fields
+- [x] Time Picker
 - [ ] Top App Bar
 
 ![](screenshots/components.png)

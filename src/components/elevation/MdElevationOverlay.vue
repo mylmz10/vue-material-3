@@ -17,7 +17,7 @@ export default {
   border-radius: inherit;
   pointer-events: none;
   transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: -2;
+  z-index: var(--overlay-z-index, -2);
   background-color: var(--surface-tint-layer-color, transparent);
   opacity: var(--overlay-opacity, 0);
 }

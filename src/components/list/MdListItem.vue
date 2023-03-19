@@ -47,7 +47,6 @@ defineProps({
   },
   trailingText: {
     type: [String, Number],
-    default: '18',
   },
   icon: {
     type: String,
@@ -148,6 +147,7 @@ $theme: map.set($theme, 'list-item-three-line-container-height', 96px);
   &__end {
     flex: 0 0 auto;
     padding-inline-end: 24px;
+    position: relative;
 
     #{$this}__trailing-text {
       padding-inline-start: 16px;
