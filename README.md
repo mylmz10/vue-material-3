@@ -34,7 +34,7 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [x] Icon Button
 - [x] List
 - [ ] Menu
-- [ ] Navigation Bars
+- [x] Navigation Bars
 - [x] Navigation Drawer
 - [ ] Navigation Rail
 - [x] Progress Indicator

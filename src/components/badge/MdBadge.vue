@@ -1,5 +1,5 @@
 <template>
-  <div class="md-badge" :class="{ 'md-badge--large': !!this.value }">
+  <div class="md-badge" :class="{ 'md-badge--large': !!this.value, 'md-badge--absolute': !!this.absolute }">
     <div class="md-badge__value">{{ value }}</div>
   </div>
 </template>
@@ -9,6 +9,7 @@ import { defineProps } from 'vue';
 
 defineProps({
   value: { type: [String, Number] },
+  absolute: { type: Boolean, default: true },
 });
 </script>
 
@@ -22,8 +23,6 @@ $theme: tokens.md-comp-badge-values();
   inset-inline-start: 50%;
   margin-inline-start: 6px;
   margin-block-start: 4px;
-  position: absolute;
-  inset-block-start: 0;
   background: map.get($theme, color);
   color: map.get($theme, large-label-text-color);
   border-radius: map.get($theme, shape);
@@ -31,6 +30,11 @@ $theme: tokens.md-comp-badge-values();
 
   &:not(&--large) {
     width: map.get($theme, size);
+  }
+
+  &--absolute {
+    position: absolute;
+    inset-block-start: 0;
   }
 
   &--large {
