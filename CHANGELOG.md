@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/mylmz10/vue-material-3/compare/v0.3.0...v0.4.0) (2023-03-19)
+
+
+### Features
+
+* dialog implementation ([eea26df](https://github.com/mylmz10/vue-material-3/commit/eea26df871ab4f848ed8a6b143139501bb89958b))
+* navigation-tab and navigation-bar implementation ([a1f0f21](https://github.com/mylmz10/vue-material-3/commit/a1f0f21c394991cacc525d83b1c188f407178087))
+
+
+### Bug Fixes
+
+* badge and list updates, readme updates ([4aa823f](https://github.com/mylmz10/vue-material-3/commit/4aa823f1a2b673b25d421092ae4c2c4e327d7063))
+
 ## [0.3.0](https://github.com/mylmz10/vue-material-3/compare/v0.2.0...v0.3.0) (2023-03-02)
 
 
