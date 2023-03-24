@@ -1,11 +1,16 @@
 <template>
   <div class="md-filter-chip" :class="{ 'md-filter-chip--flat': !elevated, 'md-filter-chip--elevated': elevated, 'md-filter-chip--disabled': disabled, 'md-filter-chip--selected': selected }">
+    <div class="md-filter-chip__background"></div>
     <div class="md-filter-chip__outline"></div>
     <MdRipple v-if="!disabled"></MdRipple>
-    <div v-if="icon" class="md-filter-chip__leading-icon">
-      <MdIcon>{{ icon }}</MdIcon>
+    <div v-if="leadingIcon || selected" class="md-filter-chip__leading-icon">
+      <MdIcon v-if="selected">check</MdIcon>
+      <MdIcon v-else>{{ leadingIcon }}</MdIcon>
     </div>
-    <div class="md-filter-chip__text">Enabled</div>
+    <div class="md-filter-chip__text">{{ label }}</div>
+    <div v-if="trailingIcon" class="md-filter-chip__trailing-icon">
+      <MdIcon>{{ trailingIcon }}</MdIcon>
+    </div>
   </div>
 </template>
 
@@ -23,7 +28,10 @@ defineProps({
   elevated: {
     type: Boolean,
   },
-  icon: {
+  leadingIcon: {
+    type: String,
+  },
+  trailingIcon: {
     type: String,
   },
   selected: {
@@ -62,6 +70,13 @@ $theme: tokens.md-comp-filter-chip-values();
     z-index: 0;
     border-radius: map.get($theme, container-shape);
   }
+  &__background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -1;
+    border-radius: map.get($theme, container-shape);
+  }
 
   &--flat {
     #{$this}__outline {
@@ -73,6 +88,19 @@ $theme: tokens.md-comp-filter-chip-values();
 
   &__leading-icon {
     padding-right: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .md-icon {
+      font-size: 18px;
+    }
+  }
+
+  &__trailing-icon {
+    padding-left: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .md-icon {
       font-size: 18px;
     }
@@ -94,21 +122,26 @@ $theme: tokens.md-comp-filter-chip-values();
   }
 
   &--elevated {
-    background-color: map.get($theme, elevated-container-color);
     box-shadow: elevation.resolve-box-shadow(map.get($theme, elevated-container-elevation), map.get($theme, elevated-container-shadow-color));
 
-    &--disabled {
-      background-color: map.get($theme, elevated-disabled-container-color);
-      box-shadow: elevation.resolve-box-shadow(map.get($theme, elevated-disabled-container-elevation), map.get($theme, elevated-disabled-container-opacity));
+    #{$this}__background {
+      background-color: map.get($theme, elevated-unselected-container-color);
     }
   }
 
   &--selected {
-    background-color: map.get($theme, elevated-container-color);
-    box-shadow: elevation.resolve-box-shadow(map.get($theme, elevated-container-elevation), map.get($theme, elevated-container-shadow-color));
+    #{$this}__background {
+      background-color: map.get($theme, elevated-container-color);
+    }
+
+    &:hover:not(&#{$this}--disabled) {
+      box-shadow: elevation.resolve-box-shadow(map.get($theme, elevated-container-elevation), map.get($theme, elevated-container-shadow-color));
+    }
 
     &#{$this}--flat {
-      background-color: map.get($theme, flat-selected-container-color);
+      #{$this}__background {
+        background-color: map.get($theme, flat-selected-container-color);
+      }
 
       #{$this}__outline {
         border-width: map.get($theme, flat-selected-outline-width);
@@ -132,9 +165,19 @@ $theme: tokens.md-comp-filter-chip-values();
       }
     }
 
-    &--disabled {
-      background-color: map.get($theme, elevated-disabled-container-color);
+    &#{$this}--elevated {
+      #{$this}__background {
+        background-color: map.get($theme, elevated-selected-container-color);
+      }
+    }
+
+    &#{$this}--disabled {
       box-shadow: elevation.resolve-box-shadow(map.get($theme, elevated-disabled-container-elevation), map.get($theme, elevated-disabled-container-opacity));
+
+      #{$this}__background {
+        background-color: map.get($theme, elevated-disabled-container-color);
+        opacity: map.get($theme, elevated-disabled-container-opacity);
+      }
     }
   }
 
@@ -148,6 +191,10 @@ $theme: tokens.md-comp-filter-chip-values();
       }
 
       &#{$this}--selected {
+        #{$this}__background {
+          background-color: map.get($theme, flat-disabled-selected-container-color);
+          opacity: map.get($theme, flat-disabled-selected-container-opacity);
+        }
         #{$this}__outline {
           border-color: map.get($theme, flat-disabled-selected-outline-color);
           opacity: map.get($theme, flat-disabled-selected-outline-opacity);
@@ -155,9 +202,22 @@ $theme: tokens.md-comp-filter-chip-values();
       }
     }
 
+    #{$this}__leading-icon {
+      color: map.get($theme, with-leading-icon-disabled-leading-icon-color);
+      opacity: map.get($theme, with-leading-icon-disabled-leading-icon-opacity);
+    }
+
     #{$this}__text {
       color: map.get($theme, disabled-label-text-color);
       opacity: map.get($theme, disabled-label-text-opacity);
+    }
+
+    &#{$this}--elevated {
+      #{$this}__background {
+        background-color: map.get($theme, elevated-disabled-container-color);
+        opacity: map.get($theme, elevated-disabled-container-opacity);
+      }
+      box-shadow: elevation.resolve-box-shadow(map.get($theme, elevated-disabled-container-elevation), map.get($theme, elevated-disabled-container-opacity));
     }
   }
 

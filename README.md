@@ -25,7 +25,7 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [x] Buttons
 - [x] Cards 
 - [x] Checkbox 
-- [ ] Chips [WIP]
+- [x] Chips
 - [ ] Date Picker
 - [x] Dialog
 - [x] Divider
