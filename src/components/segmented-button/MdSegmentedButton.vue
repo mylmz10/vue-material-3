@@ -42,6 +42,8 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
   display: flex;
   align-items: center;
   justify-content: center;
+  height: map.get($theme, container-height);
+  min-width: 100px;
   $this: &;
 
   &:hover:not(:disabled) {

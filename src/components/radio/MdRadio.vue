@@ -56,7 +56,7 @@ $theme: tokens.md-comp-radio-button-values();
   box-sizing: border-box;
   cursor: pointer;
   justify-content: center;
-  display: flex;
+  display: inline-flex;
 
   input {
     position: absolute;

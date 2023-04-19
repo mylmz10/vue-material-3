@@ -51,7 +51,7 @@ $theme: tokens.md-comp-filter-chip-values();
 
 .md-filter-chip {
   $this: &;
-  display: flex;
+  display: inline-flex;
   padding: 0 12px;
   align-items: center;
   justify-content: center;
