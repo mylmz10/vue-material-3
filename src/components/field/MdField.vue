@@ -126,7 +126,6 @@ const onFocusout = () => {
     &#{$this}--filled {
       #{$this}__middle {
         #{$this}__label {
-          @debug &;
           padding: 0 6px;
           transform: translateY(-13px) translateX(-21%) scale(0.75);
           background: none;

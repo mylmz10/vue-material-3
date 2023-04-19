@@ -78,7 +78,6 @@ $theme: tokens.md-comp-filled-text-field-values();
 
     &#{$this}--focused {
       #{$this}__outline {
-        @debug &;
         border-color: map.get($theme, focus-active-indicator-color);
         border-bottom-width: map.get($theme, focus-active-indicator-height);
       }

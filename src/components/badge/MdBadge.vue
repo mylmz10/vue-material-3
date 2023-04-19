@@ -38,7 +38,7 @@ $theme: tokens.md-comp-badge-values();
   }
 
   &--large {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     justify-content: center;
     margin-inline-start: 2px;

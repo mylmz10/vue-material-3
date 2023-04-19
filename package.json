@@ -52,11 +52,11 @@
   },
   "homepage": "https://mylmz10.github.io/vue-material-3",
   "dependencies": {
-    "vue": "^3.2.33",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/github": "^8.0.7",
     "@semantic-release/npm": "^9.0.2",
-    "@semantic-release/release-notes-generator": "^10.0.3"
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "vue": "^3.2.33"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
@@ -73,9 +73,13 @@
     "css-loader": "^5.2.7",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.5.0",
+    "eslint-plugin-storybook": "^0.6.11",
     "eslint-plugin-vue": "^8.2.0",
     "gh-pages": "^3.2.3",
     "prettier": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-syntax-highlighter": "^15.5.0",
     "sass": "^1.50.0",
     "sass-loader": "^10.2.1",
     "semantic-release": "^20.1.1",
