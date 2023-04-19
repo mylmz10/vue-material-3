@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0](https://github.com/mylmz10/vue-material-3/compare/v0.4.0...v0.5.0) (2023-04-19)
+
+
+### Features
+
+* chip and chipset updates ([48c4269](https://github.com/mylmz10/vue-material-3/commit/48c4269a46afba33007e408d0d4f1889947f15d5))
+* menu implementation ([741c6d8](https://github.com/mylmz10/vue-material-3/commit/741c6d8c592cbf7ed7fb36188e70fcd296a0edef))
+
+
+### Bug Fixes
+
+* bug fixes and storybook updates ([223e87e](https://github.com/mylmz10/vue-material-3/commit/223e87eb9e931958f95851404228c29f66f09849))
+
 ## [0.4.0](https://github.com/mylmz10/vue-material-3/compare/v0.3.0...v0.4.0) (2023-03-19)
 
 
