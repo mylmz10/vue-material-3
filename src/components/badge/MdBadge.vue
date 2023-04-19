@@ -1,5 +1,5 @@
 <template>
-  <div class="md-badge" :class="{ 'md-badge--large': !!this.value, 'md-badge--absolute': !!this.absolute }">
+  <div class="md-badge" :class="{ 'md-badge--large': !!value, 'md-badge--absolute': !!absolute }">
     <div class="md-badge__value">{{ value }}</div>
   </div>
 </template>
