@@ -41,7 +41,7 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [x] Radio Button
 - [ ] Search
 - [x] Segmented Button
-- [ ] Slider
+- [x] Slider
 - [ ] Snackbar
 - [x] Switch
 - [ ] Tabs
