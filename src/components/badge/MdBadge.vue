@@ -5,8 +5,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-
 defineProps({
   value: { type: [String, Number] },
   absolute: { type: Boolean, default: true },

@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import MdField from './MdField.vue';
 
 defineProps({

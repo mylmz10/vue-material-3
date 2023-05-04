@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 import MdTextFieldBase from './MdTextFieldBase.vue';
 import MdFilledField from '../field/MdFilledField.vue';
 
