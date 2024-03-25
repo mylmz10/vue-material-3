@@ -24,6 +24,8 @@ $theme: tokens.md-comp-list-values();
   list-style-type: none;
   min-width: 300px;
   background-color: map.get($theme, list-item-container-color);
+  max-height: 280px;
+  overflow: auto;
 
   .md-avatar {
     --md-avatar-container-color: #{map.get($theme, list-item-leading-avatar-color)};

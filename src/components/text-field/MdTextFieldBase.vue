@@ -11,6 +11,8 @@
       @change="$emit('change', $event)"
       @input="$emit('input', $event)"
       @select="$emit('select', $event)"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
     />
   </span>
 </template>

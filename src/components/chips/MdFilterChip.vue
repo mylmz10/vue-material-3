@@ -7,6 +7,9 @@
       <MdIcon v-if="selected">check</MdIcon>
       <MdIcon v-else>{{ leadingIcon }}</MdIcon>
     </div>
+    <div v-else class="md-filter-chip__leading-icon">
+      <slot name="leading-icon" />
+    </div>
     <div class="md-filter-chip__text">{{ label }}</div>
     <div v-if="trailingIcon" class="md-filter-chip__trailing-icon">
       <MdIcon>{{ trailingIcon }}</MdIcon>
@@ -91,6 +94,7 @@ $theme: tokens.md-comp-filter-chip-values();
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
     .md-icon {
       font-size: 18px;
     }
@@ -113,6 +117,10 @@ $theme: tokens.md-comp-filter-chip-values();
     font-size: map.get($theme, label-text-size);
     letter-spacing: map.get($theme, label-text-tracking);
     font-weight: map.get($theme, label-text-weight);
+    width: 100%;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   &:hover {

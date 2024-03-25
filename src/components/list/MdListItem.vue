@@ -7,24 +7,27 @@
       'md-list-item--two-line': supportingTextMultiline === 2,
       'md-list-item--three-line': supportingTextMultiline === 3,
     }"
+    @mouseover="mouseover = true"
+    @mouseleave="mouseover = false"
+    @click="$emit('click', $event)"
   >
     <div class="md-list-item__state-layer"></div>
-    <MdRipple style="z-index: 0"></MdRipple>
-    <div class="md-list-item__start">
+    <MdRipple v-if="mouseover" style="z-index: 0"></MdRipple>
+    <div v-if="renderStartSlot" class="md-list-item__start">
       <MdIcon v-if="icon">{{ icon }}</MdIcon>
       <slot name="start" />
     </div>
     <div class="md-list-item__body">
-      <span class="md-list-item__label-text">
+      <span v-if="headline" class="md-list-item__label-text">
         {{ headline }}
         <slot />
       </span>
-      <span class="md-list-item__supporting-text" :class="{ 'md-list-item__supporting-text--multiline': !!supportingTextMultiline }">
+      <span v-if="renderSupportingText" class="md-list-item__supporting-text" :class="{ 'md-list-item__supporting-text--multiline': !!supportingTextMultiline }">
         {{ supportingText }}
         <slot name="supporting-text" />
       </span>
     </div>
-    <div class="md-list-item__end">
+    <div v-if="renderEndSlot" class="md-list-item__end">
       <span v-if="trailingText" class="md-list-item__trailing-text">{{ trailingText }}</span>
       <slot name="end" />
     </div>
@@ -32,10 +35,11 @@
 </template>
 
 <script setup>
+import { useSlots, computed, ref } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-defineProps({
+const { headline, supportingText, supportingTextMultiline, trailingText, icon, selected } = defineProps({
   headline: {
     type: String,
   },
@@ -54,6 +58,22 @@ defineProps({
   selected: {
     type: Boolean,
   },
+});
+
+const slots = useSlots();
+const mouseover = ref(false);
+const emit = defineEmits(['click']);
+
+const renderStartSlot = computed(() => {
+  return slots.start || icon;
+});
+
+const renderEndSlot = computed(() => {
+  return slots.end || trailingText;
+});
+
+const renderSupportingText = computed(() => {
+  return slots['supporting-text'] || supportingText;
 });
 </script>
 
@@ -95,6 +115,13 @@ $theme: map.set($theme, 'list-item-three-line-container-height', 96px);
     pressed-state-layer-opacity: list-item-pressed-state-layer-opacity,
   );
   @include ripple.ripple($theme, $ripple-tokens, 0);
+
+  &--selected {
+    #{$this}__state-layer {
+      background-color: map.get($theme, list-item-hover-state-layer-color);
+      opacity: map.get($theme, list-item-hover-state-layer-opacity);
+    }
+  }
 
   &__state-layer {
     position: absolute;
