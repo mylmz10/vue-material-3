@@ -3,8 +3,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-
 defineProps({
   vertical: { type: Boolean },
   tag: { type: String, default: 'div' },

@@ -29,3 +29,7 @@ export { default as MdDialog } from './components/dialog/MdDialog.vue';
 export { default as MdNavigationBar } from './components/navigation-bar/MdNavigationBar.vue';
 export { default as MdNavigationTab } from './components/navigation-tab/MdNavigationTab.vue';
 export { default as MdMenu } from './components/menu/MdMenu.vue';
+export { default as MdSlider } from './components/slider/MdSlider.vue';
+export { default as MdDatePicker } from './components/datepicker/MdDatePicker.vue';
+export { default as MdSnackbar } from './components/snackbar/MdSnackbar.vue';
+export { default as MdFilledAutoComplete } from './components/autocomplete/MdFilledAutoComplete.vue';

@@ -62,9 +62,13 @@ $theme: tokens.md-comp-menu-values();
 
 .md-menu {
   border-radius: map.get($theme, container-shape);
-  z-index: 20;
   position: relative;
   user-select: none;
+  z-index: 2;
+
+  &--open {
+    z-index: 20;
+  }
 
   $this: &;
 

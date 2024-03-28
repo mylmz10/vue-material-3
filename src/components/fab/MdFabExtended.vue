@@ -8,7 +8,6 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref, defineProps } from 'vue';
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 

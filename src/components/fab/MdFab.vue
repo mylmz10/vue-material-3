@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 

@@ -8,7 +8,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .md-icon {
   font-family: 'Material Icons';
   font-weight: normal;

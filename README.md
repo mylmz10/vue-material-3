@@ -23,6 +23,8 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [ ] Autocomplete
 - [x] Badge
 - [x] Buttons
+- [ ] Bottom Sheets
+- [ ] Carousel 
 - [x] Cards 
 - [x] Checkbox 
 - [x] Chips
@@ -41,12 +43,14 @@ The Vue Material 3 provides Vue 3 components which implement the [Material You](
 - [x] Radio Button
 - [ ] Search
 - [x] Segmented Button
-- [ ] Slider
+- [ ] Side Sheets
+- [x] Slider
 - [ ] Snackbar
 - [x] Switch
 - [ ] Tabs
 - [x] Text Fields
 - [x] Time Picker
+- [ ] Tooltips
 - [ ] Top App Bar
 
 ![](screenshots/components.png)

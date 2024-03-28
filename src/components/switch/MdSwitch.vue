@@ -39,12 +39,13 @@ watch(
   (newValue) => {
     _checked.value = newValue;
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const toggle = () => {
   if (!props.disabled) {
     _checked.value = !_checked.value;
+    emit('update:modelValue', _checked.value);
   }
 };
 </script>
@@ -96,7 +97,7 @@ $theme: tokens.md-comp-switch-values();
       margin-inline-end: calc(#{map.get($theme, track-width)} - #{map.get($theme, track-height)});
       width: map.get($theme, unselected-handle-width);
       height: map.get($theme, unselected-handle-height);
-      transition: all 75ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
 
       #{$this}__handle {
         width: inherit;

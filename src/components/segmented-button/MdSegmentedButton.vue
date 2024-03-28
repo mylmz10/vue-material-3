@@ -24,6 +24,9 @@ const props = defineProps({
   noCheckmark: {
     type: Boolean,
   },
+  icon: {
+    type: String,
+  },
 });
 </script>
 
@@ -55,6 +58,9 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
     border-top-left-radius: map.get($theme, shape);
     border-bottom-left-radius: map.get($theme, shape);
   }
+  &:not(:last-child) {
+    overflow: hidden;
+  }
   &:last-child,
   &:last-child .md-ripple {
     border-top-right-radius: map.get($theme, shape);
@@ -78,21 +84,32 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
     border-radius: inherit;
     border-style: solid;
     border-width: map.get($theme, outline-width);
-    inset: 0px -0.5px;
+    inset: 0;
     pointer-events: none;
     position: absolute;
     border-color: map.get($theme, outline-color);
+  }
+
+  &:last-child &__outline {
+    border-left: none;
   }
 
   &__checkmark {
     width: 0;
     margin-right: 0;
     transition: ease width 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &#{$this}__checkmark--show {
-      width: 24px;
+      width: map.get($theme, with-icon-icon-size);
       margin-right: 4px;
       overflow: hidden;
+
+      .md-icon {
+        font-size: map.get($theme, with-icon-icon-size);
+      }
     }
   }
 

@@ -1,12 +1,10 @@
 <template>
-  <div class="md-badge" :class="{ 'md-badge--large': !!this.value, 'md-badge--absolute': !!this.absolute }">
+  <div class="md-badge" :class="{ 'md-badge--large': !!value, 'md-badge--absolute': !!absolute }">
     <div class="md-badge__value">{{ value }}</div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-
 defineProps({
   value: { type: [String, Number] },
   absolute: { type: Boolean, default: true },
