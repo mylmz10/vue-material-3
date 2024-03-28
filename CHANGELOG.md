@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/mylmz10/vue-material-3/compare/v0.5.0...v0.6.0) (2024-03-28)
+
+
+### Features
+
+* MdSlider implementation ([7eb5d17](https://github.com/mylmz10/vue-material-3/commit/7eb5d175a79ba56d383c31201ad5de58d5690628))
+* MdSnackbar & MdFilledAutoComplete implementation and some fixes ([111f5bc](https://github.com/mylmz10/vue-material-3/commit/111f5bcd3a2fbe13d18c9e639fb6e6cde0fe77c9))
+
+
+### Bug Fixes
+
+* badge value fix ([0825b06](https://github.com/mylmz10/vue-material-3/commit/0825b06803810a87fc5eee661b05069548092f39))
+* defineProps removed from the components ([9224b13](https://github.com/mylmz10/vue-material-3/commit/9224b1375a80ecdda989ca3161229a03610263a8))
+
 ## [0.5.0](https://github.com/mylmz10/vue-material-3/compare/v0.4.0...v0.5.0) (2023-04-19)
 
 
