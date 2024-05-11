@@ -4,8 +4,13 @@
       <MdFilledTextField v-model="searchText" :label="props.label" @focus="onTextFieldFocus" @input="onTextFieldInput"></MdFilledTextField>
     </template>
 
-    <MdList v-if="props.items && props.items.length">
-      <MdListItem v-for="(item, index) in filteredItems" :selected="modelValue === item" :headline="item" @click="onMenuListItemClick(index)"></MdListItem>
+    <MdList>
+      <template v-if="filteredItems.length">
+        <MdListItem v-for="(item, index) in filteredItems" :selected="modelValue === item" :headline="item" @click="onMenuListItemClick(index)"></MdListItem>
+      </template>
+      <template v-else>
+        <MdListItem headline="No data available"></MdListItem>
+      </template>
     </MdList>
   </MdMenu>
 </template>
@@ -26,7 +31,7 @@ let selecting = ref(false);
 let isPristine = ref(true);
 
 const filteredItems = computed(() => {
-  if (!selecting && searchText.value) {
+  if (!selecting.value && searchText.value) {
     return props.items.filter((item) => item.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()));
   }
   return props.items;

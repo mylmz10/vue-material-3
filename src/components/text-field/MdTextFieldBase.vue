@@ -37,6 +37,7 @@ defineProps({
 .md-text-field {
   display: inline-flex;
   outline: none;
+  width: 100%;
 
   &__field {
     cursor: text;
@@ -49,6 +50,7 @@ defineProps({
     color: currentColor;
     outline: none;
     padding: 0;
+    width: 100%;
 
     // Remove built-in datepicker icon on Chrome
     &::-webkit-calendar-picker-indicator {
