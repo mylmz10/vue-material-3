@@ -84,10 +84,12 @@ const onFocusout = () => {
 
   &__start {
     width: 16px;
+    flex-shrink: 0;
   }
 
   &__middle {
     position: relative;
+    width: 100%;
 
     #{$this}__label {
       position: absolute;
@@ -105,6 +107,7 @@ const onFocusout = () => {
       z-index: 1;
     }
     #{$this}__content {
+      width: 100%;
     }
   }
 
@@ -139,6 +142,7 @@ const onFocusout = () => {
 
   &__end {
     width: 16px;
+    flex-shrink: 0;
   }
 
   &__state-layer {
