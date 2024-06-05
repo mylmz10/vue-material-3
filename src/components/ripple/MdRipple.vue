@@ -180,7 +180,7 @@ function handleRippleDeactivate() {
 <style lang="scss">
 .md-ripple {
   position: absolute;
-  inset: 0px;
+  inset: 0;
   pointer-events: none;
   overflow: hidden;
   display: flex;
@@ -188,10 +188,10 @@ function handleRippleDeactivate() {
 
   &-surface {
     position: absolute;
-    inset: 0px;
+    inset: 0;
     pointer-events: none;
     overflow: hidden;
-    outline: 0px;
+    outline: 0;
     -webkit-tap-highlight-color: transparent;
 
     &::before, &::after {

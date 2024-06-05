@@ -1,10 +1,12 @@
 <template>
   <MdButtonBase class="md-text-button" :disabled="disabled">
     <MdRipple />
-    <template v-if="label">
+    <span v-if="label" class="md-button__label">
       {{ label }}
-    </template>
-    <slot v-else />
+    </span>
+    <span v-else class="md-button__label">
+      <slot />
+    </span>
   </MdButtonBase>
 </template>
 
