@@ -1,5 +1,5 @@
 <template>
-  <span class="md-field" :class="{ 'md-field--focused': focused, 'md-field--populated': populated }" @focusin="onFocusin" @focusout="onFocusout">
+  <span class="md-field" :class="{ 'md-field--focused': focused, 'md-field--populated': populated, 'md-field--error': error }" @focusin="onFocusin" @focusout="onFocusout">
     <span class="md-field__container">
       <span class="md-field__outline"></span>
       <span class="md-field__state-layer"></span>

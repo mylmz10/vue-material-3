@@ -1,6 +1,6 @@
 <template>
   <span class="md-filled-text-field" @click="onClick">
-    <MdFilledField :label="label" :populated="!!inputValue">
+    <MdFilledField :error="error" :label="label" :populated="!!inputValue">
       <MdTextFieldBase ref="textFieldEl" :value="inputValue" @input="onTextFieldInput" @focus="$emit('focus', $event)" @blur="$emit('blur', $event)" />
       <template #supporting-text>
         <slot name="supporting-text" />

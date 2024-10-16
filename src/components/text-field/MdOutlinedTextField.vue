@@ -1,6 +1,6 @@
 <template>
   <span class="md-outlined-text-field">
-    <MdOutlinedField :label="label" :populated="!!inputValue">
+    <MdOutlinedField :label="label" :populated="!!inputValue" :error="error">
       <MdTextFieldBase :value="inputValue" @input="inputValue = $event.target.value" />
       <template #supporting-text>
         <slot name="supporting-text" />
