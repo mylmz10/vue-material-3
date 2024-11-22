@@ -1,7 +1,7 @@
 <template>
-  <span class="md-outlined-text-field">
+  <span class="md-outlined-text-field" @click="onClick">
     <MdOutlinedField :label="label" :populated="!!inputValue" :error="error">
-      <MdTextFieldBase :value="inputValue" @input="inputValue = $event.target.value" />
+      <MdTextFieldBase ref="textFieldEl" :value="inputValue" @input="onTextFieldInput" @focus="$emit('focus', $event)" @blur="$emit('blur', $event)" />
       <template #supporting-text>
         <slot name="supporting-text" />
       </template>
@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, watch } from 'vue';
 import MdTextFieldBase from './MdTextFieldBase.vue';
 import MdOutlinedField from '../field/MdOutlinedField.vue';
 
@@ -22,13 +22,34 @@ const props = defineProps({
   required: { type: Boolean },
   focused: { type: Boolean },
   value: { type: String },
+  modelValue: { type: String },
 });
+
+const emit = defineEmits(['focus', 'blur', 'update:modelValue']);
 
 const inputValue = ref('');
+const textFieldEl = ref(null);
 
 onBeforeMount(() => {
-  inputValue.value = props.value;
+  inputValue.value = props.modelValue;
 });
+
+watch(
+  () => props.modelValue,
+  () => {
+    inputValue.value = props.modelValue;
+  }
+);
+
+const onTextFieldInput = (ev) => {
+  inputValue.value = ev.target.value;
+  emit('update:modelValue', inputValue.value);
+};
+
+const onClick = () => {
+  const inputEl = textFieldEl.value.$el.querySelector('.md-text-field__input');
+  inputEl.focus();
+};
 </script>
 
 <style lang="scss">
@@ -49,6 +70,9 @@ $theme: tokens.md-comp-outlined-text-field-values();
     font-size: map.get($theme, input-text-size);
     font-weight: map.get($theme, input-text-weight);
     letter-spacing: map.get($theme, input-text-tracking);
+  }
+  .md-field--outlined {
+    width: 100%;
   }
 }
 </style>

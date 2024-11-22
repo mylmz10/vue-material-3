@@ -13,6 +13,8 @@
       @select="$emit('select', $event)"
       @focus="$emit('focus', $event)"
       @blur="$emit('blur', $event)"
+      @keyup="$emit('keyup', $event)"
+      @keydown="$emit('keydown', $event)"
     />
   </span>
 </template>
