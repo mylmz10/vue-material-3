@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/mylmz10/vue-material-3/compare/v0.6.0...v0.7.0) (2024-11-22)
+
+
+### Features
+
+* button background & border changes ([ba695d3](https://github.com/mylmz10/vue-material-3/commit/ba695d309124936288effcc71414b43d64e1b599))
+* error prop implementation to filled and outlined fields ([d591ec9](https://github.com/mylmz10/vue-material-3/commit/d591ec93bdb81ec889bc64a6a3ee41f30907672b))
+* implementation of outlined autocomplete ([cade1da](https://github.com/mylmz10/vue-material-3/commit/cade1da69f430fe22fab4e0b286309e65a70446d))
+* updates for autocomplete ([cf7c8bd](https://github.com/mylmz10/vue-material-3/commit/cf7c8bdad7cc465450401ca0d8be4a49d95ba52b))
+
+
+### Bug Fixes
+
+* checkbox model change ([035e1b9](https://github.com/mylmz10/vue-material-3/commit/035e1b90dbef9b59ee9608bb2e013181b43e5e13))
+* some fixes ([90d0c1f](https://github.com/mylmz10/vue-material-3/commit/90d0c1fc6e413dd87b52da06e33da127036e34ae))
+
 ## [0.6.0](https://github.com/mylmz10/vue-material-3/compare/v0.5.0...v0.6.0) (2024-03-28)
 
 
