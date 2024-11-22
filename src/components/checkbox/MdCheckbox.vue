@@ -1,7 +1,11 @@
 <template>
-  <div class="md-checkbox" :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }" @click="toggle">
+  <div
+    class="md-checkbox"
+    :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate, 'md-checkbox--focused': focused }"
+    @click="toggle"
+  >
     <MdRipple />
-    <input type="checkbox" />
+    <input type="checkbox" :name="name" @input="onInput" @change="onInputChange" @focus="onFocus" @blur="onBlur" />
     <div class="md-checkbox__background">
       <svg class="md-checkbox__checkmark" viewBox="0 0 24 24" aria-hidden="true">
         <path class="md-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
@@ -15,25 +19,41 @@
 import { ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
+const emit = defineEmits(['update:model-value']);
+
 const _checked = ref(false);
 const _indeterminate = ref(false);
+const focused = ref(false);
 
 const props = defineProps({
   disabled: {
     type: Boolean,
   },
-  checked: {
+  modelValue: {
     type: Boolean,
   },
   indeterminate: {
     type: Boolean,
   },
+  name: {
+    type: String,
+  },
 });
 
+const onInput = () => {};
+const onFocus = () => {
+  focused.value = true;
+};
+const onBlur = () => {
+  focused.value = false;
+};
+const onInputChange = () => {};
+
 watch(
-  () => props.checked,
+  () => props.modelValue,
   (newValue) => {
     _checked.value = newValue;
+    emit('update:model-value', _checked.value);
   },
   { immediate: true }
 );
@@ -49,6 +69,7 @@ const toggle = () => {
   if (!props.disabled) {
     _checked.value = !_checked.value;
     _indeterminate.value = false;
+    emit('update:model-value', _checked.value);
   }
 };
 </script>
@@ -74,7 +95,13 @@ $theme: tokens.md-comp-checkbox-values();
   display: flex;
 
   input {
-    display: none;
+    opacity: 0;
+    position: absolute;
+    inset: 0;
+    appearance: none;
+    width: 0;
+    height: 0;
+    z-index: 1;
   }
 
   &__background {
@@ -167,6 +194,12 @@ $theme: tokens.md-comp-checkbox-values();
         }
       }
     }
+  }
+
+  &--focused {
+    border-width: map.get($theme, unselected-focus-outline-width);
+    border-color: map.get($theme, unselected-focus-outline-color);
+    border-style: solid;
   }
 
   &--disabled {

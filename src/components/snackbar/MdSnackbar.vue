@@ -73,6 +73,8 @@ $theme: tokens.md-comp-snackbar-values();
   transform: translateX(-50%);
   display: flex;
   align-items: center;
+  box-sizing: content-box;
+  line-height: map.get($theme, supporting-text-line-height);
 
   background-color: map.get($theme, container-color);
   border-radius: map.get($theme, container-shape);
@@ -172,6 +174,7 @@ $theme: tokens.md-comp-snackbar-values();
   &--longer-action {
     flex-wrap: wrap;
     padding: 12px 0 6px 0;
+    height: auto;
 
     .md-snackbar__supporting-text {
       width: 100%;

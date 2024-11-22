@@ -25,7 +25,7 @@ export default {
         slotItems.map((item, index) => {
           return h(MdFilterChip, {
             ...item.props,
-            selected: index === props.modelValue,
+            selected: index === props.modelValue || item.props.selected,
             onClick: () => selectChip(index),
           });
         })

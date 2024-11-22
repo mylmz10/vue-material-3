@@ -89,6 +89,30 @@ $theme: tokens.md-comp-filled-text-field-values();
         }
       }
     }
+
+    &#{$this}--error {
+      .md-text-field__input {
+        caret-color: map.get($theme, error-focus-caret-color);
+      }
+
+      #{$this}__supporting-text {
+        color: map.get($theme, error-supporting-text-color);
+      }
+
+      #{$this}__middle {
+        #{$this}__label {
+          color: map.get($theme, error-label-text-color);
+        }
+      }
+
+      #{$this}__label {
+        color: map.get($theme, error-label-text-color);
+      }
+      #{$this}__outline {
+        border-color: map.get($theme, error-active-indicator-color);
+        border-bottom-width: map.get($theme, error-active-indicator-height);
+      }
+    }
   }
 }
 </style>

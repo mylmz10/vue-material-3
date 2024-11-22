@@ -27,7 +27,7 @@ const props = defineProps({
     type: String,
   },
   modelValue: {
-    type: String,
+    type: Boolean,
   },
   checked: {
     type: Boolean,
@@ -36,6 +36,14 @@ const props = defineProps({
 
 watch(
   () => props.checked,
+  (newValue) => {
+    _checked.value = newValue;
+  },
+  { immediate: true },
+);
+
+watch(
+  () => props.modelValue,
   (newValue) => {
     _checked.value = newValue;
   },

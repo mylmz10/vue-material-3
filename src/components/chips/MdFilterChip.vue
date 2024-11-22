@@ -7,7 +7,7 @@
       <MdIcon v-if="selected">check</MdIcon>
       <MdIcon v-else>{{ leadingIcon }}</MdIcon>
     </div>
-    <div v-else class="md-filter-chip__leading-icon">
+    <div v-else-if="hasLeadingIconSlot" class="md-filter-chip__leading-icon">
       <slot name="leading-icon" />
     </div>
     <div class="md-filter-chip__text">{{ label }}</div>
@@ -18,10 +18,13 @@
 </template>
 
 <script setup>
+import { computed, useSlots } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-defineProps({
+const slots = useSlots();
+
+const props = defineProps({
   label: {
     type: String,
   },
@@ -40,6 +43,14 @@ defineProps({
   selected: {
     type: Boolean,
   },
+});
+
+const hasSlot = (name) => {
+  return !!slots[name];
+};
+
+const hasLeadingIconSlot = computed(() => {
+  return hasSlot('leading-icon');
 });
 </script>
 

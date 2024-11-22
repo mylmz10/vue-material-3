@@ -63,7 +63,7 @@ $theme: tokens.md-comp-outlined-text-field-values();
       padding-top: 4px;
     }
 
-    #{$this}--focused {
+    &#{$this}--focused {
       #{$this}__outline {
         border-color: map.get($theme, focus-outline-color);
         border-width: map.get($theme, focus-outline-width);
@@ -75,6 +75,26 @@ $theme: tokens.md-comp-outlined-text-field-values();
         }
         #{$this}__content {
         }
+      }
+    }
+
+    &#{$this}--error {
+      .md-text-field__input {
+        caret-color: map.get($theme, error-focus-caret-color);
+      }
+
+      #{$this}__supporting-text {
+        color: map.get($theme, error-supporting-text-color);
+      }
+      #{$this}__middle {
+        #{$this}__label {
+          color: map.get($theme, error-label-text-color);
+        }
+      }
+
+      #{$this}__outline {
+        border-color: map.get($theme, error-outline-color);
+        border-bottom-width: map.get($theme, error-active-indicator-height);
       }
     }
   }

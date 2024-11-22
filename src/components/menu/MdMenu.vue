@@ -1,7 +1,7 @@
 <template>
   <div class="md-menu" :class="{ 'md-menu--open': modelValue }">
-    <div class="md-menu__activator"><slot name="activator" :onClick="onActivatorClick" /></div>
-    <div class="md-menu__content">
+    <div ref="activatorEl" class="md-menu__activator"><slot name="activator" :onClick="onActivatorClick" /></div>
+    <div ref="contentEl" class="md-menu__content">
       <div class="md-menu__surface"></div>
       <slot />
     </div>
@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, useSlots } from 'vue';
+import { onMounted, onBeforeUnmount, useSlots, ref } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -22,6 +22,9 @@ const props = defineProps({
 });
 
 const slots = useSlots();
+
+const activatorEl = ref(null);
+const contentEl = ref(null);
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -42,7 +45,7 @@ const onActivatorClick = () => {
 };
 
 const handleOutsideClick = (e) => {
-  if (!e.composedPath().includes(document.querySelector('.md-menu__content')) && !e.composedPath().includes(document.querySelector('.md-menu__activator'))) {
+  if (!e.composedPath().includes(contentEl.value) && !e.composedPath().includes(activatorEl.value)) {
     if (props.closeOnOutsideClick) {
       if (props.modelValue) {
         close();
