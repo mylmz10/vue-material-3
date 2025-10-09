@@ -1,33 +1,39 @@
 <template>
-  <div class="md-date-picker">
+  <div class="md-date-picker" :style="{ '--week-count': currentWeekCount }">
     <MdDatePickerHeader :modelValue="modelValue" :docked="false" :locale="locale" v-model:month="selectedMonth"
       v-model:year="selectedYear" :show-months="showMonths" :show-years="showYears" @showMonths="showMonths = $event"
       @showYears="showYears = $event" @direction="direction = $event" />
-    <MdDatePickerDateTable
-      ref="dateTable"
-      :format="format"
-      :modelValue="modelValue"
-      v-model:day="selectedDay"
-      :month="selectedMonth"
-      :year="selectedYear"
-      :direction="direction"
-      :key="selectedYear + '-' + selectedMonth"
-    />
+
+    <div class="md-date-picker__content">
+      <transition-group :name="tableTransitionName">
+        <MdDatePickerDateTable v-for="monthOffset in [-1, 0, 1]" :key="getMonthKey(monthOffset)" :format="format"
+          :modelValue="modelValue" :month="getOffsetMonth(monthOffset)" :year="getOffsetYear(monthOffset)"
+          :direction="direction" :ref="el => monthOffset === 0 && (currentTable = el)" :class="{
+            'md-date-picker__table--current': monthOffset === 0,
+            'md-date-picker__table--prev': monthOffset === -1,
+            'md-date-picker__table--next': monthOffset === 1
+          }" />
+      </transition-group>
+    </div>
+
     <div class="md-date-picker__actions">
       <MdTextButton>Cancel</MdTextButton>
       <MdTextButton @click="setDate">OK</MdTextButton>
     </div>
+
     <transition name="fade-grow">
-      <MdDatePickerList v-if="showMonths" :modelValue="selectedMonth" type="month" :locale="locale" @input="updateMonth" />
+      <MdDatePickerList v-if="showMonths" :modelValue="selectedMonth" type="month" :locale="locale"
+        @input="updateMonth" />
     </transition>
     <transition name="fade-grow">
       <MdDatePickerList v-if="showYears" :modelValue="selectedYear" type="year" @input="updateYear" />
     </transition>
+    <MdElevationOverlay />
   </div>
 </template>
 
 <script setup>
-import { ref, watch, defineEmits } from 'vue';
+import { ref, watch, defineEmits, computed } from 'vue';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import weekday from 'dayjs/plugin/weekday';
@@ -38,6 +44,7 @@ import MdDatePickerDateTable from './MdDatePickerDateTable.vue';
 import MdDatePickerHeader from './MdDatePickerHeader.vue';
 import MdTextButton from '../button/MdTextButton.vue';
 import MdDatePickerList from './MdDatePickerList.vue';
+import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 
 import 'dayjs/locale/tr';
 import 'dayjs/locale/en';
@@ -75,12 +82,52 @@ const { modelValue, locale, docked, format } = defineProps({
 
 const showMonths = ref(false);
 const showYears = ref(false);
-const dateTable = ref(null);
+const currentTable = ref(null);
 const direction = ref('right');
+
+const currentWeekCount = computed(() => {
+  return currentTable.value?.weekCount || 4;
+});
 
 const selectedDay = ref(dayjs(modelValue).date());
 const selectedMonth = ref(dayjs(modelValue).month());
 const selectedYear = ref(dayjs(modelValue).year());
+
+const tableTransitionName = computed(() => {
+  return direction.value === 'left' ? 'fade-slide-left' : 'fade-slide-right';
+});
+
+const getOffsetMonth = (offset) => {
+  let month = selectedMonth.value + offset;
+  let yearOffset = 0;
+
+  if (month < 0) {
+    month = 11;
+    yearOffset = -1;
+  } else if (month > 11) {
+    month = 0;
+    yearOffset = 1;
+  }
+
+  return month;
+};
+
+const getOffsetYear = (offset) => {
+  let month = selectedMonth.value + offset;
+  let yearOffset = 0;
+
+  if (month < 0) {
+    yearOffset = -1;
+  } else if (month > 11) {
+    yearOffset = 1;
+  }
+
+  return selectedYear.value + yearOffset;
+};
+
+const getMonthKey = (offset) => {
+  return `${getOffsetYear(offset)}-${getOffsetMonth(offset)}`;
+};
 
 const updateMonth = (value) => {
   selectedMonth.value = value;
@@ -102,7 +149,7 @@ const setDate = () => {
     .date(1)
     .date(selectedDay.value)
     .format(format);
-    console.log(newDate)
+  console.log(newDate)
   emit('update:modelValue', newDate);
 };
 
@@ -122,35 +169,6 @@ watch(
 @use 'sass:map';
 @use '../../styles/tokens';
 
-  // Takvim tablosu için fade+slide animasyonu
-  .fade-slide-right-enter-active,
-  .fade-slide-right-leave-active,
-  .fade-slide-left-enter-active,
-  .fade-slide-left-leave-active {
-    transition: opacity 0.25s cubic-bezier(0.4,0,0.2,1),
-                transform 0.25s cubic-bezier(0.4,0,0.2,1);
-    will-change: opacity, transform;
-    position: relative;
-    z-index: 1;
-  }
-  .fade-slide-right-enter-from,
-  .fade-slide-left-leave-to {
-    opacity: 0;
-    transform: translateX(32px);
-  }
-  .fade-slide-right-leave-to,
-  .fade-slide-left-enter-from {
-    opacity: 0;
-    transform: translateX(-32px);
-  }
-  .fade-slide-right-enter-to,
-  .fade-slide-right-leave-from,
-  .fade-slide-left-enter-to,
-  .fade-slide-left-leave-from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  
 $theme: tokens.md-comp-date-picker-docked-values();
 
 .md-date-picker {
@@ -179,12 +197,44 @@ $theme: tokens.md-comp-date-picker-docked-values();
   --date-selected-hover-state-layer-color: #{map.get($theme, date-selected-hover-state-layer-color)};
   --date-selected-pressed-state-layer-color: #{map.get($theme, date-selected-pressed-state-layer-color)};
 
+  --overlay-z-index: 1;
+  --overlay-opacity: 0.12;
+  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+
+  overflow: hidden;
   width: var(--container-width);
-  //height: var(--container-height);
   border-radius: var(--container-shape);
   background-color: var(--container-color);
   position: relative;
-  overflow: hidden;
+
+  &__content {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    min-height: calc(calc(var(--week-count) + 1) * var(--date-container-height));
+    padding-bottom: 10px;
+    box-sizing: content-box;
+
+    .md-date-picker-date-table {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      transition: transform 0.3s ease-out;
+
+      &.md-date-picker__table--prev {
+        transform: translateX(-100%);
+      }
+
+      &.md-date-picker__table--next {
+        transform: translateX(100%);
+      }
+
+      &.md-date-picker__table--current {
+        transform: translateX(0);
+      }
+    }
+  }
 
   &__actions {
     display: flex;
@@ -192,22 +242,43 @@ $theme: tokens.md-comp-date-picker-docked-values();
     padding: 8px;
   }
 
-  // Fade + grow transition for date picker list
-  .fade-grow-enter-active,
-  .fade-grow-leave-active {
-    transition: opacity 0.25s cubic-bezier(0.4,0,0.2,1),
-                transform 0.25s cubic-bezier(0.4,0,0.2,1);
-    will-change: opacity, transform;
+  .fade-slide-right-move,
+  .fade-slide-left-move {
+    transition: transform 0.3s ease-out;
   }
-  .fade-grow-enter-from,
-  .fade-grow-leave-to {
+
+  .fade-slide-right-enter-active,
+  .fade-slide-left-enter-active {
+    transition: all 0.3s ease-out;
+    position: absolute;
+    width: 100%;
+  }
+
+  .fade-slide-right-leave-active,
+  .fade-slide-left-leave-active {
+    transition: all 0.3s ease-out;
+    position: absolute;
+    width: 100%;
+  }
+
+  .fade-slide-right-enter-from {
     opacity: 0;
-    transform: translateY(-16px) scaleY(0.95);
+    transform: translateX(100%);
   }
-  .fade-grow-enter-to,
-  .fade-grow-leave-from {
-    opacity: 1;
-    transform: translateY(0) scaleY(1);
+
+  .fade-slide-right-leave-to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  .fade-slide-left-enter-from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  .fade-slide-left-leave-to {
+    opacity: 0;
+    transform: translateX(100%);
   }
 }
 </style>

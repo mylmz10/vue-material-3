@@ -1,5 +1,4 @@
 <template>
-  {{ direction }}
   <div class="md-date-picker-date-table">
     <transition :name="tableTransitionName" mode="out-in">
       <table :key="props.year + '-' + props.month">
@@ -19,7 +18,7 @@
                 'md-date-picker-date-table__date-item--current-month': weekDay.isCurrentMonth,
                 'md-date-picker-date-table__date-item--today': weekDay.isCurrentDay,
                 'md-date-picker-date-table__date-item--selected': weekDay.isCurrentMonth && weekDay.isPickerDay,
-              }" @click="setDay(weekDay.day)">
+              }" @click="setDay(weekDay)">
                 <div class="date-item__state-layer"></div>
                 <span v-if="weekDay.isCurrentMonth">{{ weekDay.day }}</span>
               </button>
@@ -28,14 +27,12 @@
         </tbody>
       </table>
     </transition>
-    <MdElevationOverlay />
   </div>
 </template>
 
 <script setup>
 import { computed, defineEmits, ref, watch } from 'vue';
 import dayjs from 'dayjs';
-import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 
 const emit = defineEmits(['input', 'update:day']);
 
@@ -89,7 +86,9 @@ const currentMonth = computed(() => {
   return dayjs(pickerDate.value).year(props.year).month(props.month).locale(props.locale);
 });
 
-const setDay = (day) => {
+const setDay = (weekDay) => {
+  const { day, isCurrentMonth } = weekDay;
+  if (isCurrentMonth === false) return;
   pickerDate.value = dayjs()
     .year(props.year)
     .month(props.month)
@@ -135,6 +134,10 @@ const getAllDays = computed(() => {
   return allDates;
 });
 
+const weekCount = computed(() => {
+  return getAllDays.value.length;
+});
+
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -144,55 +147,27 @@ watch(
   },
   { immediate: true }
 );
+
+defineExpose({
+  weekCount,
+})
 </script>
 
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
 
-// Takvim tablosu için fade+slide animasyonu
-.fade-slide-right-enter-active,
-.fade-slide-right-leave-active,
-.fade-slide-left-enter-active,
-.fade-slide-left-leave-active {
-  transition: opacity 0.25s cubic-bezier(0.4,0,0.2,1),
-              transform 0.25s cubic-bezier(0.4,0,0.2,1);
-  will-change: opacity, transform;
-  position: relative;
-  z-index: 1;
-}
-.fade-slide-right-enter-from,
-.fade-slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(32px);
-}
-.fade-slide-right-leave-to,
-.fade-slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(-32px);
-}
-.fade-slide-right-enter-to,
-.fade-slide-right-leave-from,
-.fade-slide-left-enter-to,
-.fade-slide-left-leave-from {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-
 $theme: tokens.md-comp-date-picker-docked-values();
 
 .md-date-picker-date-table {
   padding: 0 12px;
-
-  --overlay-z-index: 1;
-  --overlay-opacity: 0.12;
-  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  width: 100%;
 
   table {
     width: 100%;
+    border-collapse: collapse;
+    height: calc(var(--week-count) * var(--date-container-height));
 
-    //height: 100%;
     tbody {
       td {
         text-align: center;
@@ -238,6 +213,8 @@ $theme: tokens.md-comp-date-picker-docked-values();
       opacity: var(--date-hover-state-layer-opacity);
       pointer-events: none;
     }
+
+    cursor: default;
 
     &--current-month:hover {
       cursor: pointer;
