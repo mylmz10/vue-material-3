@@ -1,31 +1,23 @@
 <template>
   <div class="md-date-picker-date-table">
     <transition :name="tableTransitionName" mode="out-in">
-      <table :key="props.year + '-' + props.month">
-        <thead>
-          <tr>
-            <th v-for="weekDay in weekDays">
-              <span class="md-date-picker-date-table__weekday-item">
-                {{ weekDay }}
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="week in getAllDays">
-            <td v-for="weekDay in week.dates">
-              <button class="md-date-picker-date-table__date-item" :class="{
-                'md-date-picker-date-table__date-item--current-month': weekDay.isCurrentMonth,
-                'md-date-picker-date-table__date-item--today': weekDay.isCurrentDay,
-                'md-date-picker-date-table__date-item--selected': weekDay.isCurrentMonth && weekDay.isPickerDay,
-              }" @click="setDay(weekDay)">
-                <div class="date-item__state-layer"></div>
-                <span v-if="weekDay.isCurrentMonth">{{ weekDay.day }}</span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="md-date-picker-date-table__grid" :key="props.year + '-' + props.month">
+        <div class="md-date-picker-date-table__header">
+          <div v-for="weekDay in weekDays" class="md-date-picker-date-table__weekday-item">
+            {{ weekDay }}
+          </div>
+        </div>
+        <div class="md-date-picker-date-table__days">
+          <button v-for="day in flatDays" :key="day.day" class="md-date-picker-date-table__date-item" :class="{
+            'md-date-picker-date-table__date-item--current-month': day.isCurrentMonth,
+            'md-date-picker-date-table__date-item--today': day.isCurrentDay,
+            'md-date-picker-date-table__date-item--selected': day.isCurrentMonth && day.isPickerDay,
+          }" @click="setDay(day)">
+            <div class="date-item__state-layer"></div>
+            <span v-if="day.isCurrentMonth">{{ day.day }}</span>
+          </button>
+        </div>
+      </div>
     </transition>
   </div>
 </template>
@@ -114,24 +106,22 @@ const formatDateObject = (date) => {
 const getAllDays = computed(() => {
   let currentDate = currentMonth.value.startOf('month').weekday(0);
   const nextMonth = currentMonth.value.add(1, 'month').month();
-
   let allDates = [];
-  let weekDates = [];
-
-  let weekCounter = 1;
 
   while (currentDate.weekday(0).toObject().months !== nextMonth) {
     const formatted = formatDateObject(currentDate);
-    weekDates.push(formatted);
-    if (weekCounter === 7) {
-      allDates.push({ dates: weekDates });
-      weekDates = [];
-      weekCounter = 0;
-    }
-    weekCounter++;
+    allDates.push(formatted);
     currentDate = currentDate.add(1, 'day');
   }
-  return allDates;
+
+  // Group days into weeks for weekCount calculation
+  return Array.from({ length: Math.ceil(allDates.length / 7) }, (_, i) =>
+    ({ dates: allDates.slice(i * 7, (i + 1) * 7) })
+  );
+});
+
+const flatDays = computed(() => {
+  return getAllDays.value.flatMap(week => week.dates);
 });
 
 const weekCount = computed(() => {
@@ -163,27 +153,30 @@ $theme: tokens.md-comp-date-picker-docked-values();
   padding: 0 12px;
   width: 100%;
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    height: calc(var(--week-count) * var(--date-container-height));
+  &__grid {
+    display: flex;
+    flex-direction: column;
+    height: calc(var(--week-count) * var(--date-container-height) + var(--date-container-height));
+  }
 
-    tbody {
-      td {
-        text-align: center;
-        height: var(--date-container-height);
-        padding: 0;
-      }
-    }
+  &__header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
+  }
+
+  &__days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: var(--date-container-height);
+    flex: 1;
   }
 
   &__weekday-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--date-container-width);
     height: var(--date-container-height);
-    border-radius: var(--date-container-shape);
     font-family: var(--date-label-text-font);
     line-height: var(--date-label-text-line-height);
     font-size: var(--date-label-text-size);
@@ -212,6 +205,16 @@ $theme: tokens.md-comp-date-picker-docked-values();
       inset: 0;
       opacity: var(--date-hover-state-layer-opacity);
       pointer-events: none;
+    }
+
+    transform-origin: center;
+    transform: scale(1);
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+
+    &:active {
+      transform: scale(0.8);
+      transition-duration: 100ms;
     }
 
     cursor: default;
