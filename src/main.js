@@ -1,5 +1,6 @@
 export { default as MdElevatedButton } from './components/button/MdElevatedButton.vue';
 export { default as MdFilledButton } from './components/button/MdFilledButton.vue';
+export { default as MdFilledTonalButton } from './components/button/MdFilledTonalButton.vue';
 export { default as MdSearch } from './components/search/MdSearch.vue';
 export { default as MdTextButton } from './components/button/MdTextButton.vue';
 export { default as MdOutlinedButton } from './components/button/MdOutlinedButton.vue';
