@@ -94,7 +94,7 @@ $theme: tokens.md-comp-outlined-text-field-values();
 
       #{$this}__outline {
         border-color: map.get($theme, error-outline-color);
-        border-bottom-width: map.get($theme, error-active-indicator-height);
+        border-width: map.get($theme, outline-width);
       }
     }
   }

@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -32,7 +35,8 @@ $_default: (
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'active-indicator-height': if($exclude-hardcoded-values, null, 1px),
     'caret-color': map.get($deps, 'md-sys-color', 'primary'),
-    'container-color': map.get($deps, 'md-sys-color', 'surface-variant'),
+    'container-color':
+      map.get($deps, 'md-sys-color', 'surface-container-highest'),
     'container-shape': map.get($deps, 'md-sys-shape', 'corner-extra-small-top'),
     'disabled-active-indicator-color':
       map.get($deps, 'md-sys-color', 'on-surface'),

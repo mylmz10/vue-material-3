@@ -199,7 +199,7 @@ $theme: tokens.md-comp-date-picker-docked-values();
 
   --overlay-z-index: 1;
   --overlay-opacity: 0.12;
-  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  --surface-tint-layer-color: #{map.get($theme, container-color)};
 
   overflow: hidden;
   width: var(--container-width);

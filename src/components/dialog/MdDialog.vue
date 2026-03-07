@@ -79,6 +79,7 @@ watch(
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-dialog-values();
+$sys-color: tokens.md-sys-color-values-light();
 
 .md-modal {
   position: fixed;
@@ -100,7 +101,7 @@ $theme: tokens.md-comp-dialog-values();
 
   --overlay-z-index: 1;
   --overlay-opacity: 0.14;
-  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  --surface-tint-layer-color: #{map.get($sys-color, surface-tint)};
 
   $this: &;
 

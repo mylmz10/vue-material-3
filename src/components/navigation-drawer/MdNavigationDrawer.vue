@@ -48,6 +48,7 @@ watch(
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-navigation-drawer-values();
+$sys-color: tokens.md-sys-color-values-light();
 
 .md-navigation-drawer {
   display: flex;
@@ -72,9 +73,9 @@ $theme: tokens.md-comp-navigation-drawer-values();
     box-sizing: border-box;
     min-inline-size: map.get($theme, container-width);
     max-inline-size: map.get($theme, container-width);
-    background-color: map.get($theme, container-color);
+    background-color: map.get($theme, standard-container-color);
     border-radius: map.get($theme, container-shape);
-    box-shadow: elevation.resolve-box-shadow(map.get($theme, standard-container-elevation), map.get($theme, container-surface-tint-layer-color));
+    box-shadow: elevation.resolve-box-shadow(map.get($theme, standard-container-elevation), map.get($sys-color, shadow));
     padding: 12px;
 
     .md-list-item {
@@ -122,15 +123,16 @@ $theme: tokens.md-comp-navigation-drawer-values();
     z-index: 1000;
 
     .md-navigation-drawer__slot-content {
-      box-shadow: elevation.resolve-box-shadow(map.get($theme, modal-container-elevation), map.get($theme, container-surface-tint-layer-color));
+      background-color: map.get($theme, modal-container-color);
+      box-shadow: elevation.resolve-box-shadow(map.get($theme, modal-container-elevation), map.get($sys-color, shadow));
     }
   }
 
   &__overlay {
     position: fixed;
     inset: 0;
-    background-color: map.get($theme, scrim-color);
-    opacity: map.get($theme, scrim-opacity);
+    background-color: rgba(0, 0, 0, 0.32);
+    opacity: 1;
   }
 }
 </style>

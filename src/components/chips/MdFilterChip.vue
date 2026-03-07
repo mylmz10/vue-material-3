@@ -122,7 +122,7 @@ $theme: tokens.md-comp-filter-chip-values();
   }
 
   &__text {
-    color: map.get($theme, label-text-color);
+    color: map.get($theme, unselected-label-text-color);
     font-family: map.get($theme, label-text-font);
     line-height: map.get($theme, label-text-line-height);
     font-size: map.get($theme, label-text-size);
@@ -136,7 +136,7 @@ $theme: tokens.md-comp-filter-chip-values();
 
   &:hover {
     &__text {
-      color: map.get($theme, hover-label-text-color);
+      color: map.get($theme, unselected-hover-label-text-color);
     }
   }
 
@@ -150,7 +150,7 @@ $theme: tokens.md-comp-filter-chip-values();
 
   &--selected {
     #{$this}__background {
-      background-color: map.get($theme, elevated-container-color);
+      background-color: map.get($theme, elevated-selected-container-color);
     }
 
     &:hover:not(&#{$this}--disabled) {
@@ -164,7 +164,7 @@ $theme: tokens.md-comp-filter-chip-values();
 
       #{$this}__outline {
         border-width: map.get($theme, flat-selected-outline-width);
-        border-color: map.get($theme, flat-selected-outline-color);
+        border-color: map.get($theme, flat-unselected-outline-color);
         border-style: solid;
       }
 
@@ -215,8 +215,8 @@ $theme: tokens.md-comp-filter-chip-values();
           opacity: map.get($theme, flat-disabled-selected-container-opacity);
         }
         #{$this}__outline {
-          border-color: map.get($theme, flat-disabled-selected-outline-color);
-          opacity: map.get($theme, flat-disabled-selected-outline-opacity);
+          border-color: map.get($theme, flat-disabled-unselected-outline-color);
+          opacity: map.get($theme, flat-disabled-unselected-outline-opacity);
         }
       }
     }

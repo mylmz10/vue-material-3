@@ -74,7 +74,7 @@ defineProps({
 
   padding: 16px;
 
-  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  --surface-tint-layer-color: #{map.get($theme, container-color)};
   --overlay-opacity: 0.11;
 
   .md-fab__icon {

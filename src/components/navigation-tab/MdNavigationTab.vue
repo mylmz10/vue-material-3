@@ -24,7 +24,7 @@ defineProps({
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$theme: tokens.md-comp-navigation-bar-values();
+$theme: tokens.md-comp-primary-navigation-tab-values();
 
 .md-navigation-tab {
   align-items: center;
@@ -56,7 +56,7 @@ $theme: tokens.md-comp-navigation-bar-values();
       grid-column: 1 / 2;
       grid-row: 1 / 2;
       display: flex;
-      width: map.get($theme, active-indicator-width);
+      width: 100%;
       height: map.get($theme, active-indicator-height);
       border-radius: map.get($theme, active-indicator-shape);
     }
@@ -68,14 +68,19 @@ $theme: tokens.md-comp-navigation-bar-values();
 
   &__label {
     margin-top: 4px;
-    font-family: map.get($theme, label-text-font);
-    font-size: map.get($theme, label-text-size);
-    line-height: map.get($theme, label-text-line-height);
-    letter-spacing: map.get($theme, label-text-tracking);
-    font-weight: map.get($theme, label-text-weight);
+    font-family: map.get($theme, with-label-text-label-text-font);
+    font-size: map.get($theme, with-label-text-label-text-size);
+    line-height: map.get($theme, with-label-text-label-text-line-height);
+    letter-spacing: map.get($theme, with-label-text-label-text-tracking);
+    font-weight: map.get($theme, with-label-text-label-text-weight);
+    color: map.get($theme, with-label-text-inactive-label-text-color);
   }
 
   &--selected {
+    .md-navigation-tab__label {
+      color: map.get($theme, with-label-text-active-label-text-color);
+    }
+
     .md-navigation-tab__active-indicator {
       background-color: map.get($theme, active-indicator-color);
     }

@@ -41,20 +41,19 @@ defineProps({
 
 $theme: tokens.md-comp-icon-button-values();
 
-@mixin icon-static-styles($theme) {
-  width: map.get($theme, state-layer-size);
-  height: map.get($theme, state-layer-size);
-  border-radius: map.get($theme, container-shape);
-  color: map.get($theme, unselected-icon-color);
-  background-color: map.get($theme, container-color);
+@mixin icon-static-styles($width-key, $height-key, $shape-key, $color-key) {
+  width: map.get($theme, $width-key);
+  height: map.get($theme, $height-key);
+  border-radius: map.get($theme, $shape-key);
+  color: map.get($theme, $color-key);
 }
 
 .md-icon-button {
   background-color: transparent;
   @include surface.root-static-styles;
-  @include icon-static-styles($theme);
+  @include icon-static-styles(state-layer-width, state-layer-height, state-layer-shape, unselected-icon-color);
   border-radius: map.get($theme, state-layer-shape);
-  margin: max(0px, (48px - #{map.get($theme, state-layer-size)}) / 2);
+  margin: max(0px, (48px - #{map.get($theme, state-layer-width)}) / 2);
   align-items: center;
   border: none;
   box-sizing: border-box;
@@ -79,36 +78,43 @@ $theme: tokens.md-comp-icon-button-values();
   );
 
   &--filled {
-    $theme: tokens.md-comp-filled-icon-button-values();
-    @include icon-static-styles($theme);
-    color: map.get($theme, icon-color);
-    margin: max(0px, (48px - #{map.get($theme, container-size)}) / 2);
+    $filled-theme: tokens.md-comp-filled-icon-button-values();
+    width: map.get($filled-theme, container-width);
+    height: map.get($filled-theme, container-height);
+    border-radius: map.get($filled-theme, container-shape);
+    color: map.get($filled-theme, icon-color);
+    background-color: map.get($filled-theme, container-color);
+    margin: max(0px, (48px - #{map.get($filled-theme, container-width)}) / 2);
 
-    @include ripple.ripple($theme);
+    @include ripple.ripple($filled-theme);
   }
 
   &--tonal {
-    $theme: tokens.md-comp-filled-tonal-icon-button-values();
-    @include icon-static-styles($theme);
-    color: map.get($theme, icon-color);
-    margin: max(0px, (48px - #{map.get($theme, container-size)}) / 2);
+    $tonal-theme: tokens.md-comp-filled-tonal-icon-button-values();
+    width: map.get($tonal-theme, container-width);
+    height: map.get($tonal-theme, container-height);
+    border-radius: map.get($tonal-theme, container-shape);
+    color: map.get($tonal-theme, icon-color);
+    background-color: map.get($tonal-theme, container-color);
+    margin: max(0px, (48px - #{map.get($tonal-theme, container-width)}) / 2);
 
-    @include ripple.ripple($theme);
+    @include ripple.ripple($tonal-theme);
   }
 
   &--outlined {
-    $theme: tokens.md-comp-outlined-icon-button-values();
-    @include icon-static-styles($theme);
-    border-radius: map.get($theme, container-shape);
-    color: map.get($theme, icon-color);
-    margin: max(0px, (48px - #{map.get($theme, container-size)}) / 2);
+    $outlined-theme: tokens.md-comp-outlined-icon-button-values();
+    width: map.get($outlined-theme, container-width);
+    height: map.get($outlined-theme, container-height);
+    border-radius: map.get($outlined-theme, container-shape);
+    color: map.get($outlined-theme, unselected-icon-color);
+    margin: max(0px, (48px - #{map.get($outlined-theme, container-width)}) / 2);
 
-    border-width: map.get($theme, unselected-outline-width);
-    border-color: map.get($theme, unselected-outline-color);
+    border-width: map.get($outlined-theme, unselected-outline-width);
+    border-color: map.get($outlined-theme, unselected-outline-color);
     border-style: solid;
 
     @include ripple.ripple(
-      $theme,
+      $outlined-theme,
       (
         hover-state-layer-color: unselected-hover-state-layer-color,
         focus-state-layer-color: unselected-focus-state-layer-color,

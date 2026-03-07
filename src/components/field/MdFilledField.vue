@@ -110,7 +110,7 @@ $theme: tokens.md-comp-filled-text-field-values();
       }
       #{$this}__outline {
         border-color: map.get($theme, error-active-indicator-color);
-        border-bottom-width: map.get($theme, error-active-indicator-height);
+        border-bottom-width: map.get($theme, active-indicator-height);
       }
     }
   }

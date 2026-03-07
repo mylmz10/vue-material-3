@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Breaking Changes
+
+* tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
+* component style token contracts were migrated to align with `v0.192` token maps
+
 ## [0.5.0](https://github.com/mylmz10/vue-material-3/compare/v0.4.0...v0.5.0) (2023-04-19)
 
 

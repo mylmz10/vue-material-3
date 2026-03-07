@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -35,12 +38,10 @@ $_default: (
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'menu-cascading-menu-indicator-icon-size':
       if($exclude-hardcoded-values, null, 24px),
-    'menu-container-color': map.get($deps, 'md-sys-color', 'surface'),
+    'menu-container-color': map.get($deps, 'md-sys-color', 'surface-container'),
     'menu-container-elevation': map.get($deps, 'md-sys-elevation', 'level2'),
     'menu-container-shadow-color': map.get($deps, 'md-sys-color', 'shadow'),
     'menu-container-shape': map.get($deps, 'md-sys-shape', 'corner-extra-small'),
-    'menu-container-surface-tint-layer-color':
-      map.get($deps, 'md-sys-color', 'surface-tint'),
     'menu-divider-color': map.get($deps, 'md-sys-color', 'surface-variant'),
     'menu-divider-height': if($exclude-hardcoded-values, null, 1px),
     'menu-list-item-container-height': if($exclude-hardcoded-values, null, 48px),
@@ -69,7 +70,7 @@ $_default: (
     'menu-list-item-label-text-weight':
       map.get($deps, 'md-sys-typescale', 'label-large-weight'),
     'menu-list-item-selected-container-color':
-      map.get($deps, 'md-sys-color', 'surface-variant'),
+      map.get($deps, 'md-sys-color', 'surface-container-highest'),
     'menu-list-item-with-leading-icon-leading-icon-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'menu-list-item-with-leading-icon-leading-icon-size':
@@ -83,7 +84,7 @@ $_default: (
     'text-field-active-indicator-height':
       if($exclude-hardcoded-values, null, 1px),
     'text-field-container-color':
-      map.get($deps, 'md-sys-color', 'surface-variant'),
+      map.get($deps, 'md-sys-color', 'surface-container-highest'),
     'text-field-container-shape':
       map.get($deps, 'md-sys-shape', 'corner-extra-small-top'),
     'text-field-disabled-active-indicator-color':
@@ -240,7 +241,7 @@ $_default: (
       map.get($deps, 'md-sys-typescale', 'body-large-weight'),
     'text-field-leading-icon-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
-    'text-field-leading-icon-size': if($exclude-hardcoded-values, null, 20px),
+    'text-field-leading-icon-size': if($exclude-hardcoded-values, null, 24px),
     'text-field-supporting-text-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'text-field-supporting-text-font':

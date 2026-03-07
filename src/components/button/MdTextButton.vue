@@ -32,7 +32,7 @@ defineProps({
 $theme: tokens.md-comp-text-button-values();
 
 .md-text-button {
-  background-color: map.get($theme, container-color);
+  background-color: transparent;
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
   color: map.get($theme, label-text-color);
@@ -49,8 +49,7 @@ $theme: tokens.md-comp-text-button-values();
   }
 
   &:disabled {
-    //background-color: rgba(map.get($theme, disabled-container-color), map.get($theme, disabled-container-opacity));
-    //color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
+    color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
   }
 }
 </style>

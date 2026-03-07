@@ -6,8 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
 // User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @function values($exclude-hardcoded-values: false) {
@@ -40,29 +42,29 @@
     'neutral-variant95': if($exclude-hardcoded-values, null, #f5eefa),
     'neutral-variant99': if($exclude-hardcoded-values, null, #fffbfe),
     'neutral0': if($exclude-hardcoded-values, null, #000),
-    'neutral10': if($exclude-hardcoded-values, null, #1c1b1f),
+    'neutral10': if($exclude-hardcoded-values, null, #1d1b20),
     'neutral100': if($exclude-hardcoded-values, null, #fff),
-    'neutral12': if($exclude-hardcoded-values, null, #201f23),
-    'neutral17': if($exclude-hardcoded-values, null, #2b292d),
-    'neutral20': if($exclude-hardcoded-values, null, #313033),
-    'neutral22': if($exclude-hardcoded-values, null, #313033),
-    'neutral24': if($exclude-hardcoded-values, null, #313033),
-    'neutral30': if($exclude-hardcoded-values, null, #484649),
-    'neutral4': if($exclude-hardcoded-values, null, #0e0e11),
-    'neutral40': if($exclude-hardcoded-values, null, #605d62),
-    'neutral50': if($exclude-hardcoded-values, null, #787579),
-    'neutral6': if($exclude-hardcoded-values, null, #141317),
-    'neutral60': if($exclude-hardcoded-values, null, #939094),
-    'neutral70': if($exclude-hardcoded-values, null, #aeaaae),
-    'neutral80': if($exclude-hardcoded-values, null, #c9c5ca),
-    'neutral87': if($exclude-hardcoded-values, null, #ddd8dd),
-    'neutral90': if($exclude-hardcoded-values, null, #e6e1e5),
-    'neutral92': if($exclude-hardcoded-values, null, #ece7ec),
-    'neutral94': if($exclude-hardcoded-values, null, #f1ecf1),
-    'neutral95': if($exclude-hardcoded-values, null, #f4eff4),
-    'neutral96': if($exclude-hardcoded-values, null, #f7f2f7),
-    'neutral98': if($exclude-hardcoded-values, null, #fdf8fd),
-    'neutral99': if($exclude-hardcoded-values, null, #fffbfe),
+    'neutral12': if($exclude-hardcoded-values, null, #211f26),
+    'neutral17': if($exclude-hardcoded-values, null, #2b2930),
+    'neutral20': if($exclude-hardcoded-values, null, #322f35),
+    'neutral22': if($exclude-hardcoded-values, null, #36343b),
+    'neutral24': if($exclude-hardcoded-values, null, #3b383e),
+    'neutral30': if($exclude-hardcoded-values, null, #48464c),
+    'neutral4': if($exclude-hardcoded-values, null, #0f0d13),
+    'neutral40': if($exclude-hardcoded-values, null, #605d64),
+    'neutral50': if($exclude-hardcoded-values, null, #79767d),
+    'neutral6': if($exclude-hardcoded-values, null, #141218),
+    'neutral60': if($exclude-hardcoded-values, null, #938f96),
+    'neutral70': if($exclude-hardcoded-values, null, #aea9b1),
+    'neutral80': if($exclude-hardcoded-values, null, #cac5cd),
+    'neutral87': if($exclude-hardcoded-values, null, #ded8e1),
+    'neutral90': if($exclude-hardcoded-values, null, #e6e0e9),
+    'neutral92': if($exclude-hardcoded-values, null, #ece6f0),
+    'neutral94': if($exclude-hardcoded-values, null, #f3edf7),
+    'neutral95': if($exclude-hardcoded-values, null, #f5eff7),
+    'neutral96': if($exclude-hardcoded-values, null, #f7f2fa),
+    'neutral98': if($exclude-hardcoded-values, null, #fef7ff),
+    'neutral99': if($exclude-hardcoded-values, null, #fffbff),
     'primary0': if($exclude-hardcoded-values, null, #000),
     'primary10': if($exclude-hardcoded-values, null, #21005d),
     'primary100': if($exclude-hardcoded-values, null, #fff),

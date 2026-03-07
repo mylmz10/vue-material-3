@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -33,8 +36,6 @@ $_default: (
   @return (
     'container-height': if($exclude-hardcoded-values, null, 32px),
     'container-shape': map.get($deps, 'md-sys-shape', 'corner-small'),
-    'container-surface-tint-layer-color':
-      map.get($deps, 'md-sys-color', 'surface-tint'),
     'disabled-label-text-color': map.get($deps, 'md-sys-color', 'on-surface'),
     'disabled-label-text-opacity': if($exclude-hardcoded-values, null, 0.38),
     'dragged-container-elevation': map.get($deps, 'md-sys-elevation', 'level4'),
@@ -42,7 +43,8 @@ $_default: (
     'dragged-state-layer-color': map.get($deps, 'md-sys-color', 'on-surface'),
     'dragged-state-layer-opacity':
       map.get($deps, 'md-sys-state', 'dragged-state-layer-opacity'),
-    'elevated-container-color': map.get($deps, 'md-sys-color', 'surface'),
+    'elevated-container-color':
+      map.get($deps, 'md-sys-color', 'surface-container-low'),
     'elevated-container-elevation': map.get($deps, 'md-sys-elevation', 'level1'),
     'elevated-container-shadow-color': map.get($deps, 'md-sys-color', 'shadow'),
     'elevated-disabled-container-color':

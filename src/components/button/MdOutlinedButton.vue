@@ -54,7 +54,7 @@ $theme: tokens.md-comp-outlined-button-values();
     line-height: map.get($theme, label-text-line-height);
   }
   .md-button__background {
-    background-color: map.get($theme, container-color);
+    background-color: transparent;
   }
 
   &:not(:disabled):hover {
@@ -68,8 +68,8 @@ $theme: tokens.md-comp-outlined-button-values();
       outline-color: rgba(map.get($theme, disabled-outline-color), map.get($theme, disabled-outline-opacity));
     }
     .md-button__background {
-      background-color: map.get($theme, disabled-container-color);
-      opacity: map.get($theme, disabled-container-opacity);
+      background-color: transparent;
+      opacity: 1;
     }
     .md-button__label {
       color: map.get($theme, disabled-label-text-color);
