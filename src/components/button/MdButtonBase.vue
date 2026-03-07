@@ -50,8 +50,19 @@ defineProps({
     z-index: 0;
   }
 
-  > * {
+  > .md-ripple {
     z-index: 1;
+  }
+
+  > :not(.md-button__background):not(.md-ripple) {
+    z-index: 2;
+  }
+
+  .md-ripple-surface {
+    &::before,
+    &::after {
+      z-index: 0;
+    }
   }
 
   &:disabled {
