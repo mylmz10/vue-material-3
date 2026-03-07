@@ -1,5 +1,13 @@
 <template>
-  <MdButtonBase class="md-text-button" :disabled="disabled">
+  <MdButtonBase
+    class="md-text-button"
+    :disabled="disabled"
+    :soft-disabled="softDisabled"
+    :href="href"
+    :target="target"
+    :download="download"
+    :type="type"
+  >
     <MdRipple />
     <span v-if="label" class="md-button__label">
       {{ label }}
@@ -7,19 +15,27 @@
     <span v-else class="md-button__label">
       <slot />
     </span>
+    <span v-if="trailingIcon || $slots['trailing-icon']" class="md-button__trailing-icon">
+      <slot name="trailing-icon">
+        <MdIcon>{{ trailingIcon }}</MdIcon>
+      </slot>
+    </span>
   </MdButtonBase>
 </template>
 
 <script setup>
 import MdButtonBase from './MdButtonBase.vue';
+import { buttonSharedProps } from './buttonSharedProps';
 import MdRipple from '../ripple/MdRipple.vue';
+import MdIcon from '../icon/MdIcon.vue';
 
 defineProps({
+  ...buttonSharedProps,
   label: {
     type: String,
   },
-  disabled: {
-    type: Boolean,
+  trailingIcon: {
+    type: String,
   },
 });
 </script>
@@ -44,12 +60,17 @@ $theme: tokens.md-comp-text-button-values();
   box-shadow: none;
   @include ripple.ripple($theme, null, 100px);
 
-  &:not(:disabled):hover {
+  &:not(:disabled):not(.md-button--soft-disabled):hover {
     box-shadow: none;
   }
 
-  &:disabled {
+  &:disabled,
+  &.md-button--soft-disabled {
     color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
+
+    .md-button__trailing-icon {
+      opacity: map.get($theme, disabled-label-text-opacity);
+    }
   }
 }
 </style>
