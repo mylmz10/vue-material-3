@@ -6,6 +6,7 @@ export { default as MdOutlinedButton } from './components/button/MdOutlinedButto
 export { default as MdCard } from './components/card/MdCard.vue';
 export { default as MdIcon } from './components/icon/MdIcon.vue';
 export { default as MdFab } from './components/fab/MdFab.vue';
+export { default as MdBrandedFab } from './components/fab/MdBrandedFab.vue';
 export { default as MdFabExtended } from './components/fab/MdFabExtended.vue';
 export { default as MdOutlinedTextField } from './components/text-field/MdOutlinedTextField.vue';
 export { default as MdFilledTextField } from './components/text-field/MdFilledTextField.vue';
