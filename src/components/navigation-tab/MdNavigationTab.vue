@@ -24,7 +24,7 @@ defineProps({
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$theme: tokens.md-comp-primary-navigation-tab-values();
+$theme: tokens.md-comp-navigation-bar-values();
 
 .md-navigation-tab {
   align-items: center;
@@ -47,42 +47,56 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   font: inherit;
 
   &__content {
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
-    grid-auto-rows: auto;
+    position: relative;
+    display: flex;
+    width: map.get($theme, active-indicator-width);
+    height: map.get($theme, active-indicator-height);
+    justify-content: center;
     align-items: center;
+    margin-bottom: 4px;
+
     .md-navigation-tab__active-indicator {
-      grid-column: 1 / 2;
-      grid-row: 1 / 2;
-      display: flex;
-      width: 100%;
+      position: absolute;
+      inset: 0;
+      width: 32px;
       height: map.get($theme, active-indicator-height);
       border-radius: map.get($theme, active-indicator-shape);
+      opacity: 0;
+      transition: width 100ms cubic-bezier(0.2, 0, 0, 1), opacity 100ms cubic-bezier(0.2, 0, 0, 1);
     }
+
     .md-navigation-tab__icon {
-      grid-column: 1 / 2;
-      grid-row: 1 / 2;
+      position: relative;
+      z-index: 1;
+      color: map.get($theme, inactive-icon-color);
+      font-size: map.get($theme, icon-size);
+      --mdc-icon-size: #{map.get($theme, icon-size)};
     }
   }
 
   &__label {
-    margin-top: 4px;
-    font-family: map.get($theme, with-label-text-label-text-font);
-    font-size: map.get($theme, with-label-text-label-text-size);
-    line-height: map.get($theme, with-label-text-label-text-line-height);
-    letter-spacing: map.get($theme, with-label-text-label-text-tracking);
-    font-weight: map.get($theme, with-label-text-label-text-weight);
-    color: map.get($theme, with-label-text-inactive-label-text-color);
+    font-family: map.get($theme, label-text-font);
+    font-size: map.get($theme, label-text-size);
+    line-height: map.get($theme, label-text-line-height);
+    letter-spacing: map.get($theme, label-text-tracking);
+    font-weight: map.get($theme, label-text-weight);
+    color: map.get($theme, inactive-label-text-color);
   }
 
   &--selected {
     .md-navigation-tab__label {
-      color: map.get($theme, with-label-text-active-label-text-color);
+      color: map.get($theme, active-label-text-color);
+      font-weight: map.get($theme, active-label-text-weight);
+    }
+
+    .md-navigation-tab__icon {
+      color: map.get($theme, active-icon-color);
     }
 
     .md-navigation-tab__active-indicator {
       background-color: map.get($theme, active-indicator-color);
+      width: map.get($theme, active-indicator-width);
+      opacity: 1;
     }
   }
 }
