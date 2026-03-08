@@ -21,9 +21,7 @@ jobs:
         uses: GoogleCloudPlatform/release-please-action@main
         with:
           release-type: node
-          node-version: 16
-          package-name: vue-material-3
-          bump-minor-pre-major: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Repo
         uses: actions/checkout@v3
