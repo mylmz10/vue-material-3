@@ -7,6 +7,14 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.8.1](https://github.com/mylmz10/vue-material-3/compare/v0.8.0...v0.8.1) (2026-03-08)
+
+
+### Bug Fixes
+
+* **select:** add explicit zero gap on filled-select trigger ([1df43ac](https://github.com/mylmz10/vue-material-3/commit/1df43acb49ad170070468bec19241d1cdea4e0cd))
+* **select:** add explicit zero gap on filled-select trigger ([c0ca041](https://github.com/mylmz10/vue-material-3/commit/c0ca041ed69b3a3d730576240e2da327aed4cc6e))
+
 ## [0.8.0](https://github.com/mylmz10/vue-material-3/compare/v0.7.0...v0.8.0) (2026-03-08)
 
 
