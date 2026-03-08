@@ -7,6 +7,16 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.8.2](https://github.com/mylmz10/vue-material-3/compare/v0.8.1...v0.8.2) (2026-03-08)
+
+
+### Bug Fixes
+
+* **ci:** disable token auth path for npm OIDC publish ([c3c6fa5](https://github.com/mylmz10/vue-material-3/commit/c3c6fa52c828659a99b552b382f1c12ee3a2c11e))
+* **ci:** force npm trusted publishing without auth token ([74a6485](https://github.com/mylmz10/vue-material-3/commit/74a6485dd2caa704aba7f735406f046bdc2fd5b7))
+* **select:** add explicit zero gap on outlined-select trigger ([0c90413](https://github.com/mylmz10/vue-material-3/commit/0c904138d55c4e6156fe0fd4eb4873b848d812c9))
+* **select:** add explicit zero gap on outlined-select trigger ([c7bd43d](https://github.com/mylmz10/vue-material-3/commit/c7bd43d825755553cc6ad005880cc5fdc169b80d))
+
 ## [0.8.1](https://github.com/mylmz10/vue-material-3/compare/v0.8.0...v0.8.1) (2026-03-08)
 
 
