@@ -4,7 +4,8 @@
   "description": "Material Design 3 styled components for Vue 3",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -43,11 +44,14 @@
     "eslint-plugin-storybook": "10.2.16",
     "eslint-plugin-vue": "^8.2.0",
     "gh-pages": "^3.2.3",
+    "jsdom": "^26.1.0",
     "prettier": "^2.5.1",
     "sass": "^1.50.0",
     "storybook": "10.2.16",
+    "vitest": "^3.2.4",
     "vite": "^7.3.1",
-    "vue": "^3.5.29"
+    "vue": "^3.5.29",
+    "@vue/test-utils": "^2.4.6"
   },
   "prettier": {
     "printWidth": 200,
