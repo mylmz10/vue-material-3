@@ -141,7 +141,7 @@ const onFocusout = () => {
   }
 
   &__end {
-    width: 16px;
+    width: 24px;
     flex-shrink: 0;
   }
 
