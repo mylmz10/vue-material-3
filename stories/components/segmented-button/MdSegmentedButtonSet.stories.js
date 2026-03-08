@@ -1,4 +1,4 @@
-import { useArgs } from '@storybook/client-api';
+import { useArgs } from 'storybook/preview-api';
 import MdSegmentedButton from '../../../src/components/segmented-button/MdSegmentedButton.vue';
 import MdSegmentedButtonSet from '../../../src/components/segmented-button/MdSegmentedButtonSet.vue';
 
