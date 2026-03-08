@@ -93,6 +93,7 @@ $theme: tokens.md-comp-menu-values();
       inset: 0;
       background-color: transparent;
       opacity: 0.11;
+      pointer-events: none;
     }
 
     .md-list {

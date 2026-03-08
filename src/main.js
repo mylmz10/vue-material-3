@@ -11,6 +11,8 @@ export { default as MdBrandedFab } from './components/fab/MdBrandedFab.vue';
 export { default as MdFabExtended } from './components/fab/MdFabExtended.vue';
 export { default as MdOutlinedTextField } from './components/text-field/MdOutlinedTextField.vue';
 export { default as MdFilledTextField } from './components/text-field/MdFilledTextField.vue';
+export { default as MdFilledSelect } from './components/select/MdFilledSelect.vue';
+export { default as MdSelectOption } from './components/select/MdSelectOption.vue';
 export { default as MdNavigationDrawer } from './components/navigation-drawer/MdNavigationDrawer.vue';
 export { default as MdList } from './components/list/MdList.vue';
 export { default as MdListItem } from './components/list/MdListItem.vue';
