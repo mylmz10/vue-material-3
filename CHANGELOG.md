@@ -7,6 +7,38 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.8.0](https://github.com/mylmz10/vue-material-3/compare/v0.7.0...v0.8.0) (2026-03-08)
+
+
+### Features
+
+* add calendar transition ([0afc930](https://github.com/mylmz10/vue-material-3/commit/0afc9305b70fd63d5493cd00d6a2ba0de852def3))
+* **button:** add filled tonal button and fix ripple/nav-tab states ([83de3b5](https://github.com/mylmz10/vue-material-3/commit/83de3b504f9d731776e9a28545ae52764460cb4d))
+* **button:** add filled tonal button component and story ([9578741](https://github.com/mylmz10/vue-material-3/commit/957874166a38a4479a8b09604e4c958501c72197))
+* **button:** add link and soft-disabled parity API ([ea50a77](https://github.com/mylmz10/vue-material-3/commit/ea50a7736da52ed038319c4e4424396a067d9770))
+* **button:** W1-02 button API parity ([5f50817](https://github.com/mylmz10/vue-material-3/commit/5f5081736111a59467c296b8bc8d079018b59f9a))
+* **fab:** add branded fab component and stories ([789b1f5](https://github.com/mylmz10/vue-material-3/commit/789b1f5021a7098363bc7ec4190136be1a79fe74))
+* **fab:** add branded fab component and stories ([4dcaa3b](https://github.com/mylmz10/vue-material-3/commit/4dcaa3b33149cfdf61157abe94aab4abf6073048))
+* **icon-button:** add toggle and link parity behavior ([4f3857f](https://github.com/mylmz10/vue-material-3/commit/4f3857f9275b2ff6bf38edf92b802ab3c55429c8))
+* **icon-button:** implement W1-03 toggle/link parity ([02206b3](https://github.com/mylmz10/vue-material-3/commit/02206b31936e2e1a5ee14ef2edc02e7f56137985))
+* implement MdFilledSelect ([54373a4](https://github.com/mylmz10/vue-material-3/commit/54373a4b5ceca9e1894415baed779ced50577e2f))
+* implement MdOutlinedSelect ([25621ab](https://github.com/mylmz10/vue-material-3/commit/25621ab7d0858f4abbe0f202bb31859ba0f3beff))
+* implementation of basic date picker ([97b9f77](https://github.com/mylmz10/vue-material-3/commit/97b9f77af1ca0c105949debbcf3dda497d37adbc))
+* select option component ([8429240](https://github.com/mylmz10/vue-material-3/commit/8429240f2da2556a8d89157510add3b39063cc58))
+* **select:** add MdSelectOption component behavior ([79f0734](https://github.com/mylmz10/vue-material-3/commit/79f0734a58a5d335fb15f805c3e896897fe5ad57))
+* **select:** add outlined select and shared option tokens ([8628ee2](https://github.com/mylmz10/vue-material-3/commit/8628ee2fda3b6cbc223f42c46aee63f97d0283f0))
+* **select:** implement MdFilledSelect ([2f6fe66](https://github.com/mylmz10/vue-material-3/commit/2f6fe66575b00d58a6ce09cb0edc065515888b67))
+* **select:** implement MdSelectOption ([1323fba](https://github.com/mylmz10/vue-material-3/commit/1323fba05d10a10c0e9b095deb47c7b2602c3d6c))
+* **tokens:** upgrade Material tokens to v0_192 and migrate components ([a32a9ff](https://github.com/mylmz10/vue-material-3/commit/a32a9ff7e4aa35a03cb18232ecf608d952f606ef))
+
+
+### Bug Fixes
+
+* **ci:** repair release and sync workflows on master ([7fad0ab](https://github.com/mylmz10/vue-material-3/commit/7fad0ab5469a51c967b4979128967cd01219f44f))
+* **ci:** repair release-please and master-&gt;develop sync workflows ([05352fe](https://github.com/mylmz10/vue-material-3/commit/05352fe71ded1c83caf7527cc2202a6bc5bd4721))
+* end slot width change ([f7cd271](https://github.com/mylmz10/vue-material-3/commit/f7cd27138559a210f6846ac2f4ed3a97cbe80067))
+* **ui:** button ripple layering and navigation tab indicator ([ca82447](https://github.com/mylmz10/vue-material-3/commit/ca82447a8b76650f0a9d9341930623d8c5094362))
+
 ## [0.7.0](https://github.com/mylmz10/vue-material-3/compare/v0.6.0...v0.7.0) (2024-11-22)
 
 
