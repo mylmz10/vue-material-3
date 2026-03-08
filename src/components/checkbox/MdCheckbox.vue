@@ -1,11 +1,24 @@
 <template>
   <div
     class="md-checkbox"
-    :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate, 'md-checkbox--focused': focused }"
-    @click="toggle"
+    :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }"
   >
     <MdRipple />
-    <input type="checkbox" :name="name" @input="onInput" @change="onInputChange" @focus="onFocus" @blur="onBlur" />
+    <input
+      ref="inputEl"
+      type="checkbox"
+      :checked="_checked"
+      :disabled="disabled"
+      :name="name || undefined"
+      :value="value"
+      :form="form || undefined"
+      :required="required"
+      :readonly="readonly"
+      @input="onInput"
+      @change="onInputChange"
+      @focus="onFocus"
+      @blur="onBlur"
+    />
     <div class="md-checkbox__background">
       <svg class="md-checkbox__checkmark" viewBox="0 0 24 24" aria-hidden="true">
         <path class="md-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
@@ -16,62 +29,151 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(['update:modelValue', 'update:model-value', 'input', 'change', 'focus', 'blur']);
 
+const inputEl = ref(null);
 const _checked = ref(false);
 const _indeterminate = ref(false);
-const focused = ref(false);
+const initialChecked = ref(false);
+const initialIndeterminate = ref(false);
+let formEl = null;
 
 const props = defineProps({
-  disabled: {
-    type: Boolean,
-  },
-  modelValue: {
-    type: Boolean,
-  },
-  indeterminate: {
-    type: Boolean,
-  },
-  name: {
-    type: String,
-  },
+  checked: { type: Boolean, default: undefined },
+  disabled: { type: Boolean, default: false },
+  form: { type: String, default: '' },
+  indeterminate: { type: Boolean, default: false },
+  modelValue: { type: Boolean, default: undefined },
+  name: { type: String, default: '' },
+  readonly: { type: Boolean, default: false },
+  required: { type: Boolean, default: false },
+  value: { type: [String, Number], default: 'on' },
 });
 
-const onInput = () => {};
-const onFocus = () => {
-  focused.value = true;
+const resolveChecked = () => {
+  if (props.modelValue !== undefined) {
+    return !!props.modelValue;
+  }
+
+  if (props.checked !== undefined) {
+    return !!props.checked;
+  }
+
+  return false;
 };
-const onBlur = () => {
-  focused.value = false;
+
+const syncIndeterminateToInput = () => {
+  if (inputEl.value) {
+    inputEl.value.indeterminate = _indeterminate.value;
+  }
 };
-const onInputChange = () => {};
+
+const emitCheckedUpdate = () => {
+  emit('update:modelValue', _checked.value);
+  emit('update:model-value', _checked.value);
+};
+
+const onInput = (ev) => {
+  if (props.disabled || props.readonly) {
+    return;
+  }
+
+  emit('input', ev.target.checked);
+};
+
+const onFocus = (ev) => {
+  emit('focus', ev);
+};
+
+const onBlur = (ev) => {
+  emit('blur', ev);
+};
+
+const onInputChange = (ev) => {
+  if (props.disabled || props.readonly) {
+    ev.target.checked = _checked.value;
+    syncIndeterminateToInput();
+    return;
+  }
+
+  _checked.value = ev.target.checked;
+  _indeterminate.value = false;
+  syncIndeterminateToInput();
+  emitCheckedUpdate();
+  emit('change', _checked.value);
+};
 
 watch(
   () => props.modelValue,
   (newValue) => {
-    _checked.value = newValue;
-    emit('update:model-value', _checked.value);
+    if (newValue === undefined) {
+      return;
+    }
+
+    _checked.value = !!newValue;
   },
-  { immediate: true }
+  { immediate: true },
 );
+
+watch(
+  () => props.checked,
+  (newValue) => {
+    if (props.modelValue !== undefined || newValue === undefined) {
+      return;
+    }
+
+    _checked.value = !!newValue;
+  },
+  { immediate: true },
+);
+
 watch(
   () => props.indeterminate,
   (newValue) => {
     _indeterminate.value = newValue;
+    syncIndeterminateToInput();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
-const toggle = () => {
-  if (!props.disabled) {
-    _checked.value = !_checked.value;
-    _indeterminate.value = false;
-    emit('update:model-value', _checked.value);
-  }
+const onFormReset = () => {
+  _checked.value = initialChecked.value;
+  _indeterminate.value = initialIndeterminate.value;
+  syncIndeterminateToInput();
+  emitCheckedUpdate();
 };
+
+const focus = () => inputEl.value?.focus();
+const blur = () => inputEl.value?.blur();
+const checkValidity = () => inputEl.value?.checkValidity();
+const reportValidity = () => inputEl.value?.reportValidity();
+const setCustomValidity = (message) => inputEl.value?.setCustomValidity(message || '');
+const getInputEl = () => inputEl.value;
+
+defineExpose({
+  focus,
+  blur,
+  checkValidity,
+  reportValidity,
+  setCustomValidity,
+  getInputEl,
+});
+
+onMounted(() => {
+  _checked.value = resolveChecked();
+  initialChecked.value = _checked.value;
+  initialIndeterminate.value = _indeterminate.value;
+  syncIndeterminateToInput();
+  formEl = inputEl.value?.form || null;
+  formEl?.addEventListener('reset', onFormReset);
+});
+
+onBeforeUnmount(() => {
+  formEl?.removeEventListener('reset', onFormReset);
+});
 </script>
 
 <style lang="scss">
@@ -83,9 +185,10 @@ $theme: tokens.md-comp-checkbox-values();
 
 .md-checkbox {
   $this: &;
+  --md-checkbox-touch-target-size: 48px;
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: var(--md-checkbox-touch-target-size);
+  height: var(--md-checkbox-touch-target-size);
   border-radius: map.get($theme, state-layer-shape);
   align-items: center;
   border: none;
@@ -99,9 +202,21 @@ $theme: tokens.md-comp-checkbox-values();
     position: absolute;
     inset: 0;
     appearance: none;
-    width: 0;
-    height: 0;
+    outline: none;
+    border: none;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: inherit;
     z-index: 1;
+    box-shadow: none;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      box-shadow: none;
+    }
   }
 
   &__background {
@@ -150,6 +265,13 @@ $theme: tokens.md-comp-checkbox-values();
     }
   }
 
+  .md-ripple {
+    width: map.get($theme, state-layer-size);
+    height: map.get($theme, state-layer-size);
+    inset: 0;
+    margin: auto;
+  }
+
   &--indeterminate {
     #{$this}__background {
       background-color: map.get($theme, selected-container-color);
@@ -181,6 +303,15 @@ $theme: tokens.md-comp-checkbox-values();
         }
       }
     }
+
+    .md-ripple {
+      --md-ripple-hover-state-layer-color: #{map.get($theme, selected-hover-state-layer-color)};
+      --md-ripple-focus-state-layer-color: #{map.get($theme, selected-focus-state-layer-color)};
+      --md-ripple-pressed-state-layer-color: #{map.get($theme, selected-pressed-state-layer-color)};
+      --md-ripple-hover-state-layer-opacity: #{map.get($theme, selected-hover-state-layer-opacity)};
+      --md-ripple-focus-state-layer-opacity: #{map.get($theme, selected-focus-state-layer-opacity)};
+      --md-ripple-pressed-state-layer-opacity: #{map.get($theme, selected-pressed-state-layer-opacity)};
+    }
   }
 
   &--checked {
@@ -194,12 +325,15 @@ $theme: tokens.md-comp-checkbox-values();
         }
       }
     }
-  }
 
-  &--focused {
-    border-width: map.get($theme, unselected-focus-outline-width);
-    border-color: map.get($theme, unselected-focus-outline-color);
-    border-style: solid;
+    .md-ripple {
+      --md-ripple-hover-state-layer-color: #{map.get($theme, selected-hover-state-layer-color)};
+      --md-ripple-focus-state-layer-color: #{map.get($theme, selected-focus-state-layer-color)};
+      --md-ripple-pressed-state-layer-color: #{map.get($theme, selected-pressed-state-layer-color)};
+      --md-ripple-hover-state-layer-opacity: #{map.get($theme, selected-hover-state-layer-opacity)};
+      --md-ripple-focus-state-layer-opacity: #{map.get($theme, selected-focus-state-layer-opacity)};
+      --md-ripple-pressed-state-layer-opacity: #{map.get($theme, selected-pressed-state-layer-opacity)};
+    }
   }
 
   &--disabled {

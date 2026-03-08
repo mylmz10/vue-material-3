@@ -1,7 +1,20 @@
 <template>
   <div class="md-radio" :class="{ 'md-radio--disabled': disabled, 'md-radio--checked': checked }">
     <MdRipple />
-    <input :checked="checked" :disabled="disabled" :name="name" type="radio" :value="value" @change="toggle" />
+    <input
+      ref="inputEl"
+      :checked="checked"
+      :disabled="disabled"
+      :name="name || undefined"
+      type="radio"
+      :value="value"
+      :form="form || undefined"
+      :required="required"
+      @input="onInput"
+      @change="onChange"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+    />
     <div class="md-radio__background">
       <div class="md-radio__outer-circle"></div>
       <div class="md-radio__inner-circle"></div>
@@ -10,33 +23,110 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur']);
 
 const props = defineProps({
-  disabled: {
-    type: Boolean,
-  },
-  name: {
-    type: String,
-  },
-  value: {
-    type: String,
-  },
-  modelValue: {
-    type: String,
-  },
+  checked: { type: Boolean, default: undefined },
+  disabled: { type: Boolean, default: false },
+  form: { type: String, default: '' },
+  modelValue: { type: [String, Number, Boolean], default: undefined },
+  name: { type: String, default: '' },
+  required: { type: Boolean, default: false },
+  value: { type: [String, Number, Boolean], default: '' },
 });
 
-const toggle = () => {
-  if (!props.disabled) {
+const inputEl = ref(null);
+const internalChecked = ref(false);
+const initialChecked = ref(false);
+let formEl = null;
+
+const resolveChecked = () => {
+  if (props.modelValue !== undefined) {
+    return props.modelValue === props.value;
+  }
+
+  return !!props.checked;
+};
+
+watch(
+  () => props.modelValue,
+  () => {
+    internalChecked.value = resolveChecked();
+  },
+  { immediate: true },
+);
+
+watch(
+  () => props.checked,
+  () => {
+    if (props.modelValue !== undefined) {
+      return;
+    }
+
+    internalChecked.value = resolveChecked();
+  },
+  { immediate: true },
+);
+
+const onInput = (ev) => {
+  if (props.disabled) {
+    return;
+  }
+
+  emit('input', ev.target.checked ? props.value : null);
+};
+
+const onChange = (ev) => {
+  if (props.disabled) {
+    ev.target.checked = internalChecked.value;
+    return;
+  }
+
+  internalChecked.value = ev.target.checked;
+  if (internalChecked.value) {
+    emit('update:modelValue', props.value);
+    emit('change', props.value);
+  }
+};
+
+const onFormReset = () => {
+  internalChecked.value = initialChecked.value;
+  if (internalChecked.value) {
     emit('update:modelValue', props.value);
   }
 };
 
-const checked = computed(() => props.modelValue === props.value);
+const checked = computed(() => internalChecked.value);
+
+const focus = () => inputEl.value?.focus();
+const blur = () => inputEl.value?.blur();
+const checkValidity = () => inputEl.value?.checkValidity();
+const reportValidity = () => inputEl.value?.reportValidity();
+const setCustomValidity = (message) => inputEl.value?.setCustomValidity(message || '');
+const getInputEl = () => inputEl.value;
+
+defineExpose({
+  focus,
+  blur,
+  checkValidity,
+  reportValidity,
+  setCustomValidity,
+  getInputEl,
+});
+
+onMounted(() => {
+  internalChecked.value = resolveChecked();
+  initialChecked.value = internalChecked.value;
+  formEl = inputEl.value?.form || null;
+  formEl?.addEventListener('reset', onFormReset);
+});
+
+onBeforeUnmount(() => {
+  formEl?.removeEventListener('reset', onFormReset);
+});
 </script>
 
 <style lang="scss">
