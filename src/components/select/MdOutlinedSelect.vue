@@ -1,13 +1,13 @@
 <template>
-  <MdMenu class="md-filled-select-menu" v-model="menuOpened">
+  <MdMenu class="md-outlined-select-menu" v-model="menuOpened">
     <template #activator>
-      <span class="md-filled-select" :class="{ 'md-filled-select--open': menuOpened, 'md-filled-select--disabled': disabled }">
-        <input v-if="name" class="md-filled-select__hidden-input" type="hidden" :name="name" :value="formValue" />
+      <span class="md-outlined-select" :class="{ 'md-outlined-select--open': menuOpened, 'md-outlined-select--disabled': disabled }">
+        <input v-if="name" class="md-outlined-select__hidden-input" type="hidden" :name="name" :value="formValue" />
 
-        <MdFilledField :disabled="disabled" :error="error" :label="label" :populated="isPopulated">
+        <MdOutlinedField :disabled="disabled" :error="error" :label="label" :populated="isPopulated">
           <button
             ref="triggerEl"
-            class="md-filled-select__trigger"
+            class="md-outlined-select__trigger"
             type="button"
             role="combobox"
             :disabled="disabled"
@@ -20,13 +20,13 @@
             @focus="onFocus"
             @blur="onBlur"
           >
-            <span class="md-filled-select__value" :class="{ 'md-filled-select__value--placeholder': !displayLabel }">
+            <span class="md-outlined-select__value" :class="{ 'md-outlined-select__value--placeholder': !displayLabel }">
               {{ displayLabel || placeholder }}
             </span>
           </button>
 
           <template #end>
-            <MdIcon class="md-filled-select__icon">expand_more</MdIcon>
+            <MdIcon class="md-outlined-select__icon">expand_more</MdIcon>
           </template>
 
           <template #supporting-text>
@@ -34,11 +34,11 @@
               {{ supportingText }}
             </slot>
           </template>
-        </MdFilledField>
+        </MdOutlinedField>
       </span>
     </template>
 
-    <MdList :id="listboxId" ref="listEl" class="md-filled-select__list" role="listbox" @keydown="onListKeydown">
+    <MdList :id="listboxId" ref="listEl" class="md-outlined-select__list" role="listbox" @keydown="onListKeydown">
       <slot />
     </MdList>
   </MdMenu>
@@ -46,7 +46,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
-import MdFilledField from '../field/MdFilledField.vue';
+import MdOutlinedField from '../field/MdOutlinedField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdList from '../list/MdList.vue';
 import MdMenu from '../menu/MdMenu.vue';
@@ -112,7 +112,7 @@ const registeredOptions = ref(new Map());
 const initializedFromOption = ref(false);
 const activeOptionId = ref('');
 const lastOpenDirection = ref(0);
-const listboxId = `md-filled-select-listbox-${Math.random().toString(36).slice(2, 10)}`;
+const listboxId = `md-outlined-select-listbox-${Math.random().toString(36).slice(2, 10)}`;
 
 const formValue = computed(() => normalizeValue(internalValue.value));
 
@@ -479,9 +479,9 @@ onBeforeUnmount(() => {
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$theme: tokens.md-comp-filled-select-values();
+$theme: tokens.md-comp-outlined-select-values();
 
-.md-filled-select-menu {
+.md-outlined-select-menu {
   --md-select-option-container-height: #{map.get($theme, menu-list-item-container-height)};
   --md-select-option-label-text-color: #{map.get($theme, menu-list-item-label-text-color)};
   --md-select-option-label-text-font: #{map.get($theme, menu-list-item-label-text-font)};
@@ -505,11 +505,11 @@ $theme: tokens.md-comp-filled-select-values();
   }
 }
 
-.md-filled-select {
+.md-outlined-select {
   display: block;
   width: 100%;
 
-  .md-field--filled {
+  .md-field--outlined {
     width: 100%;
   }
 
@@ -554,13 +554,13 @@ $theme: tokens.md-comp-filled-select-values();
   }
 
   &--open {
-    .md-filled-select__icon {
+    .md-outlined-select__icon {
       transform: rotate(180deg);
     }
   }
 
   &--disabled {
-    .md-filled-select__trigger {
+    .md-outlined-select__trigger {
       cursor: default;
     }
   }
