@@ -524,6 +524,7 @@ $theme: tokens.md-comp-outlined-select-values();
     border: none;
     cursor: pointer;
     display: inline-flex;
+    gap: 0;
     min-height: 56px;
     outline: none;
     padding: 0;
