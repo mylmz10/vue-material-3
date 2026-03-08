@@ -9,7 +9,8 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "deploy-storybook": "gh-pages -d storybook-static"
+    "deploy-storybook": "gh-pages -d storybook-static",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -39,19 +40,20 @@
     "@storybook/vue3-vite": "10.2.16",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-prettier": "^7.0.0",
+    "@vue/test-utils": "^2.4.6",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.5.0",
     "eslint-plugin-storybook": "10.2.16",
     "eslint-plugin-vue": "^8.2.0",
     "gh-pages": "^3.2.3",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "prettier": "^2.5.1",
     "sass": "^1.50.0",
     "storybook": "10.2.16",
-    "vitest": "^3.2.4",
     "vite": "^7.3.1",
-    "vue": "^3.5.29",
-    "@vue/test-utils": "^2.4.6"
+    "vitest": "^3.2.4",
+    "vue": "^3.5.29"
   },
   "prettier": {
     "printWidth": 200,
