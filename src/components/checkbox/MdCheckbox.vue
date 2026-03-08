@@ -109,8 +109,8 @@ $theme: tokens.md-comp-checkbox-values();
     border-style: solid;
     border-color: map.get($theme, unselected-outline-color);
     border-width: map.get($theme, unselected-outline-width);
-    width: map.get($theme, container-width);
-    height: map.get($theme, container-height);
+    width: map.get($theme, container-size);
+    height: map.get($theme, container-size);
     border-radius: map.get($theme, container-shape);
 
     display: inline-flex;

@@ -91,8 +91,9 @@ $theme: tokens.md-comp-menu-values();
     .md-menu__surface {
       position: absolute;
       inset: 0;
-      background-color: map.get($theme, container-surface-tint-layer-color);
+      background-color: transparent;
       opacity: 0.11;
+      pointer-events: none;
     }
 
     .md-list {

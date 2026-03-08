@@ -19,7 +19,7 @@ $theme: tokens.md-comp-list-values();
 
 .md-list-divider {
   box-sizing: border-box;
-  border-bottom: solid 1px map.get($theme, divider-color);
+  border-bottom: solid 1px var(--md-sys-color-outline-variant, #cac4d0);
   margin: 0 16px;
   margin: 0;
 }

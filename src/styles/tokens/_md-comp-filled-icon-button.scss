@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -26,8 +29,9 @@ $_default: (
 @function values($deps: $_default, $exclude-hardcoded-values: false) {
   @return (
     'container-color': map.get($deps, 'md-sys-color', 'primary'),
+    'container-height': if($exclude-hardcoded-values, null, 40px),
     'container-shape': map.get($deps, 'md-sys-shape', 'corner-full'),
-    'container-size': if($exclude-hardcoded-values, null, 40px),
+    'container-width': if($exclude-hardcoded-values, null, 40px),
     'disabled-container-color': map.get($deps, 'md-sys-color', 'on-surface'),
     'disabled-container-opacity': if($exclude-hardcoded-values, null, 0.12),
     'disabled-icon-color': map.get($deps, 'md-sys-color', 'on-surface'),
@@ -74,6 +78,6 @@ $_default: (
     'toggle-unselected-pressed-state-layer-color':
       map.get($deps, 'md-sys-color', 'primary'),
     'unselected-container-color':
-      map.get($deps, 'md-sys-color', 'surface-variant')
+      map.get($deps, 'md-sys-color', 'surface-container-highest')
   );
 }

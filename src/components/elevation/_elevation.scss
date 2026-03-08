@@ -1,5 +1,6 @@
 // Thanks https://github.com/material-components/material-web/
 @use 'sass:map';
+@use 'sass:meta';
 @use 'sass:string';
 
 $_key-opacity: 0.3;
@@ -62,6 +63,10 @@ $_dp-to-level-map: (
 }
 
 @function is-var($string) {
+  @if meta.type-of($string) != 'string' {
+    @return false;
+  }
+
   @if (str-index(string.quote($string), 'var(')) {
     @return true;
   } @else {

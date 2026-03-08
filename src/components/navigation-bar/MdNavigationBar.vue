@@ -32,6 +32,7 @@ const onItemClick = ($event, item, index) => {
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-navigation-bar-values();
+$sys-color: tokens.md-sys-color-values-light();
 
 .md-navigation-bar {
   display: flex;
@@ -40,6 +41,6 @@ $theme: tokens.md-comp-navigation-bar-values();
   background-color: map.get($theme, container-color);
   border-radius: map.get($theme, container-shape);
   height: map.get($theme, container-height);
-  box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-surface-tint-layer-color));
+  box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($sys-color, shadow));
 }
 </style>

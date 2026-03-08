@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -106,21 +109,6 @@ $_default: (
       ),
     'label-text-weight':
       map.get($deps, 'md-sys-typescale', 'label-medium-weight'),
-    'menu-focus-icon-color': map.get($deps, 'md-sys-color', 'on-surface'),
-    'menu-focus-state-layer-color': map.get($deps, 'md-sys-color', 'on-surface'),
-    'menu-focus-state-layer-opacity':
-      map.get($deps, 'md-sys-state', 'focus-state-layer-opacity'),
-    'menu-hover-icon-color': map.get($deps, 'md-sys-color', 'on-surface'),
-    'menu-hover-state-layer-color': map.get($deps, 'md-sys-color', 'on-surface'),
-    'menu-hover-state-layer-opacity':
-      map.get($deps, 'md-sys-state', 'hover-state-layer-opacity'),
-    'menu-icon-color': map.get($deps, 'md-sys-color', 'on-surface-variant'),
-    'menu-icon-size': if($exclude-hardcoded-values, null, 24px),
-    'menu-pressed-icon-color': map.get($deps, 'md-sys-color', 'on-surface'),
-    'menu-pressed-state-layer-color':
-      map.get($deps, 'md-sys-color', 'on-surface'),
-    'menu-pressed-state-layer-opacity':
-      map.get($deps, 'md-sys-state', 'pressed-state-layer-opacity'),
     'no-label-active-indicator-height':
       if($exclude-hardcoded-values, null, 56px),
     'no-label-active-indicator-shape':

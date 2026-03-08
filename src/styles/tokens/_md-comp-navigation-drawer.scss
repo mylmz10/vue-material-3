@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -61,11 +64,8 @@ $_default: (
     'active-pressed-state-layer-color':
       map.get($deps, 'md-sys-color', 'on-secondary-container'),
     'bottom-container-shape': map.get($deps, 'md-sys-shape', 'corner-large-top'),
-    'container-color': map.get($deps, 'md-sys-color', 'surface'),
     'container-height': if($exclude-hardcoded-values, null, 100%),
     'container-shape': map.get($deps, 'md-sys-shape', 'corner-large-end'),
-    'container-surface-tint-layer-color':
-      map.get($deps, 'md-sys-color', 'surface-tint'),
     'container-width': if($exclude-hardcoded-values, null, 360px),
     'focus-state-layer-opacity':
       map.get($deps, 'md-sys-state', 'focus-state-layer-opacity'),
@@ -154,9 +154,12 @@ $_default: (
       ),
     'large-badge-label-weight':
       map.get($deps, 'md-sys-typescale', 'label-large-weight'),
+    'modal-container-color':
+      map.get($deps, 'md-sys-color', 'surface-container-low'),
     'modal-container-elevation': map.get($deps, 'md-sys-elevation', 'level1'),
     'pressed-state-layer-opacity':
       map.get($deps, 'md-sys-state', 'pressed-state-layer-opacity'),
+    'standard-container-color': map.get($deps, 'md-sys-color', 'surface'),
     'standard-container-elevation': map.get($deps, 'md-sys-elevation', 'level0')
   );
 }

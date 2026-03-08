@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -31,6 +34,8 @@ $_default: (
 
 @function values($deps: $_default, $exclude-hardcoded-values: false) {
   @return (
+    'divider-leading-space': if($exclude-hardcoded-values, null, 16px),
+    'divider-trailing-space': if($exclude-hardcoded-values, null, 16px),
     'list-item-container-color': map.get($deps, 'md-sys-color', 'surface'),
     'list-item-container-elevation':
       map.get($deps, 'md-sys-elevation', 'level0'),
@@ -139,11 +144,12 @@ $_default: (
     'list-item-leading-avatar-size': if($exclude-hardcoded-values, null, 40px),
     'list-item-leading-icon-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
-    'list-item-leading-icon-size': if($exclude-hardcoded-values, null, 18px),
+    'list-item-leading-icon-size': if($exclude-hardcoded-values, null, 24px),
     'list-item-leading-image-height': if($exclude-hardcoded-values, null, 56px),
     'list-item-leading-image-shape':
       map.get($deps, 'md-sys-shape', 'corner-none'),
     'list-item-leading-image-width': if($exclude-hardcoded-values, null, 56px),
+    'list-item-leading-space': if($exclude-hardcoded-values, null, 16px),
     'list-item-leading-video-shape':
       map.get($deps, 'md-sys-shape', 'corner-none'),
     'list-item-leading-video-width': if($exclude-hardcoded-values, null, 100px),
@@ -216,6 +222,7 @@ $_default: (
     'list-item-trailing-icon-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'list-item-trailing-icon-size': if($exclude-hardcoded-values, null, 24px),
+    'list-item-trailing-space': if($exclude-hardcoded-values, null, 16px),
     'list-item-trailing-supporting-text-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'list-item-trailing-supporting-text-font':

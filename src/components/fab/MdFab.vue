@@ -69,10 +69,10 @@ defineProps({
 }
 
 .md-fab {
-  $theme: tokens.md-comp-fab-surface-values();
+$theme: tokens.md-comp-fab-surface-values();
   @include root-static-styles($theme);
 
-  --surface-tint-layer-color: #{map.get($theme, container-surface-tint-layer-color)};
+  --surface-tint-layer-color: #{map.get($theme, container-color)};
   --overlay-opacity: 0.11;
 }
 .md-fab--small.md-fab {

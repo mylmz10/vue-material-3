@@ -6,8 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
 // User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -35,7 +37,7 @@ $_default: (
     'body-large-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'body-large-line-height': if($exclude-hardcoded-values, null, 1.5rem),
     'body-large-size': if($exclude-hardcoded-values, null, 1rem),
-    'body-large-tracking': if($exclude-hardcoded-values, null, 0.031rem),
+    'body-large-tracking': if($exclude-hardcoded-values, null, 0.03125rem),
     'body-large-weight': map.get($deps, 'md-ref-typeface', 'weight-regular'),
     'body-medium':
       if(
@@ -52,7 +54,7 @@ $_default: (
     'body-medium-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'body-medium-line-height': if($exclude-hardcoded-values, null, 1.25rem),
     'body-medium-size': if($exclude-hardcoded-values, null, 0.875rem),
-    'body-medium-tracking': if($exclude-hardcoded-values, null, 0.016rem),
+    'body-medium-tracking': if($exclude-hardcoded-values, null, 0.015625rem),
     'body-medium-weight': map.get($deps, 'md-ref-typeface', 'weight-regular'),
     'body-small':
       if(
@@ -77,7 +79,7 @@ $_default: (
         null,
         /** Warning: risk of reduced fidelity from using this composite typography token. Tokens md.sys.typescale.display-large.tracking cannot be represented in the "font" property shorthand. Consider using the discrete properties instead. */
           map.get($deps, 'md-ref-typeface', 'weight-regular')
-          if($exclude-hardcoded-values, null, 3.562rem) #{'/'} if(
+          if($exclude-hardcoded-values, null, 3.5625rem) #{'/'} if(
             $exclude-hardcoded-values,
             null,
             4rem
@@ -85,8 +87,8 @@ $_default: (
       ),
     'display-large-font': map.get($deps, 'md-ref-typeface', 'brand'),
     'display-large-line-height': if($exclude-hardcoded-values, null, 4rem),
-    'display-large-size': if($exclude-hardcoded-values, null, 3.562rem),
-    'display-large-tracking': if($exclude-hardcoded-values, null, -0.016rem),
+    'display-large-size': if($exclude-hardcoded-values, null, 3.5625rem),
+    'display-large-tracking': if($exclude-hardcoded-values, null, -0.015625rem),
     'display-large-weight': map.get($deps, 'md-ref-typeface', 'weight-regular'),
     'display-medium':
       if(
@@ -94,7 +96,7 @@ $_default: (
         null,
         /** Warning: risk of reduced fidelity from using this composite typography token. Tokens md.sys.typescale.display-medium.tracking cannot be represented in the "font" property shorthand. Consider using the discrete properties instead. */
           map.get($deps, 'md-ref-typeface', 'weight-regular')
-          if($exclude-hardcoded-values, null, 2.812rem) #{'/'} if(
+          if($exclude-hardcoded-values, null, 2.8125rem) #{'/'} if(
             $exclude-hardcoded-values,
             null,
             3.25rem
@@ -102,7 +104,7 @@ $_default: (
       ),
     'display-medium-font': map.get($deps, 'md-ref-typeface', 'brand'),
     'display-medium-line-height': if($exclude-hardcoded-values, null, 3.25rem),
-    'display-medium-size': if($exclude-hardcoded-values, null, 2.812rem),
+    'display-medium-size': if($exclude-hardcoded-values, null, 2.8125rem),
     'display-medium-tracking': if($exclude-hardcoded-values, null, 0rem),
     'display-medium-weight': map.get($deps, 'md-ref-typeface', 'weight-regular'),
     'display-small':
@@ -189,7 +191,7 @@ $_default: (
     'label-large-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'label-large-line-height': if($exclude-hardcoded-values, null, 1.25rem),
     'label-large-size': if($exclude-hardcoded-values, null, 0.875rem),
-    'label-large-tracking': if($exclude-hardcoded-values, null, 0.006rem),
+    'label-large-tracking': if($exclude-hardcoded-values, null, 0.00625rem),
     'label-large-weight': map.get($deps, 'md-ref-typeface', 'weight-medium'),
     'label-large-weight-prominent':
       map.get($deps, 'md-ref-typeface', 'weight-bold'),
@@ -208,7 +210,7 @@ $_default: (
     'label-medium-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'label-medium-line-height': if($exclude-hardcoded-values, null, 1rem),
     'label-medium-size': if($exclude-hardcoded-values, null, 0.75rem),
-    'label-medium-tracking': if($exclude-hardcoded-values, null, 0.031rem),
+    'label-medium-tracking': if($exclude-hardcoded-values, null, 0.03125rem),
     'label-medium-weight': map.get($deps, 'md-ref-typeface', 'weight-medium'),
     'label-medium-weight-prominent':
       map.get($deps, 'md-ref-typeface', 'weight-bold'),
@@ -218,7 +220,7 @@ $_default: (
         null,
         /** Warning: risk of reduced fidelity from using this composite typography token. Tokens md.sys.typescale.label-small.tracking cannot be represented in the "font" property shorthand. Consider using the discrete properties instead. */
           map.get($deps, 'md-ref-typeface', 'weight-medium')
-          if($exclude-hardcoded-values, null, 0.688rem) #{'/'} if(
+          if($exclude-hardcoded-values, null, 0.6875rem) #{'/'} if(
             $exclude-hardcoded-values,
             null,
             1rem
@@ -226,8 +228,8 @@ $_default: (
       ),
     'label-small-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'label-small-line-height': if($exclude-hardcoded-values, null, 1rem),
-    'label-small-size': if($exclude-hardcoded-values, null, 0.688rem),
-    'label-small-tracking': if($exclude-hardcoded-values, null, 0.031rem),
+    'label-small-size': if($exclude-hardcoded-values, null, 0.6875rem),
+    'label-small-tracking': if($exclude-hardcoded-values, null, 0.03125rem),
     'label-small-weight': map.get($deps, 'md-ref-typeface', 'weight-medium'),
     'title-large':
       if(
@@ -261,7 +263,7 @@ $_default: (
     'title-medium-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'title-medium-line-height': if($exclude-hardcoded-values, null, 1.5rem),
     'title-medium-size': if($exclude-hardcoded-values, null, 1rem),
-    'title-medium-tracking': if($exclude-hardcoded-values, null, 0.009rem),
+    'title-medium-tracking': if($exclude-hardcoded-values, null, 0.009375rem),
     'title-medium-weight': map.get($deps, 'md-ref-typeface', 'weight-medium'),
     'title-small':
       if(
@@ -278,7 +280,7 @@ $_default: (
     'title-small-font': map.get($deps, 'md-ref-typeface', 'plain'),
     'title-small-line-height': if($exclude-hardcoded-values, null, 1.25rem),
     'title-small-size': if($exclude-hardcoded-values, null, 0.875rem),
-    'title-small-tracking': if($exclude-hardcoded-values, null, 0.006rem),
+    'title-small-tracking': if($exclude-hardcoded-values, null, 0.00625rem),
     'title-small-weight': map.get($deps, 'md-ref-typeface', 'weight-medium')
   );
 }

@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -50,41 +53,41 @@ $_default: (
       map.get($deps, 'md-sys-color', 'primary'),
     'docked-action-pressed-state-layer-opacity':
       map.get($deps, 'md-sys-state', 'pressed-state-layer-opacity'),
-    'docked-container-color': map.get($deps, 'md-sys-color', 'surface'),
     'docked-container-height': if($exclude-hardcoded-values, null, 100%),
     'docked-container-shape': map.get($deps, 'md-sys-shape', 'corner-none'),
-    'docked-container-surface-tint-layer-color':
-      map.get($deps, 'md-sys-color', 'surface-tint'),
     'docked-container-width': if($exclude-hardcoded-values, null, 256px),
     'docked-divider-color': map.get($deps, 'md-sys-color', 'outline'),
     'docked-headline-color':
       map.get($deps, 'md-sys-color', 'on-surface-variant'),
     'docked-headline-font':
-      map.get($deps, 'md-sys-typescale', 'title-small-font'),
+      map.get($deps, 'md-sys-typescale', 'title-large-font'),
     'docked-headline-line-height':
-      map.get($deps, 'md-sys-typescale', 'title-small-line-height'),
+      map.get($deps, 'md-sys-typescale', 'title-large-line-height'),
     'docked-headline-size':
-      map.get($deps, 'md-sys-typescale', 'title-small-size'),
+      map.get($deps, 'md-sys-typescale', 'title-large-size'),
     'docked-headline-tracking':
-      map.get($deps, 'md-sys-typescale', 'title-small-tracking'),
+      map.get($deps, 'md-sys-typescale', 'title-large-tracking'),
     'docked-headline-type':
       if(
         $exclude-hardcoded-values,
         null,
         /** Warning: risk of reduced fidelity from using this composite typography token. Tokens md.comp.sheet.side.docked.headline.tracking cannot be represented in the "font" property shorthand. Consider using the discrete properties instead. */
-          map.get($deps, 'md-sys-typescale', 'title-small-weight')
-          map.get($deps, 'md-sys-typescale', 'title-small-size') #{'/'} map.get(
+          map.get($deps, 'md-sys-typescale', 'title-large-weight')
+          map.get($deps, 'md-sys-typescale', 'title-large-size') #{'/'} map.get(
             $deps,
             'md-sys-typescale',
-            'title-small-line-height'
-          ) map.get($deps, 'md-sys-typescale', 'title-small-font')
+            'title-large-line-height'
+          ) map.get($deps, 'md-sys-typescale', 'title-large-font')
       ),
     'docked-headline-weight':
-      map.get($deps, 'md-sys-typescale', 'title-small-weight'),
+      map.get($deps, 'md-sys-typescale', 'title-large-weight'),
+    'docked-modal-container-color':
+      map.get($deps, 'md-sys-color', 'surface-container-low'),
     'docked-modal-container-elevation':
       map.get($deps, 'md-sys-elevation', 'level1'),
     'docked-modal-container-shape':
       map.get($deps, 'md-sys-shape', 'corner-large-start'),
+    'docked-standard-container-color': map.get($deps, 'md-sys-color', 'surface'),
     'docked-standard-container-elevation':
       map.get($deps, 'md-sys-elevation', 'level0')
   );

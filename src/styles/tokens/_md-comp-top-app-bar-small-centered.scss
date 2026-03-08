@@ -6,7 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
+// User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @use 'sass:map';
@@ -58,6 +61,8 @@ $_default: (
     'headline-weight': map.get($deps, 'md-sys-typescale', 'title-large-weight'),
     'leading-icon-color': map.get($deps, 'md-sys-color', 'on-surface'),
     'leading-icon-size': if($exclude-hardcoded-values, null, 24px),
+    'on-scroll-container-color':
+      map.get($deps, 'md-sys-color', 'surface-container'),
     'on-scroll-container-elevation':
       map.get($deps, 'md-sys-elevation', 'level2'),
     'trailing-icon-color': map.get($deps, 'md-sys-color', 'on-surface-variant'),

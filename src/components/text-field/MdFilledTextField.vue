@@ -56,10 +56,9 @@ const onClick = () => {
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$theme: tokens.md-comp-outlined-text-field-values();
+$theme: tokens.md-comp-filled-text-field-values();
 
 .md-filled-text-field {
-  height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
 
   .md-text-field__input {

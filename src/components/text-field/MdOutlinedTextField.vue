@@ -59,7 +59,6 @@ const onClick = () => {
 $theme: tokens.md-comp-outlined-text-field-values();
 
 .md-outlined-text-field {
-  height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
 
   .md-text-field__input {

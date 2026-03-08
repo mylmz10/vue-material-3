@@ -6,8 +6,10 @@
 // !!! THIS FILE WAS AUTOMATICALLY GENERATED !!!
 // !!! DO NOT MODIFY IT BY HAND !!!
 // Design system display name: Google Material 3
-// Design system version: v0.152
+// Design system version: v0.192
+// User-configured context group "Audience": "3P"
 // User-configured context group "Platform": "Web"
+// User-configured context group "Scheme": "Dynamic"
 //
 
 @function values($exclude-hardcoded-values: false) {
@@ -48,6 +50,6 @@
       if($exclude-hardcoded-values, null, cubic-bezier(0.3, 0, 1, 1)),
     'easing-standard-decelerate':
       if($exclude-hardcoded-values, null, cubic-bezier(0, 0, 0, 1)),
-    'path': /** TODO: type "motion_path" is not supported. */ null
+    'path': /* Type "motion_path" is not supported. */ null
   );
 }

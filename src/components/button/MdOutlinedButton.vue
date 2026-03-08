@@ -1,5 +1,13 @@
 <template>
-  <MdButtonBase class="md-outlined-button" :disabled="disabled">
+  <MdButtonBase
+    class="md-outlined-button"
+    :disabled="disabled"
+    :soft-disabled="softDisabled"
+    :href="href"
+    :target="target"
+    :download="download"
+    :type="type"
+  >
     <MdRipple />
     <div class="md-button__outline"></div>
     <span v-if="label" class="md-button__label">
@@ -8,19 +16,27 @@
     <span v-else class="md-button__label">
       <slot />
     </span>
+    <span v-if="trailingIcon || $slots['trailing-icon']" class="md-button__trailing-icon">
+      <slot name="trailing-icon">
+        <MdIcon>{{ trailingIcon }}</MdIcon>
+      </slot>
+    </span>
   </MdButtonBase>
 </template>
 
 <script setup>
 import MdButtonBase from './MdButtonBase.vue';
+import { buttonSharedProps } from './buttonSharedProps';
 import MdRipple from '../ripple/MdRipple.vue';
+import MdIcon from '../icon/MdIcon.vue';
 
 defineProps({
+  ...buttonSharedProps,
   label: {
     type: String,
   },
-  disabled: {
-    type: Boolean,
+  trailingIcon: {
+    type: String,
   },
 });
 </script>
@@ -54,24 +70,26 @@ $theme: tokens.md-comp-outlined-button-values();
     line-height: map.get($theme, label-text-line-height);
   }
   .md-button__background {
-    background-color: map.get($theme, container-color);
+    background-color: transparent;
   }
 
-  &:not(:disabled):hover {
+  &:not(:disabled):not(.md-button--soft-disabled):hover {
     box-shadow: none;
   }
 
-  &:disabled {
+  &:disabled,
+  &.md-button--soft-disabled {
     box-shadow: none;
 
     .md-button__outline {
       outline-color: rgba(map.get($theme, disabled-outline-color), map.get($theme, disabled-outline-opacity));
     }
     .md-button__background {
-      background-color: map.get($theme, disabled-container-color);
-      opacity: map.get($theme, disabled-container-opacity);
+      background-color: transparent;
+      opacity: 1;
     }
-    .md-button__label {
+    .md-button__label,
+    .md-button__trailing-icon {
       color: map.get($theme, disabled-label-text-color);
       opacity: map.get($theme, disabled-label-text-opacity);
     }
