@@ -1,7 +1,7 @@
 import MdSelectOption from '../../../src/components/select/MdSelectOption.vue';
 
 export default {
-  title: 'Components/Select Option',
+  title: 'Components/Select',
   component: MdSelectOption,
   argTypes: {},
 };
@@ -11,12 +11,12 @@ const Template = (args) => ({
   setup() {
     return { args };
   },
-  template: `<select style="min-width: 220px; min-height: 40px;">
+  template: `<ul style="list-style: none; margin: 0; max-width: 320px; padding: 0; border-radius: 12px; overflow: hidden; border: 1px solid #ddd;">
     <MdSelectOption value="">Select one</MdSelectOption>
-    <MdSelectOption v-bind="args">Istanbul</MdSelectOption>
+    <MdSelectOption v-bind="args" display-text="Istanbul (TR)">Istanbul</MdSelectOption>
     <MdSelectOption value="ankara">Ankara</MdSelectOption>
     <MdSelectOption value="izmir" disabled>Izmir (disabled)</MdSelectOption>
-  </select>`,
+  </ul>`,
 });
 
 export const SelectOption = Template.bind({});

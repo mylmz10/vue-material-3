@@ -1,26 +1,28 @@
 <template>
-  <component
-    :is="tagName"
+  <li
+    ref="optionEl"
     class="md-select-option"
-    :class="{ 'md-select-option--selected': isSelected, 'md-select-option--disabled': disabled }"
-    :value="tagName === 'option' ? value : undefined"
-    :disabled="disabled || undefined"
-    :selected="tagName === 'option' ? isSelected : undefined"
-    :role="tagName === 'option' ? undefined : 'option'"
-    :aria-disabled="tagName === 'option' ? undefined : `${disabled}`"
-    :aria-selected="tagName === 'option' ? undefined : `${isSelected}`"
+    :class="{
+      'md-select-option--selected': isSelected,
+      'md-select-option--disabled': disabled,
+      'md-select-option--active': isActive,
+    }"
+    role="option"
+    :data-option-id="optionId"
+    :tabindex="optionTabIndex"
+    :aria-disabled="`${disabled}`"
+    :aria-selected="`${isSelected}`"
     @click="onSelect"
-    @keydown.enter.prevent="onSelect"
-    @keydown.space.prevent="onSelect"
+    @keydown="onKeydown"
   >
-    <slot>{{ fallbackText }}</slot>
-  </component>
+    <span class="md-select-option__label">
+      <slot>{{ fallbackText }}</slot>
+    </span>
+  </li>
 </template>
 
 <script setup>
-import { computed, inject, onBeforeUnmount, watch } from 'vue';
-
-const mdSelectContextKey = 'mdSelectContext';
+import { computed, inject, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
 
 const props = defineProps({
   value: {
@@ -35,27 +37,25 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  typeaheadText: {
+    type: String,
+    default: '',
+  },
+  displayText: {
+    type: String,
+    default: '',
+  },
 });
 
-const emit = defineEmits(['select']);
+const emit = defineEmits(['select', 'request-selection', 'request-deselection']);
+const slots = useSlots();
+const optionEl = ref(null);
+const optionId = `md-select-option-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
+const mounted = ref(false);
+const mdSelectContextKey = 'mdSelectContext';
 const selectContext = inject(mdSelectContextKey, null);
-const optionId = `md-select-option-${Math.random().toString(36).slice(2, 10)}`;
 
-const tagName = computed(() => selectContext?.optionTag || 'option');
-
-const isSelected = computed(() => {
-  if (props.selected) {
-    return true;
-  }
-
-  if (selectContext?.isValueSelected) {
-    return selectContext.isValueSelected(props.value);
-  }
-
-  return false;
-});
-
-const fallbackText = computed(() => {
+const primitiveValueText = computed(() => {
   if (typeof props.value === 'string' || typeof props.value === 'number' || typeof props.value === 'boolean') {
     return `${props.value}`;
   }
@@ -63,20 +63,78 @@ const fallbackText = computed(() => {
   return '';
 });
 
+const extractTextFromVNode = (node) => {
+  if (!node) {
+    return '';
+  }
+
+  if (typeof node.children === 'string') {
+    return node.children;
+  }
+
+  if (Array.isArray(node.children)) {
+    return node.children.map((child) => extractTextFromVNode(child)).join(' ');
+  }
+
+  return '';
+};
+
+const normalizeText = (text) => {
+  return text.replace(/\s+/g, ' ').trim();
+};
+
+const slotText = computed(() => {
+  const renderedSlot = slots.default ? slots.default() : [];
+  const textFromVNodes = normalizeText(renderedSlot.map((node) => extractTextFromVNode(node)).join(' '));
+
+  if (textFromVNodes) {
+    return textFromVNodes;
+  }
+
+  return normalizeText(optionEl.value?.textContent || '');
+});
+
+const resolvedTypeaheadText = computed(() => {
+  return props.typeaheadText || slotText.value || primitiveValueText.value;
+});
+
+const fallbackText = computed(() => {
+  return props.displayText || resolvedTypeaheadText.value || primitiveValueText.value;
+});
+
+const isSelected = computed(() => {
+  if (selectContext?.isValueSelected) {
+    return selectContext.isValueSelected(props.value);
+  }
+
+  return props.selected;
+});
+
+const isActive = computed(() => {
+  if (selectContext?.isOptionActive) {
+    return selectContext.isOptionActive(optionId);
+  }
+
+  return false;
+});
+
+const optionTabIndex = computed(() => {
+  if (selectContext?.getOptionTabIndex) {
+    return selectContext.getOptionTabIndex(optionPayload.value);
+  }
+
+  return props.disabled ? -1 : 0;
+});
+
 const optionPayload = computed(() => ({
   id: optionId,
   value: props.value,
   disabled: props.disabled,
-  selected: isSelected.value,
+  selected: props.selected,
+  typeaheadText: resolvedTypeaheadText.value,
+  displayText: props.displayText || resolvedTypeaheadText.value,
+  el: optionEl.value,
 }));
-
-const syncWithParent = () => {
-  if (!selectContext?.registerOption) {
-    return;
-  }
-
-  selectContext.registerOption(optionPayload.value);
-};
 
 const onSelect = (event) => {
   if (props.disabled) {
@@ -84,36 +142,96 @@ const onSelect = (event) => {
     return;
   }
 
-  if (selectContext?.onOptionInteraction) {
-    selectContext.onOptionInteraction(optionPayload.value, event);
-  }
-
+  selectContext?.onOptionInteraction?.(optionPayload.value);
   emit('select', optionPayload.value);
 };
 
+const onKeydown = (event) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    onSelect(event);
+  }
+};
+
+const registerOption = () => {
+  selectContext?.registerOption?.(optionPayload.value);
+};
+
+const unregisterOption = () => {
+  selectContext?.unregisterOption?.(optionId);
+};
+
 watch(
-  () => [props.value, props.disabled, props.selected, isSelected.value],
+  () => [props.value, props.disabled, props.selected, props.typeaheadText, props.displayText, slotText.value],
   () => {
-    syncWithParent();
-  },
-  {
-    immediate: true,
+    registerOption();
   }
 );
 
-onBeforeUnmount(() => {
-  if (!selectContext?.unregisterOption) {
-    return;
-  }
+watch(
+  () => props.selected,
+  (newValue, oldValue) => {
+    if (!mounted.value || newValue === oldValue) {
+      return;
+    }
 
-  selectContext.unregisterOption(optionId);
+    if (newValue) {
+      emit('request-selection', optionPayload.value);
+    } else {
+      emit('request-deselection', optionPayload.value);
+    }
+
+    selectContext?.onOptionSelectedStateChange?.(optionPayload.value, newValue);
+  }
+);
+
+onMounted(() => {
+  mounted.value = true;
+  registerOption();
+});
+
+onBeforeUnmount(() => {
+  unregisterOption();
 });
 </script>
 
 <style lang="scss">
+@use 'sass:map';
+@use '../../styles/tokens';
+
+$theme: tokens.md-comp-filled-select-values();
+
 .md-select-option {
+  align-items: center;
+  border-radius: 0;
+  color: map.get($theme, menu-list-item-label-text-color);
+  cursor: pointer;
+  display: flex;
+  min-height: map.get($theme, menu-list-item-container-height);
+  outline: none;
+  padding: 0 24px;
+
+  &__label {
+    color: inherit;
+    font-family: map.get($theme, menu-list-item-label-text-font);
+    font-size: map.get($theme, menu-list-item-label-text-size);
+    font-weight: map.get($theme, menu-list-item-label-text-weight);
+    letter-spacing: map.get($theme, menu-list-item-label-text-tracking);
+    line-height: map.get($theme, menu-list-item-label-text-line-height);
+  }
+
+  &--selected {
+    background-color: map.get($theme, menu-list-item-selected-container-color);
+  }
+
+  &--active:not(&--selected) {
+    background-color: map.get($theme, menu-container-color);
+  }
+
   &--disabled {
     cursor: default;
+    opacity: 0.38;
+    pointer-events: none;
   }
 }
 </style>
