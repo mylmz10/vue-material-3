@@ -1,6 +1,20 @@
 <template>
-  <div class="md-switch" :class="{ 'md-switch--disabled': disabled, 'md-switch--checked': _checked }" @click="toggle">
-    <input :checked="_checked" :disabled="disabled" :name="name" type="checkbox" :value="value" @change="toggle" />
+  <div class="md-switch" :class="{ 'md-switch--disabled': disabled, 'md-switch--checked': _checked }">
+    <input
+      ref="inputEl"
+      :checked="_checked"
+      :disabled="disabled"
+      :name="name || undefined"
+      type="checkbox"
+      :value="value"
+      :form="form || undefined"
+      :required="required"
+      :readonly="readonly"
+      @input="onInput"
+      @change="onInputChange"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
+    />
     <div class="md-switch__track">
       <div class="md-switch__handle-container">
         <div class="md-switch__handle"></div>
@@ -10,34 +24,46 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const _checked = ref(false);
+const inputEl = ref(null);
+const initialChecked = ref(false);
+let formEl = null;
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur']);
 
 const props = defineProps({
-  disabled: {
-    type: Boolean,
-  },
-  name: {
-    type: String,
-  },
-  value: {
-    type: String,
-  },
-  modelValue: {
-    type: Boolean,
-  },
-  checked: {
-    type: Boolean,
-  },
+  checked: { type: Boolean, default: undefined },
+  disabled: { type: Boolean, default: false },
+  form: { type: String, default: '' },
+  modelValue: { type: Boolean, default: undefined },
+  name: { type: String, default: '' },
+  readonly: { type: Boolean, default: false },
+  required: { type: Boolean, default: false },
+  value: { type: [String, Number], default: 'on' },
 });
+
+const resolveChecked = () => {
+  if (props.modelValue !== undefined) {
+    return !!props.modelValue;
+  }
+
+  if (props.checked !== undefined) {
+    return !!props.checked;
+  }
+
+  return false;
+};
 
 watch(
   () => props.checked,
   (newValue) => {
-    _checked.value = newValue;
+    if (props.modelValue !== undefined || newValue === undefined) {
+      return;
+    }
+
+    _checked.value = !!newValue;
   },
   { immediate: true },
 );
@@ -45,17 +71,65 @@ watch(
 watch(
   () => props.modelValue,
   (newValue) => {
-    _checked.value = newValue;
+    if (newValue === undefined) {
+      return;
+    }
+
+    _checked.value = !!newValue;
   },
   { immediate: true },
 );
 
-const toggle = () => {
-  if (!props.disabled) {
-    _checked.value = !_checked.value;
-    emit('update:modelValue', _checked.value);
+const onInput = (ev) => {
+  if (props.disabled || props.readonly) {
+    return;
   }
+
+  emit('input', ev.target.checked);
 };
+
+const onInputChange = (ev) => {
+  if (props.disabled || props.readonly) {
+    ev.target.checked = _checked.value;
+    return;
+  }
+
+  _checked.value = ev.target.checked;
+  emit('update:modelValue', _checked.value);
+  emit('change', _checked.value);
+};
+
+const onFormReset = () => {
+  _checked.value = initialChecked.value;
+  emit('update:modelValue', _checked.value);
+};
+
+const focus = () => inputEl.value?.focus();
+const blur = () => inputEl.value?.blur();
+const checkValidity = () => inputEl.value?.checkValidity();
+const reportValidity = () => inputEl.value?.reportValidity();
+const setCustomValidity = (message) => inputEl.value?.setCustomValidity(message || '');
+const getInputEl = () => inputEl.value;
+
+defineExpose({
+  focus,
+  blur,
+  checkValidity,
+  reportValidity,
+  setCustomValidity,
+  getInputEl,
+});
+
+onMounted(() => {
+  _checked.value = resolveChecked();
+  initialChecked.value = _checked.value;
+  formEl = inputEl.value?.form || null;
+  formEl?.addEventListener('reset', onFormReset);
+});
+
+onBeforeUnmount(() => {
+  formEl?.removeEventListener('reset', onFormReset);
+});
 </script>
 
 <style lang="scss">
@@ -82,7 +156,15 @@ $theme: tokens.md-comp-switch-values();
   border-radius: map.get($theme, track-shape);
 
   input {
-    display: none;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    cursor: inherit;
+    z-index: 1;
+    block-size: 100%;
+    inline-size: 100%;
+    inset: 0;
   }
 
   &__track {
