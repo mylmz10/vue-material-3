@@ -7,6 +7,14 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.8.3](https://github.com/mylmz10/vue-material-3/compare/v0.8.2...v0.8.3) (2026-03-08)
+
+
+### Bug Fixes
+
+* **ci:** align npm trusted publishing prerequisites ([b169d5a](https://github.com/mylmz10/vue-material-3/commit/b169d5a2b642e5414a1f435807e8668d369fa408))
+* **ci:** align npm trusted publishing prerequisites ([389b0ba](https://github.com/mylmz10/vue-material-3/commit/389b0ba4b59e8aa21d4130f8a71bf6b2aee0713b))
+
 ## [0.8.2](https://github.com/mylmz10/vue-material-3/compare/v0.8.1...v0.8.2) (2026-03-08)
 
 
