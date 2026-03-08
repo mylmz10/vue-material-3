@@ -1,0 +1,25 @@
+name: sync-master-to-develop
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create PR from master to develop
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: master
+          destination_branch: develop
+          pr_title: 'chore: sync master into develop'
+          pr_body: |
+            Automated sync PR created after a push to `master`.
+            This keeps `develop` aligned with release updates (`package.json`, `CHANGELOG.md`).
+          github_token: ${{ secrets.GITHUB_TOKEN }}

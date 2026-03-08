@@ -3,8 +3,6 @@ on:
     branches:
       - master
 name: release-please
-env:
-  ACTION_NAME: release-please-action
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +22,7 @@ jobs:
         with:
           release-type: node
           node-version: 16
-          package-name: ${{env.ACTION_NAME}}
+          package-name: vue-material-3
           bump-minor-pre-major: true
 
       - name: Checkout Repo
