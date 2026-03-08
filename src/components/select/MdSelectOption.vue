@@ -204,28 +204,28 @@ $theme: tokens.md-comp-filled-select-values();
 .md-select-option {
   align-items: center;
   border-radius: 0;
-  color: map.get($theme, menu-list-item-label-text-color);
+  color: var(--md-select-option-label-text-color, #{map.get($theme, menu-list-item-label-text-color)});
   cursor: pointer;
   display: flex;
-  min-height: map.get($theme, menu-list-item-container-height);
+  min-height: var(--md-select-option-container-height, #{map.get($theme, menu-list-item-container-height)});
   outline: none;
   padding: 0 24px;
 
   &__label {
     color: inherit;
-    font-family: map.get($theme, menu-list-item-label-text-font);
-    font-size: map.get($theme, menu-list-item-label-text-size);
-    font-weight: map.get($theme, menu-list-item-label-text-weight);
-    letter-spacing: map.get($theme, menu-list-item-label-text-tracking);
-    line-height: map.get($theme, menu-list-item-label-text-line-height);
+    font-family: var(--md-select-option-label-text-font, #{map.get($theme, menu-list-item-label-text-font)});
+    font-size: var(--md-select-option-label-text-size, #{map.get($theme, menu-list-item-label-text-size)});
+    font-weight: var(--md-select-option-label-text-weight, #{map.get($theme, menu-list-item-label-text-weight)});
+    letter-spacing: var(--md-select-option-label-text-tracking, #{map.get($theme, menu-list-item-label-text-tracking)});
+    line-height: var(--md-select-option-label-text-line-height, #{map.get($theme, menu-list-item-label-text-line-height)});
   }
 
   &--selected {
-    background-color: map.get($theme, menu-list-item-selected-container-color);
+    background-color: var(--md-select-option-selected-container-color, #{map.get($theme, menu-list-item-selected-container-color)});
   }
 
   &--active:not(&--selected) {
-    background-color: map.get($theme, menu-container-color);
+    background-color: var(--md-select-option-container-color, #{map.get($theme, menu-container-color)});
   }
 
   &--disabled {
