@@ -1,4 +1,5 @@
 import MdRadio from '../../../src/components/radio/MdRadio.vue';
+import { ref, watch } from 'vue';
 
 export default {
   title: 'Components/Radio',
@@ -9,9 +10,23 @@ export default {
 const Template = (args) => ({
   components: { MdRadio },
   setup() {
-    return { args };
+    const selectedValue = ref(args.modelValue);
+
+    watch(
+      () => args.modelValue,
+      (value) => {
+        selectedValue.value = value;
+      }
+    );
+
+    return { args, selectedValue };
   },
-  template: `<MdRadio v-bind="args" value="1" name="radio_1" /><MdRadio v-bind="args" value="2" name="radio_2" />`,
+  template: `
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <MdRadio v-model="selectedValue" :disabled="args.disabled" value="1" name="radio" />
+      <MdRadio v-model="selectedValue" :disabled="args.disabled" value="2" name="radio" />
+    </div>
+  `,
 });
 
 export const Radio = Template.bind({});

@@ -45,6 +45,7 @@ const checked = computed(() => props.modelValue === props.value);
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-radio-button-values();
+$sys-color: tokens.md-sys-color-values-light();
 
 .md-radio {
   $this: &;
@@ -89,7 +90,7 @@ $theme: tokens.md-comp-radio-button-values();
       border-width: 2px;
       border-style: solid;
       border-radius: 50%;
-      border-color: map.get($theme, unselected-icon-color);
+      border-color: map.get($sys-color, outline);
     }
     #{$this}__inner-circle {
       position: absolute;
