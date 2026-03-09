@@ -35,12 +35,54 @@ jobs:
       - id: release
         uses: GoogleCloudPlatform/release-please-action@v4
         with:
-          release-type: node
+          command: manifest
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize release outputs
+        id: release-meta
+        run: |
+          OUTPUTS_JSON='${{ toJSON(steps.release.outputs) }}'
+          echo "${OUTPUTS_JSON}" > /tmp/release-please-outputs.json
+
+          RELEASE_CREATED=$(jq -r '[
+            .release_created,
+            .releases_created,
+            .[".--release_created"],
+            (to_entries[] | select(.key | endswith("--release_created")) | .value)
+          ]
+          | map(select(. != null and . != ""))
+          | map(ascii_downcase)
+          | if any(. == "true") then "true" else "false" end' /tmp/release-please-outputs.json)
+
+          TAG_NAME=$(jq -r '[
+            .tag_name,
+            .[".--tag_name"],
+            (to_entries[] | select(.key | endswith("--tag_name")) | .value)
+          ]
+          | map(select(. != null and . != ""))
+          | .[0] // ""' /tmp/release-please-outputs.json)
+
+          RELEASE_SHA=$(jq -r '[
+            .sha,
+            .[".--sha"],
+            (to_entries[] | select(.key | endswith("--sha")) | .value)
+          ]
+          | map(select(. != null and . != ""))
+          | .[0] // ""' /tmp/release-please-outputs.json)
+
+          echo "release_created=${RELEASE_CREATED}" >> "${GITHUB_OUTPUT}"
+          echo "tag_name=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "sha=${RELEASE_SHA}" >> "${GITHUB_OUTPUT}"
+
+          echo "release_created=${RELEASE_CREATED}"
+          echo "tag_name=${TAG_NAME}"
+          echo "sha=${RELEASE_SHA}"
 
       - name: Checkout Repo
         uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
         with:
           fetch-depth: 0
           ref: master
@@ -49,23 +91,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-        if: ${{ steps.release.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
 
       - name: Ensure npm 11.5.1+
         run: |
           npm install -g npm@^11.5.1
           node --version
           npm --version
-        if: ${{ steps.release.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
 
       - name: Install dependencies
         run: npm ci
-        if: ${{ steps.release.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
 
       - name: Publish package on NPM 📦
         id: publish
         continue-on-error: true
-        if: ${{ steps.release.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.simulate_publish_failure }}" = "true" ]; then
             echo "Simulating publish failure."
@@ -75,11 +117,11 @@ jobs:
           npm publish --access public
 
       - name: Roll back failed release by opening PR
-        if: ${{ steps.release.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ steps.release.outputs.tag_name }}
-          RELEASE_SHA: ${{ steps.release.outputs.sha }}
+          TAG_NAME: ${{ steps.release-meta.outputs.tag_name }}
+          RELEASE_SHA: ${{ steps.release-meta.outputs.sha }}
         run: |
           set -euo pipefail
           echo "Publish failed for ${TAG_NAME}. Cleaning release metadata and opening rollback PR."
@@ -141,7 +183,7 @@ jobs:
           fi
 
       - name: Mark workflow as failed after rollback
-        if: ${{ steps.release.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
         run: |
           echo "Publish failed. Rollback PR was created."
           exit 1
