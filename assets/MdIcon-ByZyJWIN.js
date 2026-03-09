@@ -1,0 +1,1 @@
+import{b as e,r as s,o as t}from"./iframe-C_bcjK8c.js";import{_ as n}from"./_plugin-vue_export-helper-DlAUqK2U.js";const r={name:"MdIcon"},c={class:"md-icon"};function a(o,_,d,p,i,m){return t(),e("i",c,[s(o.$slots,"default")])}const $=n(r,[["render",a]]);export{$ as M};

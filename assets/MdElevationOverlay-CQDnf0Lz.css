@@ -1,0 +1,1 @@
+.md-elevation-overlay{position:absolute;inset:0;border-radius:inherit;pointer-events:none;transition:opacity .28s cubic-bezier(.4,0,.2,1);z-index:var(--overlay-z-index, -2);background-color:var(--surface-tint-layer-color, transparent);opacity:var(--overlay-opacity, 0)}
