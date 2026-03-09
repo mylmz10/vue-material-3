@@ -7,6 +7,14 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.9.1](https://github.com/mylmz10/vue-material-3/compare/v0.9.0...v0.9.1) (2026-03-09)
+
+
+### Bug Fixes
+
+* **ci:** keep release tags in vX.Y.Z format ([f87edfc](https://github.com/mylmz10/vue-material-3/commit/f87edfc92d705a9397632fa80fbcafd048fb019b))
+* **ci:** remove release tag name prefix ([6ffd9de](https://github.com/mylmz10/vue-material-3/commit/6ffd9de30d24d39dca98bb22ffc8f9a3b439cda7))
+
 ## [0.9.0](https://github.com/mylmz10/vue-material-3/compare/vue-material-3-v0.8.3...vue-material-3-v0.9.0) (2026-03-09)
 
 
