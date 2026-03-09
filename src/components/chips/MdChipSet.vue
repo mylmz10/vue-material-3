@@ -47,8 +47,13 @@ export default {
   mounted() {
     this.$nextTick(this.syncActiveIndex);
   },
-  updated() {
-    this.$nextTick(this.syncActiveIndex);
+  watch: {
+    modelValue() {
+      this.$nextTick(this.syncActiveIndex);
+    },
+    selectionMode() {
+      this.$nextTick(this.syncActiveIndex);
+    },
   },
   methods: {
     getSlotItems() {
