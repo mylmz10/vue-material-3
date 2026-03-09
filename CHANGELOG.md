@@ -7,6 +7,20 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.10.0](https://github.com/mylmz10/vue-material-3/compare/v0.9.0...v0.10.0) (2026-03-09)
+
+
+### Features
+
+* **ci:** add transactional rollback and reconcile flow for releases ([e5207f9](https://github.com/mylmz10/vue-material-3/commit/e5207f951c07f6fd645e932081de8a44676ff771))
+
+
+### Bug Fixes
+
+* **ci:** harden release rollback for merge commits ([b31203b](https://github.com/mylmz10/vue-material-3/commit/b31203b6027e990454ff87f0b77dc32624a79dc1))
+* **ci:** install deps before npm publish ([e318348](https://github.com/mylmz10/vue-material-3/commit/e3183480dac7d8a364edf966436b49bcc5f581de))
+* **ci:** resolve husky not found during npm publish ([3b27358](https://github.com/mylmz10/vue-material-3/commit/3b27358202f5f1f97529c01222a7957b972aec27))
+
 ## [0.9.0](https://github.com/mylmz10/vue-material-3/compare/v0.8.3...v0.9.0) (2026-03-09)
 
 
