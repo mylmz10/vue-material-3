@@ -40,7 +40,7 @@ jobs:
 
       - name: Checkout Repo
         uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created == 'true' }}
         with:
           fetch-depth: 0
           ref: master
@@ -49,23 +49,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created == 'true' }}
 
       - name: Ensure npm 11.5.1+
         run: |
           npm install -g npm@^11.5.1
           node --version
           npm --version
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created == 'true' }}
 
       - name: Install dependencies
         run: npm ci
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created == 'true' }}
 
       - name: Publish package on NPM 📦
         id: publish
         continue-on-error: true
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.release_created == 'true' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.simulate_publish_failure }}" = "true" ]; then
             echo "Simulating publish failure."
@@ -74,15 +74,15 @@ jobs:
 
           npm publish --access public
 
-      - name: Roll back release metadata and version bump
-        if: ${{ steps.release.outputs.release_created && steps.publish.outcome == 'failure' }}
+      - name: Roll back failed release by opening PR
+        if: ${{ steps.release.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.release.outputs.tag_name }}
           RELEASE_SHA: ${{ steps.release.outputs.sha }}
         run: |
           set -euo pipefail
-          echo "Publish failed for ${TAG_NAME}. Rolling back release artifacts and version commit ${RELEASE_SHA}."
+          echo "Publish failed for ${TAG_NAME}. Cleaning release metadata and opening rollback PR."
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -90,9 +90,6 @@ jobs:
           git fetch origin master
           git checkout master
           git reset --hard origin/master
-
-          git revert -m 1 --no-edit "${RELEASE_SHA}"
-          git push origin HEAD:master
 
           if gh release view "${TAG_NAME}" >/dev/null 2>&1; then
             gh release delete "${TAG_NAME}" --yes
@@ -102,10 +99,51 @@ jobs:
             git push origin ":refs/tags/${TAG_NAME}"
           fi
 
+          TAG_SAFE="${TAG_NAME//./-}"
+          TAG_SAFE="${TAG_SAFE//\//-}"
+          BRANCH_NAME="ci/rollback-${TAG_SAFE}-${GITHUB_RUN_ID}"
+          git checkout -b "${BRANCH_NAME}"
+
+          if ! git revert --no-edit "${RELEASE_SHA}"; then
+            git revert --abort || true
+            git revert -m 1 --no-edit "${RELEASE_SHA}"
+          fi
+
+          git commit --amend -m "chore(ci): rollback failed release ${TAG_NAME}"
+          git push origin "${BRANCH_NAME}"
+
+          PR_TITLE="chore(ci): rollback failed release ${TAG_NAME}"
+          PR_BODY=$(printf 'npm publish failed for %s in run https://github.com/%s/actions/runs/%s.\nThis PR reverts release commit %s to keep master aligned with npm.\n' "${TAG_NAME}" "${GITHUB_REPOSITORY}" "${GITHUB_RUN_ID}" "${RELEASE_SHA}")
+
+          PR_URL=""
+          if ! PR_URL=$(gh pr create \
+            --base master \
+            --head "${BRANCH_NAME}" \
+            --title "${PR_TITLE}" \
+            --body "${PR_BODY}"); then
+            PR_URL=$(gh pr list \
+              --head "${BRANCH_NAME}" \
+              --base master \
+              --state open \
+              --json url \
+              --jq '.[0].url // empty')
+          fi
+
+          if [ -z "${PR_URL}" ]; then
+            echo "Failed to create or resolve rollback PR."
+            exit 1
+          fi
+
+          echo "Opened rollback PR: ${PR_URL}"
+
+          if ! gh pr merge "${PR_URL}" --auto --merge; then
+            echo "Auto-merge could not be enabled. Merge rollback PR manually."
+          fi
+
       - name: Mark workflow as failed after rollback
-        if: ${{ steps.release.outputs.release_created && steps.publish.outcome == 'failure' }}
+        if: ${{ steps.release.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
         run: |
-          echo "Publish failed. Rollback completed."
+          echo "Publish failed. Rollback PR was created."
           exit 1
 
   reconcile-release:
@@ -113,6 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout master
         uses: actions/checkout@v4
@@ -137,7 +176,7 @@ jobs:
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
           echo "release_sha=${RELEASE_SHA}" >> "$GITHUB_OUTPUT"
 
-      - name: Delete release and tag
+      - name: Reconcile release by opening rollback PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.resolve.outputs.tag_name }}
@@ -150,13 +189,52 @@ jobs:
           git checkout master
           git reset --hard origin/master
 
-          git revert -m 1 --no-edit "${{ steps.resolve.outputs.release_sha }}"
-          git push origin HEAD:master
-
           if gh release view "${TAG_NAME}" >/dev/null 2>&1; then
             gh release delete "${TAG_NAME}" --yes
           fi
 
           if git ls-remote --exit-code --tags origin "refs/tags/${TAG_NAME}" >/dev/null 2>&1; then
             git push origin ":refs/tags/${TAG_NAME}"
+          fi
+
+          RELEASE_SHA="${{ steps.resolve.outputs.release_sha }}"
+          TAG_SAFE="${TAG_NAME//./-}"
+          TAG_SAFE="${TAG_SAFE//\//-}"
+          BRANCH_NAME="ci/reconcile-${TAG_SAFE}-${GITHUB_RUN_ID}"
+          git checkout -b "${BRANCH_NAME}"
+
+          if ! git revert --no-edit "${RELEASE_SHA}"; then
+            git revert --abort || true
+            git revert -m 1 --no-edit "${RELEASE_SHA}"
+          fi
+
+          git commit --amend -m "chore(ci): reconcile release ${TAG_NAME}"
+          git push origin "${BRANCH_NAME}"
+
+          PR_TITLE="chore(ci): reconcile release ${TAG_NAME}"
+          PR_BODY=$(printf 'Reconcile workflow requested for %s in run https://github.com/%s/actions/runs/%s.\nThis PR reverts release commit %s after cleaning release metadata.\n' "${TAG_NAME}" "${GITHUB_REPOSITORY}" "${GITHUB_RUN_ID}" "${RELEASE_SHA}")
+
+          PR_URL=""
+          if ! PR_URL=$(gh pr create \
+            --base master \
+            --head "${BRANCH_NAME}" \
+            --title "${PR_TITLE}" \
+            --body "${PR_BODY}"); then
+            PR_URL=$(gh pr list \
+              --head "${BRANCH_NAME}" \
+              --base master \
+              --state open \
+              --json url \
+              --jq '.[0].url // empty')
+          fi
+
+          if [ -z "${PR_URL}" ]; then
+            echo "Failed to create or resolve reconcile PR."
+            exit 1
+          fi
+
+          echo "Opened reconcile PR: ${PR_URL}"
+
+          if ! gh pr merge "${PR_URL}" --auto --merge; then
+            echo "Auto-merge could not be enabled. Merge reconcile PR manually."
           fi
