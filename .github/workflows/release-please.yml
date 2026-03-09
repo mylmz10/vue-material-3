@@ -117,6 +117,18 @@ jobs:
 
           npm publish --access public
 
+      - name: Build Storybook
+        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
+        run: npm run build-storybook
+
+      - name: Deploy Storybook to gh-pages
+        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./storybook-static
+
       - name: Roll back failed release by opening PR
         if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
         env:
