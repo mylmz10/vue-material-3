@@ -44,6 +44,10 @@ jobs:
           npm --version
         if: ${{ steps.release.outputs.release_created }}
 
+      - name: Install dependencies
+        run: npm ci
+        if: ${{ steps.release.outputs.release_created }}
+
       - name: Publish package on NPM 📦
         run: npm publish --access public
         if: ${{ steps.release.outputs.release_created }}
