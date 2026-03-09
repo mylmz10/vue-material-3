@@ -7,26 +7,6 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
-## [0.9.0](https://github.com/mylmz10/vue-material-3/compare/v0.8.3...v0.9.0) (2026-03-09)
-
-
-### Features
-
-* checkbox/radio/switch form parity (W2-05) ([6f6206f](https://github.com/mylmz10/vue-material-3/commit/6f6206fcaf8b7823f0fc82b02be6e8095a56ae0e))
-* **chips:** consolidate chip variants and chip set ([ae199c9](https://github.com/mylmz10/vue-material-3/commit/ae199c92561992b5b084bdcd1a2cfdf4b71ba8ca))
-* consolidate chips under MdChip core ([b7182b7](https://github.com/mylmz10/vue-material-3/commit/b7182b7afb59b1e198d5a648c74eb1c65d62d0d4))
-* **controls:** complete W2-05 form parity for checkbox/radio/switch ([a8bba33](https://github.com/mylmz10/vue-material-3/commit/a8bba335331989fbb8ed8458c1ae471a175fb380))
-* slider range/ticks/labeled parity (W2-06) ([e31593c](https://github.com/mylmz10/vue-material-3/commit/e31593c1c6eaca4366ca111919c9106fa03d27fb))
-* **slider:** implement W2-06 range ticks and labeled parity ([f078ada](https://github.com/mylmz10/vue-material-3/commit/f078ada2043e84ae208cec3341c8c229f6e05854))
-* **text-field:** align label/prefix layout with material behavior ([97f495c](https://github.com/mylmz10/vue-material-3/commit/97f495c19de06e03a79fcf9dd204c007fdf7f48e))
-* **text-field:** complete W2-04 text field API/layout parity ([46dbd40](https://github.com/mylmz10/vue-material-3/commit/46dbd4040fc5fa241dcbe9436c001c81d083ebcb))
-
-
-### Bug Fixes
-
-* **chips:** keep active index during keyboard navigation ([1da68ef](https://github.com/mylmz10/vue-material-3/commit/1da68ef983347530c228216347aa1ad6df37a83c))
-* **radio:** restore story selection and outline color ([f69b373](https://github.com/mylmz10/vue-material-3/commit/f69b3730609ee2058a3bce1d2faa9989791bd6bf))
-
 ## [0.8.3](https://github.com/mylmz10/vue-material-3/compare/v0.8.2...v0.8.3) (2026-03-08)
 
 
