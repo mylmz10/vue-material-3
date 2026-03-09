@@ -1,11 +1,10 @@
 <template>
   <MdChip
-    variant="filter"
+    variant="input"
     :always-focusable="alwaysFocusable"
     :avatar="avatar"
     :disabled="disabled"
     :download="download"
-    :elevated="elevated"
     :href="href"
     :label="label"
     :leading-icon="leadingIcon"
@@ -46,7 +45,6 @@ defineProps({
   avatar: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   download: { type: String, default: '' },
-  elevated: { type: Boolean, default: false },
   href: { type: String, default: '' },
   label: { type: String, default: '' },
   leadingIcon: { type: String, default: '' },
