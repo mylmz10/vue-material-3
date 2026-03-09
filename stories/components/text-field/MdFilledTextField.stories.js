@@ -17,4 +17,17 @@ const Template = (args) => ({
 export const FilledTextField = Template.bind({});
 FilledTextField.args = {
   label: 'Filled Label',
+  modelValue: '',
+  name: 'filled-text-field',
+  supportingText: 'Supporting text',
+  prefix: '$',
+  suffix: 'USD',
+};
+
+export const FilledTextFieldError = Template.bind({});
+FilledTextFieldError.args = {
+  label: 'Filled Label',
+  modelValue: '',
+  error: true,
+  errorText: 'Please enter a valid value',
 };

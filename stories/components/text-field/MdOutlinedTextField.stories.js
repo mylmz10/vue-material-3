@@ -24,4 +24,17 @@ export const OutlinedTextField = Template.bind({});
 // More on args: https://storybook.js.org/docs/vue/writing-stories/args
 OutlinedTextField.args = {
   label: 'Outlined Label',
+  modelValue: '',
+  name: 'outlined-text-field',
+  supportingText: 'Supporting text',
+  prefix: '@',
+  suffix: '.com',
+};
+
+export const OutlinedTextFieldError = Template.bind({});
+OutlinedTextFieldError.args = {
+  label: 'Outlined Label',
+  modelValue: '',
+  error: true,
+  errorText: 'Please enter a valid value',
 };

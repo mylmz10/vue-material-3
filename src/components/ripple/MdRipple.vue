@@ -37,8 +37,8 @@ const surfaceClasses = computed(() => ({
 }));
 
 onMounted(() => {
-  mdRipple.value.parentElement.addEventListener('focus', handleRippleFocus);
-  mdRipple.value.parentElement.addEventListener('blur', handleRippleBlur);
+  mdRipple.value.parentElement.addEventListener('focusin', handleRippleFocus);
+  mdRipple.value.parentElement.addEventListener('focusout', handleRippleBlur);
   mdRipple.value.parentElement.addEventListener('mousedown', handleRippleActivate);
   mdRipple.value.parentElement.addEventListener('mouseenter', handleRippleMouseEnter);
   mdRipple.value.parentElement.addEventListener('mouseleave', handleRippleMouseLeave);
@@ -49,8 +49,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  mdRipple.value.parentElement.removeEventListener('focus', handleRippleFocus);
-  mdRipple.value.parentElement.removeEventListener('blur', handleRippleBlur);
+  mdRipple.value.parentElement.removeEventListener('focusin', handleRippleFocus);
+  mdRipple.value.parentElement.removeEventListener('focusout', handleRippleBlur);
   mdRipple.value.parentElement.removeEventListener('mousedown', handleRippleActivate);
   mdRipple.value.parentElement.removeEventListener('mouseenter', handleRippleMouseEnter);
   mdRipple.value.parentElement.removeEventListener('mouseleave', handleRippleMouseLeave);
@@ -219,6 +219,11 @@ function handleRippleDeactivate() {
     &--hovered::before {
       opacity: var(--md-ripple-hover-state-layer-opacity, 0.08);
       background-color: var(--md-ripple-hover-state-layer-color, black);
+    }
+
+    &--focused::before {
+      opacity: var(--md-ripple-focus-state-layer-opacity, 0.12);
+      background-color: var(--md-ripple-focus-state-layer-color, black);
     }
 
     &--pressed::after {
