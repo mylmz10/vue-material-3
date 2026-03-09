@@ -130,6 +130,20 @@ export default {
 
       return Array.from(this.$el.querySelectorAll('[data-md-chip="true"]'));
     },
+    resolveCurrentIndex(chipElements) {
+      if (!chipElements.length) {
+        return 0;
+      }
+
+      const focusedIndex =
+        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement) : -1;
+
+      if (focusedIndex !== -1) {
+        return focusedIndex;
+      }
+
+      return Math.max(0, Math.min(this.activeIndex, chipElements.length - 1));
+    },
     focusChip(index) {
       const chipElements = this.getChipElements();
       if (!chipElements.length) {
@@ -163,8 +177,7 @@ export default {
       }
 
       const isChipEventTarget = !!event.target?.closest?.('[data-md-chip="true"]');
-
-      const currentIndex = Math.max(0, Math.min(this.activeIndex, chipElements.length - 1));
+      const currentIndex = this.resolveCurrentIndex(chipElements);
 
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         event.preventDefault();
