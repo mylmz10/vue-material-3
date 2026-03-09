@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
   release-please-pr:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.reconcile_tag == '') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.reconcile_tag == '' && inputs.simulate_publish_failure == true) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -84,9 +84,6 @@ jobs:
           set -euo pipefail
           echo "Publish failed for ${TAG_NAME}. Rolling back release artifacts and version commit ${RELEASE_SHA}."
 
-          gh release delete "${TAG_NAME}" --yes || true
-          git push origin ":refs/tags/${TAG_NAME}" || true
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -94,8 +91,16 @@ jobs:
           git checkout master
           git reset --hard origin/master
 
-          git revert --no-edit "${RELEASE_SHA}"
+          git revert -m 1 --no-edit "${RELEASE_SHA}"
           git push origin HEAD:master
+
+          if gh release view "${TAG_NAME}" >/dev/null 2>&1; then
+            gh release delete "${TAG_NAME}" --yes
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG_NAME}" >/dev/null 2>&1; then
+            git push origin ":refs/tags/${TAG_NAME}"
+          fi
 
       - name: Mark workflow as failed after rollback
         if: ${{ steps.release.outputs.release_created && steps.publish.outcome == 'failure' }}
@@ -138,14 +143,6 @@ jobs:
           TAG_NAME: ${{ steps.resolve.outputs.tag_name }}
         run: |
           set -euo pipefail
-          gh release delete "${TAG_NAME}" --yes || true
-          git push origin ":refs/tags/${TAG_NAME}" || true
-
-      - name: Revert release commit on master
-        env:
-          RELEASE_SHA: ${{ steps.resolve.outputs.release_sha }}
-        run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -153,5 +150,13 @@ jobs:
           git checkout master
           git reset --hard origin/master
 
-          git revert --no-edit "${RELEASE_SHA}"
+          git revert -m 1 --no-edit "${{ steps.resolve.outputs.release_sha }}"
           git push origin HEAD:master
+
+          if gh release view "${TAG_NAME}" >/dev/null 2>&1; then
+            gh release delete "${TAG_NAME}" --yes
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG_NAME}" >/dev/null 2>&1; then
+            git push origin ":refs/tags/${TAG_NAME}"
+          fi
