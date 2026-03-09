@@ -261,6 +261,7 @@ export default {
 <style lang="scss">
 .md-chip-set {
   align-items: center;
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
