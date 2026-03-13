@@ -1,0 +1,1 @@
+import{c as a,n as t,y as r,b as c}from"./iframe-BZY2mGdK.js";const n={__name:"MdDivider",props:{vertical:{type:Boolean},tag:{type:String,default:"div"}},setup(e){return(i,s)=>(c(),a(r(e.tag),{class:t(["md-divider",{"md-divider--vertical":e.vertical}])},null,8,["class"]))}};export{n as _};
