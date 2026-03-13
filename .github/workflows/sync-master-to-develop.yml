@@ -35,7 +35,7 @@ jobs:
           echo "Changed files for master -> develop sync:"
           printf '%s\n' "${FILES[@]}"
 
-          NON_ALLOWED=$(printf '%s\n' "${FILES[@]}" | grep -Ev '^(CHANGELOG\.md|package\.json|package-lock\.json)$' || true)
+          NON_ALLOWED=$(printf '%s\n' "${FILES[@]}" | grep -Ev '^(CHANGELOG\.md|package\.json|package-lock\.json|\.release-please-manifest\.json)$' || true)
           if [ -n "$NON_ALLOWED" ]; then
             echo "Sync includes non-whitelisted files; skipping sync PR creation."
             printf '%s\n' "$NON_ALLOWED"
@@ -54,7 +54,7 @@ jobs:
           pr_title: 'chore: sync master into develop'
           pr_body: |
             Automated sync PR created after a push to `master`.
-            This keeps `develop` aligned with release updates (`package.json`, `CHANGELOG.md`).
+            This keeps `develop` aligned with release updates (`package.json`, `package-lock.json`, `CHANGELOG.md`, `.release-please-manifest.json`).
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Find sync PR
@@ -88,7 +88,7 @@ jobs:
           echo "Changed files in PR #$PR_NUMBER:"
           printf '%s\n' "${FILES[@]}"
 
-          NON_ALLOWED=$(printf '%s\n' "${FILES[@]}" | grep -Ev '^(CHANGELOG\.md|package\.json|package-lock\.json)$' || true)
+          NON_ALLOWED=$(printf '%s\n' "${FILES[@]}" | grep -Ev '^(CHANGELOG\.md|package\.json|package-lock\.json|\.release-please-manifest\.json)$' || true)
           if [ -n "$NON_ALLOWED" ]; then
             echo "PR includes non-whitelisted files. Skipping auto-merge."
             printf '%s\n' "$NON_ALLOWED"

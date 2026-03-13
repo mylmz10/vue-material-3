@@ -20,9 +20,9 @@ const PrimaryTemplate = (args) => ({
   },
   template: `<div>
     <MdTabs v-model="activeIndex" :activation-mode="args.activationMode" aria-label="Primary tabs">
-      <MdPrimaryTab label="Flights" panel-id="primary-panel-flights" icon="flight" />
-      <MdPrimaryTab label="Trips" panel-id="primary-panel-trips" icon="trip" />
-      <MdPrimaryTab label="Explore" panel-id="primary-panel-explore" icon="explore" />
+      <MdPrimaryTab panel-id="primary-panel-flights" icon="flight">Flights</MdPrimaryTab>
+      <MdPrimaryTab panel-id="primary-panel-trips" icon="luggage">Trips</MdPrimaryTab>
+      <MdPrimaryTab panel-id="primary-panel-explore" icon="explore">Explore</MdPrimaryTab>
     </MdTabs>
     <section id="primary-panel-flights" role="tabpanel" :hidden="activeIndex !== 0">Flights panel</section>
     <section id="primary-panel-trips" role="tabpanel" :hidden="activeIndex !== 1">Trips panel</section>
@@ -38,8 +38,8 @@ const SecondaryTemplate = (args) => ({
   },
   template: `<div>
     <MdTabs v-model="activeIndex" :activation-mode="args.activationMode" aria-label="Secondary tabs">
-      <MdSecondaryTab label="Overview" panel-id="secondary-panel-overview" />
-      <MdSecondaryTab label="Specifications" panel-id="secondary-panel-specifications" />
+      <MdSecondaryTab panel-id="secondary-panel-overview">Overview</MdSecondaryTab>
+      <MdSecondaryTab panel-id="secondary-panel-specifications">Specifications</MdSecondaryTab>
     </MdTabs>
     <section id="secondary-panel-overview" role="tabpanel" :hidden="activeIndex !== 0">Overview panel</section>
     <section id="secondary-panel-specifications" role="tabpanel" :hidden="activeIndex !== 1">Specifications panel</section>
