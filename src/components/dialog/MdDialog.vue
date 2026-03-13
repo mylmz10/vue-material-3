@@ -1,7 +1,7 @@
 <template>
   <Transition>
-    <dialog v-if="_open" class="md-modal" :class="{ 'md-modal--open': _open }" @close="handleDialogDismiss" @cancel="handleDialogDismiss" @click="handleDialogClick">
-      <div class="md-modal__container">
+    <dialog v-if="_open" ref="dialogEl" class="md-modal" :class="{ 'md-modal--open': _open }" open @cancel.prevent="onCancel" @click="handleBackdropClick" @keydown="onDialogKeydown">
+      <div ref="containerEl" class="md-modal__container" tabindex="-1">
         <div class="md-modal__header">
           <slot name="header" />
         </div>
@@ -19,46 +19,228 @@
 
 <script setup>
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
-import { watch, onMounted, ref } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+
+let bodyScrollLockCount = 0;
 
 const _open = ref(false);
+const dialogEl = ref(null);
+const containerEl = ref(null);
+const previousFocusedElement = ref(null);
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
+    default: false,
+  },
+  closeOnEscape: {
+    type: Boolean,
+    default: true,
+  },
+  closeOnBackdropClick: {
+    type: Boolean,
+    default: true,
+  },
+  trapFocus: {
+    type: Boolean,
+    default: true,
+  },
+  restoreFocus: {
+    type: Boolean,
+    default: true,
+  },
+  initialFocus: {
+    type: [String, Function],
+    default: null,
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'open', 'opened', 'close', 'closed', 'cancel']);
 
-const close = () => {
-  _open.value = false;
-  emit('update:modelValue', false);
-};
+const focusableSelector = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';
 
-const handleDialogDismiss = () => {
-  console.log('handleDialogDismiss');
-};
-const handleDialogClick = (e) => {
-  if (!e.composedPath().includes(document.querySelector('.md-modal__container'))) {
-    close();
+const lockBodyScroll = () => {
+  if (typeof document === 'undefined') {
+    return;
   }
-};
 
-onMounted(() => {
-  if (props.modelValue) {
+  bodyScrollLockCount += 1;
+  if (bodyScrollLockCount === 1) {
     document.body.style.overflow = 'hidden';
   }
-});
+};
+
+const unlockBodyScroll = () => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0) {
+    document.body.style.overflow = '';
+  }
+};
+
+const getFocusableElements = () => {
+  if (!containerEl.value) {
+    return [];
+  }
+
+  return Array.from(containerEl.value.querySelectorAll(focusableSelector)).filter((element) => !element.hasAttribute('disabled'));
+};
+
+const resolveInitialFocusTarget = () => {
+  if (!containerEl.value) {
+    return null;
+  }
+
+  if (typeof props.initialFocus === 'string' && props.initialFocus) {
+    const element = containerEl.value.querySelector(props.initialFocus);
+    if (element) {
+      return element;
+    }
+  }
+
+  if (typeof props.initialFocus === 'function') {
+    const element = props.initialFocus(containerEl.value);
+    if (element) {
+      return element;
+    }
+  }
+
+  const focusables = getFocusableElements();
+  if (focusables.length) {
+    return focusables[0];
+  }
+
+  return containerEl.value;
+};
+
+const focusInitialElement = () => {
+  const focusTarget = resolveInitialFocusTarget();
+  focusTarget?.focus?.();
+};
+
+const openDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) => {
+  if (_open.value) {
+    return;
+  }
+
+  previousFocusedElement.value = typeof document !== 'undefined' ? document.activeElement : null;
+  _open.value = true;
+  lockBodyScroll();
+
+  emit('open', { source });
+  if (emitModelUpdate) {
+    emit('update:modelValue', true);
+  }
+
+  nextTick(() => {
+    focusInitialElement();
+    emit('opened', { source });
+  });
+};
+
+const closeDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) => {
+  if (!_open.value) {
+    return;
+  }
+
+  emit('close', { source });
+  _open.value = false;
+  unlockBodyScroll();
+
+  if (emitModelUpdate) {
+    emit('update:modelValue', false);
+  }
+
+  nextTick(() => {
+    if (props.restoreFocus) {
+      previousFocusedElement.value?.focus?.();
+    }
+    emit('closed', { source });
+  });
+};
+
+const requestClose = (source) => {
+  if (source === 'escape' && !props.closeOnEscape) {
+    return;
+  }
+
+  if (source === 'backdrop' && !props.closeOnBackdropClick) {
+    return;
+  }
+
+  emit('cancel', { source });
+  closeDialog({ source, emitModelUpdate: true });
+};
+
+const onCancel = () => {
+  requestClose('escape');
+};
+
+const handleBackdropClick = (event) => {
+  if (event.target !== dialogEl.value) {
+    return;
+  }
+  requestClose('backdrop');
+};
+
+const trapFocus = (event) => {
+  const focusables = getFocusableElements();
+  if (!focusables.length) {
+    event.preventDefault();
+    containerEl.value?.focus?.();
+    return;
+  }
+
+  const firstFocusable = focusables[0];
+  const lastFocusable = focusables[focusables.length - 1];
+  const activeElement = typeof document !== 'undefined' ? document.activeElement : null;
+
+  if (event.shiftKey) {
+    if (activeElement === firstFocusable || activeElement === containerEl.value) {
+      event.preventDefault();
+      lastFocusable.focus();
+    }
+    return;
+  }
+
+  if (activeElement === lastFocusable || activeElement === dialogEl.value) {
+    event.preventDefault();
+    firstFocusable.focus();
+  }
+};
+
+const onDialogKeydown = (event) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    requestClose('escape');
+    return;
+  }
+
+  if (event.key === 'Tab' && props.trapFocus) {
+    trapFocus(event);
+  }
+};
 
 watch(
   () => props.modelValue,
   (newValue) => {
-    _open.value = newValue;
-    document.body.style.overflow = newValue ? 'hidden' : '';
+    if (newValue) {
+      openDialog({ source: 'model' });
+    } else {
+      closeDialog({ source: 'model' });
+    }
   },
   { immediate: true }
 );
+
+onBeforeUnmount(() => {
+  if (_open.value) {
+    unlockBodyScroll();
+  }
+});
 </script>
 
 <style lang="scss" scoped>

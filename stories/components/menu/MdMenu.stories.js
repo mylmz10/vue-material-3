@@ -1,35 +1,35 @@
 import MdMenu from '../../../src/components/menu/MdMenu.vue';
-import MdList from '../../../src/components/list/MdList.vue';
-import MdListItem from '../../../src/components/list/MdListItem.vue';
-import MdBadge from '../../../src/components/badge/MdBadge.vue';
+import MdMenuItem from '../../../src/components/menu/MdMenuItem.vue';
+import MdSubMenu from '../../../src/components/menu/MdSubMenu.vue';
+import MdFilledButton from '../../../src/components/button/MdFilledButton.vue';
+import { ref } from 'vue';
 
 export default {
   title: 'Components/Menu',
   component: MdMenu,
-  argTypes: {},
+  args: {
+    modelValue: false,
+  },
 };
 
 const Template = (args) => ({
-  components: { MdMenu, MdList, MdListItem, MdBadge },
+  components: { MdMenu, MdMenuItem, MdSubMenu, MdFilledButton },
   setup() {
-    return { args };
+    const open = ref(args.modelValue);
+    return { args, open };
   },
-  template: `<MdMenu v-bind="args"> 
-    <template v-slot:activator="props"> 
-      <MdFilledButton label="Open Menu" v-bind="props"></MdFilledButton>
+  template: `<MdMenu v-model="open" :close-on-outside-click="args.closeOnOutsideClick" :close-on-select="args.closeOnSelect">
+    <template #activator="{ onClick, onKeydown }">
+      <MdFilledButton label="Open Menu" @click="onClick" @keydown="onKeydown" />
     </template>
-    <MdList>
-      <MdListItem headline="Headline" supportingText="Supporting Text"></MdListItem>
-      <MdListDivider></MdListDivider>
-      <MdListItem headline="Headline">
-        <template #end=""><MdBadge value="33" :absolute="false"></MdBadge></template>
-      </MdListItem>
-      <MdListItem trailingText="18">Trash</MdListItem>
-    </MdList>
-    </MdMenu>`,
+    <MdMenuItem label="Profile" icon="person" />
+    <MdSubMenu label="Share" icon="share">
+      <MdMenuItem label="Copy Link" icon="link" />
+      <MdMenuItem label="Email" icon="mail" />
+    </MdSubMenu>
+    <MdMenuItem label="Archive" icon="archive" />
+    <MdMenuItem label="Delete" icon="delete" :disabled="true" />
+  </MdMenu>`,
 });
 
 export const Menu = Template.bind({});
-Menu.args = {
-  modelValue: true,
-};

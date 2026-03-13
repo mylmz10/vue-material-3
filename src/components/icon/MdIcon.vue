@@ -1,7 +1,6 @@
 <template>
-  <i class="md-icon"><slot></slot></i>
+  <i class="material-symbols-outlined"><slot></slot></i>
 </template>
-
 <script>
 export default {
   name: 'MdIcon',
