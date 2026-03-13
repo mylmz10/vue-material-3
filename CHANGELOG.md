@@ -7,6 +7,26 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.10.0](https://github.com/mylmz10/vue-material-3/compare/v0.9.2...v0.10.0) (2026-03-13)
+
+
+### Features
+
+* implement wave 3 navigation overlay parity and tabs ([89637fe](https://github.com/mylmz10/vue-material-3/commit/89637fedd52dc5f962d43151a06dcaa90738bf6f))
+
+
+### Bug Fixes
+
+* align outlined field notch and floating label ([5d41ea6](https://github.com/mylmz10/vue-material-3/commit/5d41ea60be3b817ad057a2403637a3553dca7de6))
+
+## [0.9.2](https://github.com/mylmz10/vue-material-3/compare/v0.9.1...v0.9.2) (2026-03-09)
+
+
+### Bug Fixes
+
+* **chips:** normalize chip set container box sizing ([18a76f9](https://github.com/mylmz10/vue-material-3/commit/18a76f916c231d3889e523db790f55a9be14c35f))
+* **chips:** normalize chip set container box sizing ([a93a8d1](https://github.com/mylmz10/vue-material-3/commit/a93a8d114e711144f5d6edbc2a85ffddd8532f95))
+
 ## [0.9.1](https://github.com/mylmz10/vue-material-3/compare/v0.9.0...v0.9.1) (2026-03-09)
 
 
