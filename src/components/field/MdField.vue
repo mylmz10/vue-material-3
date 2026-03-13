@@ -12,7 +12,13 @@
     @focusout="onFocusout"
   >
     <span class="md-field__container">
-      <span class="md-field__outline"></span>
+      <span class="md-field__outline">
+        <span class="md-field__outline-start"></span>
+        <span class="md-field__outline-notch">
+          <span class="md-field__outline-notch-label" aria-hidden="true">{{ label }}</span>
+        </span>
+        <span class="md-field__outline-end"></span>
+      </span>
       <span class="md-field__state-layer"></span>
       <span class="md-field__start" :class="{ 'md-field__start--empty': !hasStartContent }">
         <slot name="start"></slot>
@@ -170,7 +176,6 @@ const onFocusout = () => {
     #{$this}__middle {
       #{$this}__label {
         transform: translateY(-27px) translateX(-15%) scale(0.75);
-        background-color: #ffffff;
       }
       #{$this}__content {
       }
@@ -207,6 +212,18 @@ const onFocusout = () => {
     width: 100%;
     height: 100%;
     position: absolute;
+  }
+
+  &__outline-start,
+  &__outline-notch,
+  &__outline-end {
+    display: none;
+  }
+
+  &__outline-notch-label {
+    display: inline-block;
+    visibility: hidden;
+    white-space: nowrap;
   }
 }
 </style>
