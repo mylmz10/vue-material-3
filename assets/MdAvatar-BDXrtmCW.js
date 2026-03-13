@@ -1,0 +1,1 @@
+import{c as e,f as a,t as s,o as i}from"./iframe-4Lc6ThV1.js";const n={class:"md-avatar"},c=["src"],r={key:1},d={__name:"MdAvatar",props:{image:{type:String},initials:{type:String}},setup(t){return(o,l)=>(i(),e("div",n,[t.image?(i(),e("img",{key:0,src:t.image,alt:"initials"},null,8,c)):a("",!0),t.initials?(i(),e("div",r,s(t.initials),1)):a("",!0)]))}};export{d as _};

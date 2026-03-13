@@ -1,1 +1,0 @@
-import{b as a,f as t,t as s,n as l,o}from"./iframe-C_bcjK8c.js";const d={class:"md-badge__value"},c={__name:"MdBadge",props:{value:{type:[String,Number]},absolute:{type:Boolean,default:!0}},setup(e){return(r,n)=>(o(),a("div",{class:l(["md-badge",{"md-badge--large":!!e.value,"md-badge--absolute":!!e.absolute}])},[t("div",d,s(e.value),1)],2))}};export{c as _};
