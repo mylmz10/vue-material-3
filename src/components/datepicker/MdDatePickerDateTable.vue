@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 
 const emit = defineEmits(['input', 'update:day']);

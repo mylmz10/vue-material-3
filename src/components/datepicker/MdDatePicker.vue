@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineEmits, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import weekday from 'dayjs/plugin/weekday';
@@ -149,7 +149,6 @@ const setDate = () => {
     .date(1)
     .date(selectedDay.value)
     .format(format);
-  console.log(newDate)
   emit('update:modelValue', newDate);
 };
 

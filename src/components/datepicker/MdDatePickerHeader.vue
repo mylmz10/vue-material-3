@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { computed, defineEmits } from 'vue';
+import { computed } from 'vue';
 import dayjs from 'dayjs';
 import MdIconButton from '../icon-button/MdIconButton.vue';
 import MdIcon from '../icon/MdIcon.vue';
