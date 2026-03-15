@@ -1,146 +1,125 @@
 <template>
-  <div class="md-date-picker-date-table">
-    <transition :name="tableTransitionName" mode="out-in">
-      <div class="md-date-picker-date-table__grid" :key="props.year + '-' + props.month">
-        <div class="md-date-picker-date-table__header">
-          <div v-for="weekDay in weekDays" class="md-date-picker-date-table__weekday-item">
-            {{ weekDay }}
-          </div>
-        </div>
-        <div class="md-date-picker-date-table__days">
-          <button v-for="day in flatDays" :key="day.day" class="md-date-picker-date-table__date-item" :class="{
-            'md-date-picker-date-table__date-item--current-month': day.isCurrentMonth,
-            'md-date-picker-date-table__date-item--today': day.isCurrentDay,
-            'md-date-picker-date-table__date-item--selected': day.isCurrentMonth && day.isPickerDay,
-          }" @click="setDay(day)">
-            <div class="date-item__state-layer"></div>
-            <span v-if="day.isCurrentMonth">{{ day.day }}</span>
-          </button>
-        </div>
+  <div class="md-date-picker-date-table" role="grid" :aria-label="ariaLabel">
+    <div class="md-date-picker-date-table__header" role="row">
+      <div v-for="weekDay in weekDays" :key="weekDay" class="md-date-picker-date-table__weekday-item" role="columnheader">
+        {{ weekDay }}
       </div>
-    </transition>
+    </div>
+
+    <div class="md-date-picker-date-table__days" @mouseleave="$emit('hover-date', null)">
+      <div
+        v-for="day in days"
+        :key="day.iso"
+        class="md-date-picker-date-table__day-cell"
+        :class="{
+          'md-date-picker-date-table__day-cell--range-start': day.isRangeStart,
+          'md-date-picker-date-table__day-cell--range-end': day.isRangeEnd,
+          'md-date-picker-date-table__day-cell--range-fill': day.isInRange || day.isPreviewInRange,
+          'md-date-picker-date-table__day-cell--range-fill-start': day.isRangeStart && !day.isRangeEnd,
+          'md-date-picker-date-table__day-cell--range-fill-end': day.isRangeEnd && !day.isRangeStart,
+          'md-date-picker-date-table__day-cell--range-single': day.isRangeStart && day.isRangeEnd,
+          'md-date-picker-date-table__day-cell--range-preview-end': day.isPreviewRangeEnd,
+        }"
+        role="gridcell"
+        :aria-selected="day.isSelected ? 'true' : 'false'"
+      >
+        <button
+          type="button"
+          :data-iso="day.iso"
+          class="md-date-picker-date-table__date-item"
+          :class="{
+            'md-date-picker-date-table__date-item--current-month': day.isCurrentMonth,
+            'md-date-picker-date-table__date-item--out-of-month': !day.isCurrentMonth,
+            'md-date-picker-date-table__date-item--today': day.isToday,
+            'md-date-picker-date-table__date-item--selected': day.isSelected,
+            'md-date-picker-date-table__date-item--focused': day.isFocused,
+            'md-date-picker-date-table__date-item--in-range': day.isInRange || day.isPreviewInRange,
+            'md-date-picker-date-table__date-item--preview-end': day.isPreviewRangeEnd,
+          }"
+          :disabled="day.isDisabled"
+          :tabindex="day.isFocused && !day.isDisabled ? 0 : -1"
+          :aria-current="day.isToday ? 'date' : undefined"
+          :aria-label="getAriaLabel(day)"
+          @click="$emit('select', day.iso)"
+          @focus="$emit('focus-date', day.iso)"
+          @mouseenter="$emit('hover-date', day.isDisabled ? null : day.iso)"
+        >
+          <div class="md-date-picker-date-table__state-layer"></div>
+          <span>{{ day.label }}</span>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
-import dayjs from 'dayjs';
-
-const emit = defineEmits(['input', 'update:day']);
+import { computed } from 'vue';
+import { getWeekdayLabels, parseModelValue } from './datePickerUtils';
 
 const props = defineProps({
-  modelValue: {
+  ariaLabel: {
     type: String,
-    default: '2023-02-03',
+    default: 'Calendar',
+  },
+  days: {
+    type: Array,
+    default: () => [],
   },
   locale: {
     type: String,
-    default: 'tr-TR',
+    default: 'en-US',
   },
-  format: {
-    type: String,
-    default: 'YYYY-MM-DD', // Provide a default format
-  },
-  month: {
-    type: Number,
-  },
-  year: {
-    type: Number,
-  },
-  direction: {
-    type: String,
-    default: 'right'
-  }
 });
 
-const tableTransitionName = computed(() => {
-  return props.direction === 'left' ? 'fade-slide-left' : 'fade-slide-right';
-});
+defineEmits(['focus-date', 'hover-date', 'select']);
 
-const pickerDate = ref(props.modelValue);
+const weekDays = computed(() => getWeekdayLabels(props.locale));
 
-const now = dayjs().locale(props.locale);
+const getAriaLabel = (day) => {
+  const parsedDay = parseModelValue(day.iso);
+  const parts = [
+    new Intl.DateTimeFormat(props.locale, {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(parsedDay.toDate()),
+  ];
 
-const weekDays = computed(() => {
-  const dateFormat = 'dddd';
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    days.push(now.weekday(i).format(dateFormat)[0]);
-  }
-  return days;
-});
-
-const changePickerDay = (value) => {
-  pickerDate.value = dayjs(pickerDate.value).locale(props.locale).date(value).format(props.format);
-};
-
-const currentMonth = computed(() => {
-  return dayjs(pickerDate.value).year(props.year).month(props.month).locale(props.locale);
-});
-
-const setDay = (weekDay) => {
-  const { day, isCurrentMonth } = weekDay;
-  if (isCurrentMonth === false) return;
-  pickerDate.value = dayjs()
-    .year(props.year)
-    .month(props.month)
-    .date(day)
-    .locale(props.locale)
-    .format(props.format);
-  emit('update:day', day);
-};
-
-const formatDateObject = (date) => {
-  const clonedObject = { ...date.toObject() };
-  return {
-    day: clonedObject.date,
-    month: clonedObject.months,
-    year: clonedObject.years,
-    isCurrentMonth: clonedObject.months === currentMonth.value.month(),
-    isCurrentDay: date.isToday(),
-    isPickerDay: date.isSame(pickerDate.value, 'day') && date.isSame(pickerDate.value, 'month') && date.isSame(pickerDate.value, 'year'),
-    isCurrentYear: date.year() === currentMonth.value.year(), // Fix isCurrentYear logic
-  };
-};
-
-const getAllDays = computed(() => {
-  let currentDate = currentMonth.value.startOf('month').weekday(0);
-  const nextMonth = currentMonth.value.add(1, 'month').month();
-  let allDates = [];
-
-  while (currentDate.weekday(0).toObject().months !== nextMonth) {
-    const formatted = formatDateObject(currentDate);
-    allDates.push(formatted);
-    currentDate = currentDate.add(1, 'day');
+  if (day.isToday) {
+    parts.push('Today');
   }
 
-  // Group days into weeks for weekCount calculation
-  return Array.from({ length: Math.ceil(allDates.length / 7) }, (_, i) =>
-    ({ dates: allDates.slice(i * 7, (i + 1) * 7) })
-  );
-});
+  if (day.isSelected) {
+    parts.push('Selected');
+  }
 
-const flatDays = computed(() => {
-  return getAllDays.value.flatMap(week => week.dates);
-});
-
-const weekCount = computed(() => {
-  return getAllDays.value.length;
-});
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined && newValue !== null) {
-      changePickerDay(dayjs(newValue).date());
+  if (day.isRangeStart && day.isRangeEnd) {
+    parts.push('Start and end date');
+  } else {
+    if (day.isRangeStart) {
+      parts.push('Start date');
     }
-  },
-  { immediate: true }
-);
 
-defineExpose({
-  weekCount,
-})
+    if (day.isRangeEnd) {
+      parts.push('End date');
+    }
+  }
+
+  if (day.isInRange || day.isPreviewInRange) {
+    parts.push('In selected range');
+  }
+
+  if (day.isDisabled) {
+    parts.push('Unavailable');
+  }
+
+  if (!day.isCurrentMonth) {
+    parts.push('Outside current month');
+  }
+
+  return parts.join(', ');
+};
 </script>
 
 <style lang="scss">
@@ -150,114 +129,154 @@ defineExpose({
 $theme: tokens.md-comp-date-picker-docked-values();
 
 .md-date-picker-date-table {
-  padding: 0 12px;
   width: 100%;
 
-  &__grid {
-    display: flex;
-    flex-direction: column;
-    height: calc(var(--week-count) * var(--date-container-height) + var(--date-container-height));
+  &__header,
+  &__days {
+    display: grid;
+    grid-template-columns: repeat(7, var(--date-grid-column-width, var(--date-container-width, #{map.get($theme, date-container-width)})));
+    justify-content: center;
   }
 
   &__header {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    width: 100%;
-  }
-
-  &__days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: var(--date-container-height);
-    flex: 1;
+    margin-bottom: 4px;
   }
 
   &__weekday-item {
-    display: flex;
     align-items: center;
+    color: var(--weekdays-label-text-color, #{map.get($theme, weekdays-label-text-color)});
+    display: flex;
+    font-family: var(--weekdays-label-text-font, #{map.get($theme, weekdays-label-text-font)});
+    font-size: var(--weekdays-label-text-size, #{map.get($theme, weekdays-label-text-size)});
+    font-weight: var(--weekdays-label-text-weight, #{map.get($theme, weekdays-label-text-weight)});
+    height: var(--date-grid-row-height, var(--date-container-height, #{map.get($theme, date-container-height)}));
     justify-content: center;
-    height: var(--date-container-height);
-    font-family: var(--date-label-text-font);
-    line-height: var(--date-label-text-line-height);
-    font-size: var(--date-label-text-size);
-    letter-spacing: var(--date-label-text-tracking);
-    font-weight: var(--date-label-text-weight);
+    letter-spacing: var(--weekdays-label-text-tracking, #{map.get($theme, weekdays-label-text-tracking)});
+    line-height: var(--weekdays-label-text-line-height, #{map.get($theme, weekdays-label-text-line-height)});
+    text-transform: uppercase;
+    width: var(--date-grid-column-width, var(--date-container-width, #{map.get($theme, date-container-width)}));
+  }
+
+  &__day-cell {
+    align-items: center;
+    display: flex;
+    height: var(--date-grid-row-height, var(--date-container-height, #{map.get($theme, date-container-height)}));
+    justify-content: center;
+    position: relative;
+    width: var(--date-grid-column-width, var(--date-container-width, #{map.get($theme, date-container-width)}));
+
+    &::before {
+      background-color: transparent;
+      content: '';
+      height: var(--range-selection-active-indicator-container-height, var(--date-container-height, #{map.get($theme, date-container-height)}));
+      inset-block-start: 50%;
+      inset-inline: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transform: translateY(-50%);
+      transition: opacity 150ms ease;
+    }
+
+    &--range-fill::before,
+    &--range-fill-start::before,
+    &--range-fill-end::before,
+    &--range-preview-end::before {
+      background-color: var(--range-selection-active-indicator-container-color, rgba(103, 80, 164, 0.12));
+      opacity: 1;
+    }
+
+    &--range-fill-start::before {
+      inset-inline-start: 50%;
+    }
+
+    &--range-fill-end::before,
+    &--range-preview-end::before {
+      inset-inline-end: 50%;
+    }
+
+    &--range-single::before {
+      opacity: 0;
+    }
   }
 
   &__date-item {
-    width: var(--date-container-width);
-    height: var(--date-container-height);
-    border-radius: var(--date-container-shape);
-    background: none;
+    align-items: center;
+    background: transparent;
     border: none;
+    border-radius: var(--date-container-shape, #{map.get($theme, date-container-shape)});
+    box-sizing: border-box;
+    color: var(--date-unselected-label-text-color, #{map.get($theme, date-unselected-label-text-color)});
+    cursor: pointer;
+    display: inline-flex;
+    font-family: var(--date-label-text-font, #{map.get($theme, date-label-text-font)});
+    font-size: var(--date-label-text-size, #{map.get($theme, date-label-text-size)});
+    font-weight: var(--date-label-text-weight, #{map.get($theme, date-label-text-weight)});
+    height: var(--date-state-layer-height, #{map.get($theme, date-state-layer-height)});
+    justify-content: center;
+    letter-spacing: var(--date-label-text-tracking, #{map.get($theme, date-label-text-tracking)});
+    line-height: var(--date-label-text-line-height, #{map.get($theme, date-label-text-line-height)});
+    padding: 0;
     position: relative;
-    overflow: hidden;
-    color: var(--date-unselected-label-text-color);
+    z-index: 1;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+    width: var(--date-state-layer-width, #{map.get($theme, date-state-layer-width)});
 
-    font-family: var(--date-label-text-font);
-    line-height: var(--date-label-text-line-height);
-    font-size: var(--date-label-text-size);
-    letter-spacing: var(--date-label-text-tracking);
-    font-weight: var(--date-label-text-weight);
-
-    .date-item__state-layer {
-      position: absolute;
-      inset: 0;
-      opacity: var(--date-hover-state-layer-opacity);
-      pointer-events: none;
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
     }
 
-    transform-origin: center;
-    transform: scale(1);
-    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform;
-
-    &:active {
-      transform: scale(0.8);
-      transition-duration: 100ms;
+    &:hover:not(:disabled) .md-date-picker-date-table__state-layer {
+      opacity: var(--date-hover-state-layer-opacity, #{map.get($theme, date-hover-state-layer-opacity)});
     }
 
-    cursor: default;
+    &:active:not(:disabled) {
+      transform: scale(0.96);
+    }
 
-    &--current-month:hover {
-      cursor: pointer;
+    &:disabled {
+      cursor: default;
+      opacity: 0.38;
+    }
 
-      .date-item__state-layer {
-        position: absolute;
-        inset: 0;
-        background-color: var(--date-unselected-hover-state-layer-color);
-      }
+    &--out-of-month {
+      color: var(--date-unselected-outside-month-label-text-color, rgba(0, 0, 0, 0.38));
     }
 
     &--today {
-      border-style: solid;
-      border-color: var(--date-today-container-outline-color);
-      border-width: var(--date-today-container-outline-width);
-      color: var(--date-today-label-text-color);
-
-      &:hover {
-        .date-item__state-layer {
-          background-color: var(--date-today-hover-state-layer-color);
-        }
-      }
+      border: var(--date-today-container-outline-width, #{map.get($theme, date-today-container-outline-width)}) solid var(--date-today-container-outline-color, #{map.get($theme, date-today-container-outline-color)});
+      color: var(--date-today-label-text-color, #{map.get($theme, date-today-label-text-color)});
     }
 
     &--selected {
-      background-color: var(--date-selected-container-color);
-      color: var(--date-selected-label-text-color);
-
-      &:hover {
-        .date-item__state-layer {
-          background-color: var(--date-selected-hover-state-layer-color);
-        }
-      }
-
-      &:active {
-        .date-item__state-layer {
-          background-color: var(--date-selected-pressed-state-layer-color);
-        }
-      }
+      background-color: var(--date-selected-container-color, #{map.get($theme, date-selected-container-color)});
+      border-color: var(--date-selected-container-color, #{map.get($theme, date-selected-container-color)});
+      color: var(--date-selected-label-text-color, #{map.get($theme, date-selected-label-text-color)});
     }
+
+    &--selected .md-date-picker-date-table__state-layer {
+      background-color: var(--date-selected-hover-state-layer-color, #{map.get($theme, date-selected-hover-state-layer-color)});
+    }
+
+    &--in-range {
+      color: var(--range-selection-date-in-range-label-text-color, currentColor);
+    }
+
+    &--preview-end {
+      border: var(--date-today-container-outline-width, #{map.get($theme, date-today-container-outline-width)}) solid var(--date-today-container-outline-color, #{map.get($theme, date-today-container-outline-color)});
+      color: var(--date-today-label-text-color, #{map.get($theme, date-today-label-text-color)});
+    }
+  }
+
+  &__state-layer {
+    background-color: var(--date-unselected-hover-state-layer-color, #{map.get($theme, date-unselected-hover-state-layer-color)});
+    border-radius: inherit;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 150ms ease;
   }
 }
 </style>

@@ -1,15 +1,15 @@
 <template>
-  <div ref="rootEl" class="md-date-picker-list" role="listbox" :aria-label="ariaLabel">
+  <div ref="gridEl" class="md-date-picker-year-grid" role="listbox" :aria-label="ariaLabel">
     <button
       v-for="item in items"
       :key="item.value"
       :ref="(el) => setItemRef(el, item.value)"
       type="button"
       role="option"
-      class="md-date-picker-list__item"
+      class="md-date-picker-year-grid__item"
       :class="{
-        'md-date-picker-list__item--selected': item.selected,
-        'md-date-picker-list__item--disabled': item.disabled,
+        'md-date-picker-year-grid__item--selected': item.selected,
+        'md-date-picker-year-grid__item--disabled': item.disabled,
       }"
       :tabindex="item.value === activeValue ? 0 : -1"
       :disabled="item.disabled"
@@ -18,22 +18,18 @@
       @keydown="handleKeydown($event, item.value)"
       @click="$emit('select', item.value)"
     >
-      <span class="md-date-picker-list__leading">
-        <MdIcon v-if="item.selected">check</MdIcon>
-      </span>
-      <span class="md-date-picker-list__label">{{ item.label }}</span>
+      {{ item.label }}
     </button>
   </div>
 </template>
 
 <script setup>
 import { nextTick, onMounted, ref, watch } from 'vue';
-import MdIcon from '../icon/MdIcon.vue';
 
 const props = defineProps({
   ariaLabel: {
     type: String,
-    default: 'Options',
+    default: 'Years',
   },
   items: {
     type: Array,
@@ -43,8 +39,8 @@ const props = defineProps({
 
 defineEmits(['select']);
 
-const rootEl = ref(null);
 const itemRefs = new Map();
+const gridEl = ref(null);
 
 const getActiveItem = () => props.items.find((item) => item.selected && !item.disabled) || props.items.find((item) => !item.disabled) || null;
 const activeValue = ref(getActiveItem()?.value ?? null);
@@ -62,15 +58,14 @@ const scrollSelectedIntoView = async () => {
   const selectedItem = getActiveItem();
   activeValue.value = selectedItem?.value ?? null;
   const selectedEl = selectedItem ? itemRefs.get(selectedItem.value) : null;
-
-  if (!selectedEl) {
+  if (!selectedEl || !gridEl.value) {
     return;
   }
 
-  selectedEl.scrollIntoView?.({
-    block: 'center',
-    behavior: 'auto',
-  });
+  gridEl.value.scrollTop = Math.max(
+    0,
+    selectedEl.offsetTop - (gridEl.value.clientHeight - selectedEl.offsetHeight) / 2
+  );
 };
 
 const focusValue = async (value) => {
@@ -92,16 +87,25 @@ const handleKeydown = async (event, currentValue) => {
     if (!nextItem) {
       return;
     }
+
     event.preventDefault();
     await focusValue(nextItem.value);
   };
 
-  if (event.key === 'ArrowDown') {
+  if (event.key === 'ArrowRight') {
     await focusByIndex(Math.min(enabledItems.length - 1, currentIndex + 1));
   }
 
-  if (event.key === 'ArrowUp') {
+  if (event.key === 'ArrowLeft') {
     await focusByIndex(Math.max(0, currentIndex - 1));
+  }
+
+  if (event.key === 'ArrowDown') {
+    await focusByIndex(Math.min(enabledItems.length - 1, currentIndex + 3));
+  }
+
+  if (event.key === 'ArrowUp') {
+    await focusByIndex(Math.max(0, currentIndex - 3));
   }
 
   if (event.key === 'Home') {
@@ -127,33 +131,39 @@ watch(
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$theme: tokens.md-comp-date-picker-docked-values();
+$theme: tokens.md-comp-date-picker-modal-values();
 
-.md-date-picker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 320px;
-  overflow: auto;
-  padding: 8px 12px 12px;
+.md-date-picker-year-grid {
+  align-content: start;
+  box-sizing: border-box;
+  display: grid;
+  gap: 12px 16px;
+  grid-template-columns: repeat(3, var(--year-selection-year-container-width, #{map.get($theme, year-selection-year-container-width)}));
+  height: 288px;
+  justify-content: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 16px 24px 8px;
+  scrollbar-gutter: stable both-edges;
 
   &__item {
     align-items: center;
     background: transparent;
     border: none;
     border-radius: 999px;
-    color: inherit;
+    color: var(--year-selection-year-unselected-label-text-color, #{map.get($theme, year-selection-year-unselected-label-text-color)});
     cursor: pointer;
-    display: flex;
-    font-family: var(--menu-list-item-label-text-font, #{map.get($theme, menu-list-item-label-text-font)});
-    font-size: var(--menu-list-item-label-text-size, #{map.get($theme, menu-list-item-label-text-size)});
-    font-weight: var(--menu-list-item-label-text-weight, #{map.get($theme, menu-list-item-label-text-weight)});
-    gap: 12px;
-    min-height: var(--menu-list-item-container-height, #{map.get($theme, menu-list-item-container-height)});
-    padding: 0 16px;
-    text-align: left;
+    display: inline-flex;
+    font-family: var(--year-selection-year-label-text-font, #{map.get($theme, year-selection-year-label-text-font)});
+    font-size: var(--year-selection-year-label-text-size, #{map.get($theme, year-selection-year-label-text-size)});
+    font-weight: var(--year-selection-year-label-text-weight, #{map.get($theme, year-selection-year-label-text-weight)});
+    justify-content: center;
+    letter-spacing: var(--year-selection-year-label-text-tracking, #{map.get($theme, year-selection-year-label-text-tracking)});
+    line-height: var(--year-selection-year-label-text-line-height, #{map.get($theme, year-selection-year-label-text-line-height)});
+    height: var(--year-selection-year-container-height, #{map.get($theme, year-selection-year-container-height)});
+    padding: 0;
     transition: background-color 150ms ease, color 150ms ease;
-    width: 100%;
+    width: var(--year-selection-year-container-width, #{map.get($theme, year-selection-year-container-width)});
 
     &:hover:not(:disabled),
     &:focus-visible:not(:disabled) {
@@ -167,19 +177,9 @@ $theme: tokens.md-comp-date-picker-docked-values();
     }
 
     &--selected {
-      background-color: var(--menu-list-item-selected-container-color, #{map.get($theme, menu-list-item-selected-container-color)});
+      background-color: var(--year-selection-year-selected-container-color, #{map.get($theme, year-selection-year-selected-container-color)});
+      color: var(--year-selection-year-selected-label-text-color, #{map.get($theme, year-selection-year-selected-label-text-color)});
     }
-  }
-
-  &__leading {
-    align-items: center;
-    display: inline-flex;
-    justify-content: center;
-    min-width: 24px;
-  }
-
-  &__label {
-    flex: 1;
   }
 }
 </style>

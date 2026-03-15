@@ -125,10 +125,13 @@ const onFocusout = () => {
     width: auto;
     min-width: 0;
     flex-shrink: 0;
+    justify-content: center;
   }
 
   &__start:not(.md-field__start--empty) {
-    min-width: 16px;
+    min-width: 52px;
+    padding-inline-start: 12px;
+    padding-inline-end: 16px;
   }
 
   &__middle {
@@ -205,7 +208,15 @@ const onFocusout = () => {
   }
 
   &__end:not(.md-field__end--empty) {
-    min-width: 16px;
+    min-width: 52px;
+    padding-inline-start: 16px;
+    padding-inline-end: 12px;
+  }
+
+  &__start > *,
+  &__end > * {
+    align-items: center;
+    display: inline-flex;
   }
 
   &__state-layer {

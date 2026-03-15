@@ -43,6 +43,7 @@ export { default as MdMenuItem } from './components/menu/MdMenuItem.vue';
 export { default as MdSubMenu } from './components/menu/MdSubMenu.vue';
 export { default as MdSlider } from './components/slider/MdSlider.vue';
 export { default as MdDatePicker } from './components/datepicker/MdDatePicker.vue';
+export { default as MdDatePickerField } from './components/datepicker/MdDatePickerField.vue';
 export { default as MdSnackbar } from './components/snackbar/MdSnackbar.vue';
 export { default as MdFilledAutoComplete } from './components/autocomplete/MdFilledAutoComplete.vue';
 export { default as MdOutlinedAutoComplete } from './components/autocomplete/MdOutlinedAutoComplete.vue';
