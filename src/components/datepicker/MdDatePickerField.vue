@@ -312,11 +312,17 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss">
+@use 'sass:map';
+@use '../../styles/tokens';
+
+$docked-theme: tokens.md-comp-date-picker-docked-values();
+$motion: tokens.md-sys-motion-values();
+
 .md-date-picker-field {
   display: inline-flex;
   flex-direction: column;
   position: relative;
-  width: min(360px, 100%);
+  width: min(#{map.get($docked-theme, container-width)}, 100%);
 
   &__control {
     width: 100%;
@@ -350,7 +356,9 @@ onBeforeUnmount(() => {
 
   .fade-grow-enter-active,
   .fade-grow-leave-active {
-    transition: opacity 250ms ease, transform 250ms ease;
+    transition:
+      opacity #{map.get($motion, duration-medium2)} #{map.get($motion, easing-standard)},
+      transform #{map.get($motion, duration-medium2)} #{map.get($motion, easing-standard)};
   }
 
   .fade-grow-enter-from,

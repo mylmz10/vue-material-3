@@ -182,7 +182,7 @@ $theme: tokens.md-comp-date-picker-docked-values();
     &--range-fill-start::before,
     &--range-fill-end::before,
     &--range-preview-end::before {
-      background-color: var(--range-selection-active-indicator-container-color, rgba(103, 80, 164, 0.12));
+      background-color: var(--range-selection-active-indicator-container-color, #{map.get($theme, date-selected-container-color)});
       opacity: 1;
     }
 
@@ -204,7 +204,7 @@ $theme: tokens.md-comp-date-picker-docked-values();
     align-items: center;
     background: transparent;
     border: none;
-    border-radius: var(--date-container-shape, #{map.get($theme, date-container-shape)});
+    border-radius: var(--date-state-layer-shape, #{map.get($theme, date-state-layer-shape)});
     box-sizing: border-box;
     color: var(--date-unselected-label-text-color, #{map.get($theme, date-unselected-label-text-color)});
     cursor: pointer;
@@ -241,7 +241,7 @@ $theme: tokens.md-comp-date-picker-docked-values();
     }
 
     &--out-of-month {
-      color: var(--date-unselected-outside-month-label-text-color, rgba(0, 0, 0, 0.38));
+      color: var(--date-unselected-outside-month-label-text-color, #{map.get($theme, date-unselected-outside-month-label-text-color)});
     }
 
     &--today {

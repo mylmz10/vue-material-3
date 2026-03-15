@@ -809,10 +809,13 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../elevation/elevation';
 
 $docked-theme: tokens.md-comp-date-picker-docked-values();
 $modal-theme: tokens.md-comp-date-picker-modal-values();
 $date-input-theme: tokens.md-comp-date-input-modal-values();
+$divider-theme: tokens.md-comp-divider-values();
+$sys-color: tokens.md-sys-color-values-light();
 $motion: tokens.md-sys-motion-values();
 
 .md-date-picker-dialog {
@@ -820,7 +823,7 @@ $motion: tokens.md-sys-motion-values();
   --md-date-picker-dialog-container-color: #{map.get($modal-theme, container-color)};
 
   &--input {
-    --md-date-picker-dialog-width: #{map.get($modal-theme, container-width)};
+    --md-date-picker-dialog-width: #{map.get($date-input-theme, container-width)};
     --md-date-picker-dialog-container-color: #{map.get($date-input-theme, container-color)};
   }
 
@@ -863,6 +866,7 @@ $motion: tokens.md-sys-motion-values();
     --date-container-height: #{map.get($docked-theme, date-container-height)};
     --date-state-layer-width: #{map.get($docked-theme, date-state-layer-width)};
     --date-state-layer-height: #{map.get($docked-theme, date-state-layer-height)};
+    --date-state-layer-shape: #{map.get($docked-theme, date-state-layer-shape)};
     --date-container-shape: #{map.get($docked-theme, date-container-shape)};
     --date-label-text-font: #{map.get($docked-theme, date-label-text-font)};
     --date-label-text-line-height: #{map.get($docked-theme, date-label-text-line-height)};
@@ -885,15 +889,27 @@ $motion: tokens.md-sys-motion-values();
     --weekdays-label-text-size: #{map.get($docked-theme, weekdays-label-text-size)};
     --weekdays-label-text-tracking: #{map.get($docked-theme, weekdays-label-text-tracking)};
     --weekdays-label-text-weight: #{map.get($docked-theme, weekdays-label-text-weight)};
+    --menu-button-container-shape: #{map.get($docked-theme, menu-button-container-shape)};
+    --menu-button-hover-state-layer-color: #{map.get($docked-theme, menu-button-hover-state-layer-color)};
+    --menu-button-hover-state-layer-opacity: #{map.get($docked-theme, menu-button-hover-state-layer-opacity)};
+    --menu-button-focus-state-layer-color: #{map.get($docked-theme, menu-button-focus-state-layer-color)};
+    --menu-button-focus-state-layer-opacity: #{map.get($docked-theme, menu-button-focus-state-layer-opacity)};
+    --menu-button-disabled-label-text-opacity: #{map.get($docked-theme, menu-button-disabled-label-text-opacity)};
     --menu-list-item-container-height: #{map.get($docked-theme, menu-list-item-container-height)};
+    --menu-list-item-label-text-color: #{map.get($docked-theme, menu-list-item-label-text-color)};
     --menu-list-item-label-text-font: #{map.get($docked-theme, menu-list-item-label-text-font)};
+    --menu-list-item-hover-state-layer-color: #{map.get($docked-theme, menu-list-item-hover-state-layer-color)};
+    --menu-list-item-hover-state-layer-opacity: #{map.get($docked-theme, menu-list-item-hover-state-layer-opacity)};
+    --menu-list-item-focus-state-layer-color: #{map.get($docked-theme, menu-list-item-focus-state-layer-color)};
+    --menu-list-item-focus-state-layer-opacity: #{map.get($docked-theme, menu-list-item-focus-state-layer-opacity)};
     --menu-list-item-label-text-size: #{map.get($docked-theme, menu-list-item-label-text-size)};
     --menu-list-item-label-text-weight: #{map.get($docked-theme, menu-list-item-label-text-weight)};
     --menu-list-item-selected-container-color: #{map.get($docked-theme, menu-list-item-selected-container-color)};
+    --menu-list-item-selected-leading-icon-size: #{map.get($docked-theme, menu-list-item-selected-leading-icon-size)};
     --range-selection-active-indicator-container-color: #{map.get($modal-theme, range-selection-active-indicator-container-color)};
     --range-selection-active-indicator-container-height: #{map.get($docked-theme, date-container-height)};
     --range-selection-date-in-range-label-text-color: #{map.get($modal-theme, range-selection-date-in-range-label-text-color)};
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: elevation.resolve-box-shadow(map.get($docked-theme, container-elevation), map.get($sys-color, shadow));
   }
 
   &--modal {
@@ -906,7 +922,9 @@ $motion: tokens.md-sys-motion-values();
     --date-grid-row-height: #{map.get($docked-theme, date-container-height)};
     --date-state-layer-width: #{map.get($modal-theme, date-state-layer-width)};
     --date-state-layer-height: #{map.get($modal-theme, date-state-layer-height)};
+    --date-state-layer-shape: #{map.get($modal-theme, date-state-layer-shape)};
     --date-container-shape: #{map.get($modal-theme, date-container-shape)};
+    --modal-menu-button-label-text-color: #{map.get($modal-theme, range-selection-month-subhead-color)};
     --date-label-text-font: #{map.get($modal-theme, date-label-text-font)};
     --date-label-text-line-height: #{map.get($modal-theme, date-label-text-line-height)};
     --date-label-text-size: #{map.get($modal-theme, date-label-text-size)};
@@ -921,25 +939,57 @@ $motion: tokens.md-sys-motion-values();
     --date-selected-container-color: #{map.get($modal-theme, date-selected-container-color)};
     --date-selected-label-text-color: #{map.get($modal-theme, date-selected-label-text-color)};
     --date-selected-hover-state-layer-color: #{map.get($modal-theme, date-selected-hover-state-layer-color)};
+    --date-unselected-outside-month-label-text-color: #{map.get($modal-theme, date-unselected-outside-month-label-text-color)};
     --weekdays-label-text-color: #{map.get($modal-theme, weekdays-label-text-color)};
     --weekdays-label-text-font: #{map.get($modal-theme, weekdays-label-text-font)};
     --weekdays-label-text-line-height: #{map.get($modal-theme, weekdays-label-text-line-height)};
     --weekdays-label-text-size: #{map.get($modal-theme, weekdays-label-text-size)};
     --weekdays-label-text-tracking: #{map.get($modal-theme, weekdays-label-text-tracking)};
     --weekdays-label-text-weight: #{map.get($modal-theme, weekdays-label-text-weight)};
-    --menu-list-item-container-height: 48px;
+    --menu-button-container-shape: #{map.get($docked-theme, menu-button-container-shape)};
+    --menu-button-hover-state-layer-color: #{map.get($docked-theme, menu-button-hover-state-layer-color)};
+    --menu-button-hover-state-layer-opacity: #{map.get($docked-theme, menu-button-hover-state-layer-opacity)};
+    --menu-button-focus-state-layer-color: #{map.get($docked-theme, menu-button-focus-state-layer-color)};
+    --menu-button-focus-state-layer-opacity: #{map.get($docked-theme, menu-button-focus-state-layer-opacity)};
+    --menu-button-disabled-label-text-opacity: #{map.get($docked-theme, menu-button-disabled-label-text-opacity)};
+    --menu-list-item-container-height: #{map.get($docked-theme, menu-list-item-container-height)};
+    --menu-list-item-label-text-color: #{map.get($docked-theme, menu-list-item-label-text-color)};
     --menu-list-item-label-text-font: #{map.get($docked-theme, menu-list-item-label-text-font)};
+    --menu-list-item-hover-state-layer-color: #{map.get($docked-theme, menu-list-item-hover-state-layer-color)};
+    --menu-list-item-hover-state-layer-opacity: #{map.get($docked-theme, menu-list-item-hover-state-layer-opacity)};
+    --menu-list-item-focus-state-layer-color: #{map.get($docked-theme, menu-list-item-focus-state-layer-color)};
+    --menu-list-item-focus-state-layer-opacity: #{map.get($docked-theme, menu-list-item-focus-state-layer-opacity)};
     --menu-list-item-label-text-size: #{map.get($docked-theme, menu-list-item-label-text-size)};
     --menu-list-item-label-text-weight: #{map.get($docked-theme, menu-list-item-label-text-weight)};
     --menu-list-item-selected-container-color: #{map.get($docked-theme, menu-list-item-selected-container-color)};
+    --menu-list-item-selected-leading-icon-size: #{map.get($docked-theme, menu-list-item-selected-leading-icon-size)};
+    --modal-header-headline-color: #{map.get($modal-theme, header-headline-color)};
+    --modal-header-headline-font: #{map.get($modal-theme, header-headline-font)};
+    --modal-header-headline-size: #{map.get($modal-theme, header-headline-size)};
+    --modal-header-headline-weight: #{map.get($modal-theme, header-headline-weight)};
+    --modal-header-headline-tracking: #{map.get($modal-theme, header-headline-tracking)};
+    --modal-header-headline-line-height: #{map.get($modal-theme, header-headline-line-height)};
+    --modal-header-supporting-text-color: #{map.get($modal-theme, header-supporting-text-color)};
+    --modal-header-supporting-text-font: #{map.get($modal-theme, header-supporting-text-font)};
+    --modal-header-supporting-text-size: #{map.get($modal-theme, header-supporting-text-size)};
+    --modal-header-supporting-text-weight: #{map.get($modal-theme, header-supporting-text-weight)};
+    --modal-header-supporting-text-tracking: #{map.get($modal-theme, header-supporting-text-tracking)};
+    --modal-header-supporting-text-line-height: #{map.get($modal-theme, header-supporting-text-line-height)};
     --year-selection-year-container-width: #{map.get($modal-theme, year-selection-year-container-width)};
     --year-selection-year-container-height: #{map.get($modal-theme, year-selection-year-container-height)};
+    --year-selection-year-state-layer-width: #{map.get($modal-theme, year-selection-year-state-layer-width)};
+    --year-selection-year-state-layer-height: #{map.get($modal-theme, year-selection-year-state-layer-height)};
+    --year-selection-year-state-layer-shape: #{map.get($modal-theme, year-selection-year-state-layer-shape)};
     --year-selection-year-label-text-font: #{map.get($modal-theme, year-selection-year-label-text-font)};
     --year-selection-year-label-text-line-height: #{map.get($modal-theme, year-selection-year-label-text-line-height)};
     --year-selection-year-label-text-size: #{map.get($modal-theme, year-selection-year-label-text-size)};
     --year-selection-year-label-text-tracking: #{map.get($modal-theme, year-selection-year-label-text-tracking)};
     --year-selection-year-label-text-weight: #{map.get($modal-theme, year-selection-year-label-text-weight)};
     --year-selection-year-unselected-label-text-color: #{map.get($modal-theme, year-selection-year-unselected-label-text-color)};
+    --year-selection-year-unselected-hover-state-layer-color: #{map.get($modal-theme, year-selection-year-unselected-hover-state-layer-color)};
+    --year-selection-year-unselected-hover-state-layer-opacity: #{map.get($modal-theme, year-selection-year-hover-state-layer-opacity)};
+    --year-selection-year-unselected-focus-state-layer-color: #{map.get($modal-theme, year-selection-year-unselected-focus-state-layer-color)};
+    --year-selection-year-unselected-focus-state-layer-opacity: #{map.get($modal-theme, year-selection-year-focus-state-layer-opacity)};
     --year-selection-year-selected-container-color: #{map.get($modal-theme, year-selection-year-selected-container-color)};
     --year-selection-year-selected-label-text-color: #{map.get($modal-theme, year-selection-year-selected-label-text-color)};
     --range-selection-active-indicator-container-color: #{map.get($modal-theme, range-selection-active-indicator-container-color)};
@@ -974,8 +1024,8 @@ $motion: tokens.md-sys-motion-values();
   }
 
   &__divider {
-    background-color: rgba(0, 0, 0, 0.12);
-    height: 1px;
+    background-color: #{map.get($divider-theme, color)};
+    height: #{map.get($divider-theme, thickness)};
     width: 100%;
   }
 
@@ -994,28 +1044,28 @@ $motion: tokens.md-sys-motion-values();
 
   &__modal-supporting {
     color: var(--modal-header-supporting-text-color, #{map.get($modal-theme, header-supporting-text-color)});
-    font-family: #{map.get($modal-theme, header-supporting-text-font)};
-    font-size: #{map.get($modal-theme, header-supporting-text-size)};
-    font-weight: #{map.get($modal-theme, header-supporting-text-weight)};
-    letter-spacing: #{map.get($modal-theme, header-supporting-text-tracking)};
-    line-height: #{map.get($modal-theme, header-supporting-text-line-height)};
+    font-family: var(--modal-header-supporting-text-font, #{map.get($modal-theme, header-supporting-text-font)});
+    font-size: var(--modal-header-supporting-text-size, #{map.get($modal-theme, header-supporting-text-size)});
+    font-weight: var(--modal-header-supporting-text-weight, #{map.get($modal-theme, header-supporting-text-weight)});
+    letter-spacing: var(--modal-header-supporting-text-tracking, #{map.get($modal-theme, header-supporting-text-tracking)});
+    line-height: var(--modal-header-supporting-text-line-height, #{map.get($modal-theme, header-supporting-text-line-height)});
     margin-bottom: 16px;
   }
 
   &__modal-headline {
     color: var(--modal-header-headline-color, #{map.get($modal-theme, header-headline-color)});
-    font-family: #{map.get($modal-theme, header-headline-font)};
-    font-size: #{map.get($modal-theme, header-headline-size)};
-    font-weight: #{map.get($modal-theme, header-headline-weight)};
-    letter-spacing: #{map.get($modal-theme, header-headline-tracking)};
-    line-height: #{map.get($modal-theme, header-headline-line-height)};
+    font-family: var(--modal-header-headline-font, #{map.get($modal-theme, header-headline-font)});
+    font-size: var(--modal-header-headline-size, #{map.get($modal-theme, header-headline-size)});
+    font-weight: var(--modal-header-headline-weight, #{map.get($modal-theme, header-headline-weight)});
+    letter-spacing: var(--modal-header-headline-tracking, #{map.get($modal-theme, header-headline-tracking)});
+    line-height: var(--modal-header-headline-line-height, #{map.get($modal-theme, header-headline-line-height)});
   }
 
   &__modal-toggle {
     flex: 0 0 auto;
-    height: 48px;
+    height: #{map.get($docked-theme, date-container-height)};
     margin: 0;
-    width: 48px;
+    width: #{map.get($docked-theme, date-container-width)};
   }
 
   &__input-panel {
@@ -1044,7 +1094,20 @@ $motion: tokens.md-sys-motion-values();
   }
 
   &--input {
-    width: #{map.get($modal-theme, container-width)};
+    --container-width: #{map.get($date-input-theme, container-width)};
+    --modal-header-headline-color: #{map.get($date-input-theme, header-headline-color)};
+    --modal-header-headline-font: #{map.get($date-input-theme, header-headline-font)};
+    --modal-header-headline-size: #{map.get($date-input-theme, header-headline-size)};
+    --modal-header-headline-weight: #{map.get($date-input-theme, header-headline-weight)};
+    --modal-header-headline-tracking: #{map.get($date-input-theme, header-headline-tracking)};
+    --modal-header-headline-line-height: #{map.get($date-input-theme, header-headline-line-height)};
+    --modal-header-supporting-text-color: #{map.get($date-input-theme, header-supporting-text-color)};
+    --modal-header-supporting-text-font: #{map.get($date-input-theme, header-supporting-text-font)};
+    --modal-header-supporting-text-size: #{map.get($date-input-theme, header-supporting-text-size)};
+    --modal-header-supporting-text-weight: #{map.get($date-input-theme, header-supporting-text-weight)};
+    --modal-header-supporting-text-tracking: #{map.get($date-input-theme, header-supporting-text-tracking)};
+    --modal-header-supporting-text-line-height: #{map.get($date-input-theme, header-supporting-text-line-height)};
+    width: var(--container-width);
   }
 
   &--input .md-date-picker__modal-header {

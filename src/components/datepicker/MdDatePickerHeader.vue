@@ -133,7 +133,7 @@ $modal-theme: tokens.md-comp-date-picker-modal-values();
     align-items: center;
     background: transparent;
     border: none;
-    border-radius: 999px;
+    border-radius: var(--menu-button-container-shape, #{map.get($docked-theme, menu-button-container-shape)});
     color: var(--menu-button-label-text-color, #{map.get($docked-theme, menu-button-label-text-color)});
     cursor: pointer;
     display: inline-flex;
@@ -141,34 +141,58 @@ $modal-theme: tokens.md-comp-date-picker-modal-values();
     font-size: var(--menu-button-label-text-size, #{map.get($docked-theme, menu-button-label-text-size)});
     font-weight: var(--menu-button-label-text-weight, #{map.get($docked-theme, menu-button-label-text-weight)});
     gap: 4px;
+    isolation: isolate;
     min-height: var(--menu-button-container-height, #{map.get($docked-theme, menu-button-container-height)});
     padding: 0 12px;
+    position: relative;
     transition: background-color 150ms ease, color 150ms ease;
+
+    &::before {
+      background-color: var(--menu-button-hover-state-layer-color, #{map.get($docked-theme, menu-button-hover-state-layer-color)});
+      border-radius: inherit;
+      content: '';
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transition: opacity 150ms ease;
+      z-index: -1;
+    }
 
     &:hover,
     &:focus-visible {
-      background-color: rgba(103, 80, 164, 0.08);
       outline: none;
+
+      &::before {
+        opacity: var(--menu-button-hover-state-layer-opacity, #{map.get($docked-theme, menu-button-hover-state-layer-opacity)});
+      }
+    }
+
+    &:focus-visible::before {
+      background-color: var(--menu-button-focus-state-layer-color, #{map.get($docked-theme, menu-button-focus-state-layer-color)});
+      opacity: var(--menu-button-focus-state-layer-opacity, #{map.get($docked-theme, menu-button-focus-state-layer-opacity)});
     }
 
     &--active {
-      background-color: rgba(103, 80, 164, 0.12);
+      &::before {
+        opacity: var(--menu-button-focus-state-layer-opacity, #{map.get($docked-theme, menu-button-focus-state-layer-opacity)});
+      }
     }
 
     &--disabled {
-      opacity: 0.6;
+      opacity: var(--menu-button-disabled-label-text-opacity, #{map.get($docked-theme, menu-button-disabled-label-text-opacity)});
     }
   }
 
   &--modal {
     align-items: center;
     gap: 8px;
-    min-height: 48px;
+    min-height: var(--date-grid-row-height, #{map.get($docked-theme, date-container-height)});
     padding: 4px 8px 4px 24px;
 
     .md-date-picker-header__value {
       color: var(--modal-menu-button-label-text-color, #{map.get($modal-theme, weekdays-label-text-color)});
-      min-height: 40px;
+      min-height: var(--menu-button-container-height, #{map.get($docked-theme, menu-button-container-height)});
     }
 
     .md-date-picker-header__value--combined {
@@ -182,9 +206,9 @@ $modal-theme: tokens.md-comp-date-picker-modal-values();
     }
 
     .md-icon-button {
-      height: 48px;
+      height: var(--date-grid-row-height, #{map.get($docked-theme, date-container-height)});
       margin: 0;
-      width: 48px;
+      width: var(--date-grid-column-width, #{map.get($docked-theme, date-container-width)});
     }
   }
 }

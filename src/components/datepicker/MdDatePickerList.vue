@@ -142,23 +142,45 @@ $theme: tokens.md-comp-date-picker-docked-values();
     background: transparent;
     border: none;
     border-radius: 999px;
-    color: inherit;
+    color: var(--menu-list-item-label-text-color, #{map.get($theme, menu-list-item-label-text-color)});
     cursor: pointer;
     display: flex;
     font-family: var(--menu-list-item-label-text-font, #{map.get($theme, menu-list-item-label-text-font)});
     font-size: var(--menu-list-item-label-text-size, #{map.get($theme, menu-list-item-label-text-size)});
     font-weight: var(--menu-list-item-label-text-weight, #{map.get($theme, menu-list-item-label-text-weight)});
     gap: 12px;
+    isolation: isolate;
     min-height: var(--menu-list-item-container-height, #{map.get($theme, menu-list-item-container-height)});
     padding: 0 16px;
+    position: relative;
     text-align: left;
     transition: background-color 150ms ease, color 150ms ease;
     width: 100%;
 
+    &::before {
+      background-color: var(--menu-list-item-hover-state-layer-color, #{map.get($theme, menu-list-item-hover-state-layer-color)});
+      border-radius: inherit;
+      content: '';
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transition: opacity 150ms ease;
+      z-index: -1;
+    }
+
     &:hover:not(:disabled),
     &:focus-visible:not(:disabled) {
-      background-color: rgba(103, 80, 164, 0.08);
       outline: none;
+
+      &::before {
+        opacity: var(--menu-list-item-hover-state-layer-opacity, #{map.get($theme, menu-list-item-hover-state-layer-opacity)});
+      }
+    }
+
+    &:focus-visible:not(:disabled)::before {
+      background-color: var(--menu-list-item-focus-state-layer-color, #{map.get($theme, menu-list-item-focus-state-layer-color)});
+      opacity: var(--menu-list-item-focus-state-layer-opacity, #{map.get($theme, menu-list-item-focus-state-layer-opacity)});
     }
 
     &:disabled {
@@ -175,7 +197,7 @@ $theme: tokens.md-comp-date-picker-docked-values();
     align-items: center;
     display: inline-flex;
     justify-content: center;
-    min-width: 24px;
+    min-width: var(--menu-list-item-selected-leading-icon-size, #{map.get($theme, menu-list-item-selected-leading-icon-size)});
   }
 
   &__label {

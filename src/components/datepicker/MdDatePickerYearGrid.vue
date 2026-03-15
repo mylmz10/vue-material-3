@@ -150,25 +150,47 @@ $theme: tokens.md-comp-date-picker-modal-values();
     align-items: center;
     background: transparent;
     border: none;
-    border-radius: 999px;
+    border-radius: var(--year-selection-year-state-layer-shape, #{map.get($theme, year-selection-year-state-layer-shape)});
     color: var(--year-selection-year-unselected-label-text-color, #{map.get($theme, year-selection-year-unselected-label-text-color)});
     cursor: pointer;
     display: inline-flex;
     font-family: var(--year-selection-year-label-text-font, #{map.get($theme, year-selection-year-label-text-font)});
     font-size: var(--year-selection-year-label-text-size, #{map.get($theme, year-selection-year-label-text-size)});
     font-weight: var(--year-selection-year-label-text-weight, #{map.get($theme, year-selection-year-label-text-weight)});
+    isolation: isolate;
     justify-content: center;
     letter-spacing: var(--year-selection-year-label-text-tracking, #{map.get($theme, year-selection-year-label-text-tracking)});
     line-height: var(--year-selection-year-label-text-line-height, #{map.get($theme, year-selection-year-label-text-line-height)});
-    height: var(--year-selection-year-container-height, #{map.get($theme, year-selection-year-container-height)});
+    height: var(--year-selection-year-state-layer-height, #{map.get($theme, year-selection-year-state-layer-height)});
     padding: 0;
+    position: relative;
     transition: background-color 150ms ease, color 150ms ease;
-    width: var(--year-selection-year-container-width, #{map.get($theme, year-selection-year-container-width)});
+    width: var(--year-selection-year-state-layer-width, #{map.get($theme, year-selection-year-state-layer-width)});
+
+    &::before {
+      background-color: var(--year-selection-year-unselected-hover-state-layer-color, #{map.get($theme, year-selection-year-unselected-hover-state-layer-color)});
+      border-radius: inherit;
+      content: '';
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transition: opacity 150ms ease;
+      z-index: -1;
+    }
 
     &:hover:not(:disabled),
     &:focus-visible:not(:disabled) {
-      background-color: rgba(103, 80, 164, 0.08);
       outline: none;
+
+      &::before {
+        opacity: var(--year-selection-year-unselected-hover-state-layer-opacity, #{map.get($theme, year-selection-year-hover-state-layer-opacity)});
+      }
+    }
+
+    &:focus-visible:not(:disabled)::before {
+      background-color: var(--year-selection-year-unselected-focus-state-layer-color, #{map.get($theme, year-selection-year-unselected-focus-state-layer-color)});
+      opacity: var(--year-selection-year-unselected-focus-state-layer-opacity, #{map.get($theme, year-selection-year-focus-state-layer-opacity)});
     }
 
     &:disabled {
