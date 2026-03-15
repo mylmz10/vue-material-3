@@ -3,7 +3,7 @@
     <span
       ref="triggerEl"
       class="md-tooltip__trigger"
-      :aria-describedby="isOpen ? tooltipId : undefined"
+      :aria-describedby="tooltipId"
       @mouseenter="handleTriggerMouseEnter"
       @mouseleave="handleTriggerMouseLeave"
       @focusin="handleTriggerFocusIn"
@@ -26,6 +26,7 @@
         :class="{
           'md-tooltip__surface--plain': !isRich,
           'md-tooltip__surface--rich': isRich,
+          'md-tooltip__surface--interactive': isInteractive,
         }"
         :style="tooltipStyle"
         role="tooltip"
@@ -58,12 +59,12 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
 
 const CLOSE_DELAY_MS = 1500;
 const LONG_PRESS_DELAY_MS = 500;
 const VIEWPORT_MARGIN = 8;
-const RICH_GAP = 8;
+const RICH_GAP = 4;
 
 let tooltipInstanceIndex = 0;
 
@@ -86,9 +87,25 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  id: {
+    type: String,
+    default: '',
+  },
   inAppBar: {
     type: Boolean,
     default: false,
+  },
+  interactive: {
+    type: [Boolean, null],
+    default: null,
+  },
+  modelValue: {
+    type: Boolean,
+    default: undefined,
+  },
+  placement: {
+    type: String,
+    default: '',
   },
   persistent: {
     type: Boolean,
@@ -108,7 +125,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['action', 'close', 'open']);
+const emit = defineEmits(['action', 'close', 'open', 'update:modelValue']);
 
 const triggerEl = ref(null);
 const tooltipEl = ref(null);
@@ -119,14 +136,16 @@ const hoveredTooltip = ref(false);
 const ignoreNextClick = ref(false);
 
 const instanceId = `md-tooltip-${++tooltipInstanceIndex}`;
-const tooltipId = `${instanceId}-surface`;
+const tooltipId = computed(() => props.id || `${instanceId}-surface`);
 
 let closeTimer = null;
 let longPressTimer = null;
 let openedFromLongPress = false;
+let hasGlobalListeners = false;
 
 const isRich = computed(() => props.variant === 'rich');
 const isPersistentRich = computed(() => isRich.value && props.persistent);
+const isInteractive = computed(() => (props.interactive == null ? isRich.value : props.interactive));
 const hasAction = computed(() => isRich.value && (!!props.actionLabel || !!slots.action));
 const plainGap = computed(() => {
   if (props.inAppBar) {
@@ -179,10 +198,15 @@ const closeOtherTooltips = () => {
 };
 
 function removeGlobalListeners() {
+  if (!hasGlobalListeners) {
+    return;
+  }
+
   window.removeEventListener('resize', handleViewportChange);
   window.removeEventListener('scroll', handleViewportChange, true);
   document.removeEventListener('mousedown', handleOutsidePointerDown);
   document.removeEventListener('keydown', handleEscapeKeydown);
+  hasGlobalListeners = false;
 }
 
 const closeTooltip = (source = 'programmatic') => {
@@ -199,17 +223,95 @@ const closeTooltip = (source = 'programmatic') => {
   isOpen.value = false;
   tooltipStyle.value = {};
   removeGlobalListeners();
+  emit('update:modelValue', false);
   emit('close', { source });
 };
 
-const roundToStep = (value, step = 8) => Math.round(value / step) * step;
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const getHorizontalAlignedLeft = (triggerRect, surfaceRect, align = 'center') => {
+  if (align === 'start') {
+    return triggerRect.left;
+  }
+
+  if (align === 'end') {
+    return triggerRect.right - surfaceRect.width;
+  }
+
+  return triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2);
+};
+
+const getVerticalAlignedTop = (triggerRect, surfaceRect, align = 'center') => {
+  if (align === 'start') {
+    return triggerRect.top;
+  }
+
+  if (align === 'end') {
+    return triggerRect.bottom - surfaceRect.height;
+  }
+
+  return triggerRect.top + ((triggerRect.height - surfaceRect.height) / 2);
+};
+
+const normalizePlacement = (placement) => {
+  const normalized = (placement || '').trim().toLowerCase().replace(/\s+/g, '-');
+  if (!normalized) {
+    return '';
+  }
+
+  const aliasMap = {
+    'top-left': 'top-start',
+    'top-right': 'top-end',
+    'bottom-left': 'bottom-start',
+    'bottom-right': 'bottom-end',
+    'left-top': 'left-start',
+    'left-bottom': 'left-end',
+    'right-top': 'right-start',
+    'right-bottom': 'right-end',
+  };
+
+  return aliasMap[normalized] || normalized;
+};
+
+const resolvePlacementPosition = (triggerRect, surfaceRect, gap, placement) => {
+  const normalizedPlacement = normalizePlacement(placement);
+  if (!normalizedPlacement) {
+    return null;
+  }
+
+  const [side, align = 'center'] = normalizedPlacement.split('-');
+
+  switch (side) {
+    case 'top':
+      return {
+        left: getHorizontalAlignedLeft(triggerRect, surfaceRect, align),
+        top: triggerRect.top - surfaceRect.height - gap,
+      };
+    case 'bottom':
+      return {
+        left: getHorizontalAlignedLeft(triggerRect, surfaceRect, align),
+        top: triggerRect.bottom + gap,
+      };
+    case 'left':
+      return {
+        left: triggerRect.left - surfaceRect.width - gap,
+        top: getVerticalAlignedTop(triggerRect, surfaceRect, align),
+      };
+    case 'right':
+      return {
+        left: triggerRect.right + gap,
+        top: getVerticalAlignedTop(triggerRect, surfaceRect, align),
+      };
+    default:
+      return null;
+  }
+};
+
 const clampToViewport = (candidate, rect) => {
   const maxLeft = Math.max(VIEWPORT_MARGIN, window.innerWidth - rect.width - VIEWPORT_MARGIN);
   const maxTop = Math.max(VIEWPORT_MARGIN, window.innerHeight - rect.height - VIEWPORT_MARGIN);
   return {
-    left: clamp(roundToStep(candidate.left), VIEWPORT_MARGIN, maxLeft),
-    top: clamp(roundToStep(candidate.top), VIEWPORT_MARGIN, maxTop),
+    left: clamp(candidate.left, VIEWPORT_MARGIN, maxLeft),
+    top: clamp(candidate.top, VIEWPORT_MARGIN, maxTop),
   };
 };
 
@@ -223,6 +325,11 @@ const fitsViewport = (candidate, rect) => {
 };
 
 const resolvePlainPosition = (triggerRect, surfaceRect) => {
+  const explicitPlacement = resolvePlacementPosition(triggerRect, surfaceRect, plainGap.value, props.placement);
+  if (explicitPlacement) {
+    return clampToViewport(explicitPlacement, surfaceRect);
+  }
+
   const centeredLeft = triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2);
   const topCandidate = {
     left: centeredLeft,
@@ -238,6 +345,11 @@ const resolvePlainPosition = (triggerRect, surfaceRect) => {
 };
 
 const resolveRichPosition = (triggerRect, surfaceRect) => {
+  const explicitPlacement = resolvePlacementPosition(triggerRect, surfaceRect, RICH_GAP, props.placement);
+  if (explicitPlacement) {
+    return clampToViewport(explicitPlacement, surfaceRect);
+  }
+
   const centeredBelow = {
     left: triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2),
     top: triggerRect.bottom + RICH_GAP,
@@ -313,10 +425,15 @@ const handleEscapeKeydown = (event) => {
 };
 
 function addGlobalListeners() {
+  if (hasGlobalListeners) {
+    return;
+  }
+
   window.addEventListener('resize', handleViewportChange);
   window.addEventListener('scroll', handleViewportChange, true);
   document.addEventListener('mousedown', handleOutsidePointerDown);
   document.addEventListener('keydown', handleEscapeKeydown);
+  hasGlobalListeners = true;
 }
 
 const openTooltip = async (source = 'programmatic') => {
@@ -330,6 +447,7 @@ const openTooltip = async (source = 'programmatic') => {
   if (!isOpen.value) {
     isOpen.value = true;
     addGlobalListeners();
+    emit('update:modelValue', true);
     emit('open', { source });
   }
 
@@ -379,21 +497,37 @@ const handleTriggerFocusOut = () => {
 };
 
 const handleTooltipMouseEnter = () => {
+  if (!isInteractive.value) {
+    return;
+  }
+
   hoveredTooltip.value = true;
   clearCloseTimer();
 };
 
 const handleTooltipMouseLeave = () => {
+  if (!isInteractive.value) {
+    return;
+  }
+
   hoveredTooltip.value = false;
   scheduleClose('tooltip-leave');
 };
 
 const handleTooltipFocusIn = () => {
+  if (!isInteractive.value) {
+    return;
+  }
+
   hoveredTooltip.value = true;
   clearCloseTimer();
 };
 
 const handleTooltipFocusOut = () => {
+  if (!isInteractive.value) {
+    return;
+  }
+
   hoveredTooltip.value = false;
   scheduleClose('tooltip-blur');
 };
@@ -456,6 +590,40 @@ onMounted(() => {
   getTooltipRegistry().set(instanceId, closeTooltip);
 });
 
+watch(
+  () => props.modelValue,
+  async (nextValue) => {
+    if (nextValue === undefined) {
+      return;
+    }
+
+    if (nextValue === isOpen.value) {
+      if (nextValue) {
+        await nextTick();
+        updatePosition();
+      }
+      return;
+    }
+
+    clearCloseTimer();
+    clearLongPressTimer();
+    hoveredTrigger.value = false;
+    hoveredTooltip.value = false;
+    isOpen.value = !!nextValue;
+
+    if (nextValue) {
+      addGlobalListeners();
+      await nextTick();
+      updatePosition();
+      return;
+    }
+
+    tooltipStyle.value = {};
+    removeGlobalListeners();
+  },
+  { immediate: true }
+);
+
 onBeforeUnmount(() => {
   clearCloseTimer();
   clearLongPressTimer();
@@ -515,6 +683,11 @@ $rich-theme: tokens.md-comp-rich-tooltip-values();
     max-inline-size: min(320px, calc(100vw - 32px));
     min-inline-size: min(200px, calc(100vw - 32px));
     padding: 12px 16px 8px;
+    pointer-events: none;
+  }
+
+  &__surface--interactive {
+    pointer-events: auto;
   }
 
   &__headline {

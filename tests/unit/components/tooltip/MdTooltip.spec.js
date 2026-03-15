@@ -22,6 +22,7 @@ const mountTooltip = (props = {}, slots = {}) => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
   document.body.innerHTML = '';
 });
 
@@ -103,6 +104,84 @@ describe('MdTooltip', () => {
 
     expect(wrapper.emitted('action')).toHaveLength(1);
     expect(document.body.querySelector('.md-tooltip__surface--rich')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('supports an explicit id and controlled open state', async () => {
+    const wrapper = mountTooltip({
+      id: 'custom-tooltip',
+      modelValue: true,
+      text: 'Controlled tooltip',
+    });
+
+    await flushTooltipOpen();
+
+    expect(wrapper.get('.md-tooltip__trigger').attributes('aria-describedby')).toBe('custom-tooltip');
+    expect(document.body.querySelector('#custom-tooltip')?.textContent).toContain('Controlled tooltip');
+
+    await wrapper.setProps({ modelValue: false });
+    await nextTick();
+
+    expect(document.body.querySelector('#custom-tooltip')).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  it('supports explicit placement overrides', async () => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this.classList?.contains('md-tooltip__trigger')) {
+        return {
+          width: 56,
+          height: 56,
+          top: 100,
+          right: 156,
+          bottom: 156,
+          left: 100,
+          x: 100,
+          y: 100,
+          toJSON: () => ({}),
+        };
+      }
+
+      if (this.classList?.contains('md-tooltip__surface')) {
+        return {
+          width: 120,
+          height: 24,
+          top: 0,
+          right: 120,
+          bottom: 24,
+          left: 0,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        };
+      }
+
+      return {
+        width: 0,
+        height: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      };
+    });
+
+    const wrapper = mountTooltip({
+      text: 'Placed tooltip',
+      placement: 'bottom-end',
+    });
+
+    await wrapper.get('.md-tooltip__trigger').trigger('mouseenter');
+    await flushTooltipOpen();
+
+    const surface = document.body.querySelector('.md-tooltip__surface--plain');
+    expect(surface?.style.left).toBe('36px');
+    expect(surface?.style.top).toBe('160px');
 
     wrapper.unmount();
   });
