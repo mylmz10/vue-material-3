@@ -1,1 +1,0 @@
-import{b as e,e as o}from"./iframe-BZY2mGdK.js";import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";const a={name:"MdElevationOverlay"},r={class:"md-elevation-overlay"};function n(s,c,_,i,l,p){return e(),o("div",r)}const v=t(a,[["render",n]]);export{v as M};

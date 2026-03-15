@@ -1,0 +1,1 @@
+import{e as t,j as e,b as o}from"./iframe-9ulbaOut.js";import{_ as r}from"./_plugin-vue_export-helper-DlAUqK2U.js";const n={name:"MdList"},a={class:"md-list"};function c(s,_,d,i,l,p){return o(),t("ul",a,[e(s.$slots,"default")])}const u=r(n,[["render",c]]);export{u as M};

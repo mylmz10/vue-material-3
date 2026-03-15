@@ -1,0 +1,1 @@
+import{e,l as a,t as s,b as i}from"./iframe-9ulbaOut.js";const n={class:"md-avatar"},r=["src"],c={key:1},d={__name:"MdAvatar",props:{image:{type:String},initials:{type:String}},setup(t){return(o,l)=>(i(),e("div",n,[t.image?(i(),e("img",{key:0,src:t.image,alt:"initials"},null,8,r)):a("",!0),t.initials?(i(),e("div",c,s(t.initials),1)):a("",!0)]))}};export{d as _};

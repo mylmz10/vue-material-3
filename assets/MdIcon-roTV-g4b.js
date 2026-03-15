@@ -1,0 +1,1 @@
+import{e,j as s,b as t}from"./iframe-9ulbaOut.js";import{_ as n}from"./_plugin-vue_export-helper-DlAUqK2U.js";const r={name:"MdIcon"},a={class:"material-symbols-outlined"};function c(o,l,_,d,i,m){return t(),e("i",a,[s(o.$slots,"default")])}const u=n(r,[["render",c]]);export{u as M};

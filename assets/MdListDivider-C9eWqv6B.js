@@ -1,0 +1,1 @@
+import{_ as e}from"./MdDivider-DuJ3eHa2.js";import{c as i,A as r,b as s}from"./iframe-9ulbaOut.js";import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";const n={name:"MdListDivider",components:{MdDivider:e}};function c(d,a,_,m,p,f){const o=r("MdDivider");return s(),i(o,{tag:"li",class:"md-list-divider"})}const D=t(n,[["render",c]]);export{D as M};
