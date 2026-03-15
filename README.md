@@ -87,7 +87,7 @@ These components are planned and not published in the current API yet:
 - [ ] NavigationRail
 - [ ] SideSheet
 - [ ] Tabs
-- [ ] TimePicker
+- [x] TimePicker
 - [ ] Tooltip
 - [ ] TopAppBar
 
