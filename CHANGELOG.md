@@ -7,6 +7,14 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.12.0](https://github.com/mylmz10/vue-material-3/compare/v0.11.0...v0.12.0) (2026-03-15)
+
+
+### Features
+
+* add material tooltip ([c7e990f](https://github.com/mylmz10/vue-material-3/commit/c7e990fb7c92ba99a72709a37aeb8aba96a62a2c))
+* add tooltip placement controls ([77e0b50](https://github.com/mylmz10/vue-material-3/commit/77e0b5086d05daaed1933fa89b8b4cfe573ccca7))
+
 ## [0.11.0](https://github.com/mylmz10/vue-material-3/compare/v0.10.0...v0.11.0) (2026-03-15)
 
 
