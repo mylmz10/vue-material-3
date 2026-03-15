@@ -119,8 +119,17 @@ const handleOpenUpdate = (value) => {
 </script>
 
 <style lang="scss">
+.md-time-picker-field {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  position: relative;
+  width: 100%;
+}
+
 .md-time-picker-field__control {
   cursor: pointer;
+  width: 100%;
 }
 
 .md-time-picker-field__icon-button {

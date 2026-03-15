@@ -488,6 +488,10 @@ $motion: tokens.md-sys-motion-values();
 .md-time-picker-dialog {
   --time-picker-container-color: #{map.get($picker-theme, container-color)};
   --time-picker-container-shape: #{map.get($picker-theme, container-shape)};
+  --time-picker-dialog-padding-inline: 24px;
+  --time-picker-dialog-padding-block-start: 24px;
+  --time-picker-display-row-gap: 12px;
+  --time-picker-separator-width: 24px;
   --time-picker-headline-color: #{map.get($picker-theme, headline-color)};
   --time-picker-headline-font: #{map.get($picker-theme, headline-font)};
   --time-picker-headline-size: #{map.get($picker-theme, headline-size)};
@@ -537,12 +541,20 @@ $motion: tokens.md-sys-motion-values();
   --clock-selector-handle-shape: #{map.get($picker-theme, clock-dial-selector-handle-container-shape)};
   --clock-selector-track-color: #{map.get($picker-theme, clock-dial-selector-track-container-color)};
   --clock-selector-track-width: #{map.get($picker-theme, clock-dial-selector-track-container-width)};
+  --time-picker-display-row-width: calc(
+    (var(--time-selector-width) * 2) +
+    var(--time-picker-separator-width) +
+    (var(--time-picker-display-row-gap) * 3) +
+    var(--period-selector-width)
+  );
+  --time-picker-content-width: max(var(--time-picker-display-row-width), var(--clock-dial-size));
+  --time-picker-dialog-width: calc(var(--time-picker-content-width) + (var(--time-picker-dialog-padding-inline) * 2));
 
   .md-time-picker-dialog__container {
     background-color: var(--time-picker-container-color);
     border-radius: var(--time-picker-container-shape);
     box-shadow: elevation.resolve-box-shadow(map.get($picker-theme, container-elevation), map.get($sys-color, shadow));
-    inline-size: min(360px, calc(100vw - 48px));
+    inline-size: min(var(--time-picker-dialog-width), calc(100vw - 48px));
     max-inline-size: calc(100vw - 48px);
     overflow: hidden;
     padding: 0;
@@ -560,6 +572,14 @@ $motion: tokens.md-sys-motion-values();
     justify-content: stretch;
     inline-size: 100%;
   }
+}
+
+.md-time-picker-dialog--24h {
+  --time-picker-display-row-width: calc(
+    (var(--time-selector-width) * 2) +
+    var(--time-picker-separator-width) +
+    (var(--time-picker-display-row-gap) * 2)
+  );
 }
 
 .md-time-picker-dialog--input {
@@ -606,7 +626,7 @@ $motion: tokens.md-sys-motion-values();
   color: var(--time-selector-unselected-label-color);
   inline-size: 100%;
   min-inline-size: 0;
-  padding: 24px 24px 0;
+  padding: var(--time-picker-dialog-padding-block-start) var(--time-picker-dialog-padding-inline) 0;
 }
 
 .md-time-picker--24h {
@@ -620,18 +640,18 @@ $motion: tokens.md-sys-motion-values();
   font-weight: var(--time-picker-headline-weight);
   letter-spacing: var(--time-picker-headline-tracking);
   line-height: var(--time-picker-headline-line-height);
-  padding: 24px 24px 0;
+  padding: var(--time-picker-dialog-padding-block-start) var(--time-picker-dialog-padding-inline) 0;
 }
 
 .md-time-picker__display-row {
   align-items: flex-start;
   display: grid;
-  gap: 12px;
-  grid-template-columns: var(--time-selector-width) 24px var(--time-selector-width) var(--period-selector-width);
+  gap: var(--time-picker-display-row-gap);
+  grid-template-columns: var(--time-selector-width) var(--time-picker-separator-width) var(--time-selector-width) var(--period-selector-width);
 }
 
 .md-time-picker--24h .md-time-picker__display-row {
-  grid-template-columns: var(--time-selector-width) 24px var(--time-selector-width);
+  grid-template-columns: var(--time-selector-width) var(--time-picker-separator-width) var(--time-selector-width);
 }
 
 .md-time-picker__time-selector,
@@ -755,7 +775,7 @@ $motion: tokens.md-sys-motion-values();
   display: flex;
   inline-size: 100%;
   justify-content: flex-start;
-  padding: 24px;
+  padding: 24px var(--time-picker-dialog-padding-inline);
 }
 
 .md-time-picker__actions {

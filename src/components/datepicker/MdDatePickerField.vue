@@ -315,14 +315,14 @@ onBeforeUnmount(() => {
 @use 'sass:map';
 @use '../../styles/tokens';
 
-$docked-theme: tokens.md-comp-date-picker-docked-values();
 $motion: tokens.md-sys-motion-values();
 
 .md-date-picker-field {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
+  max-width: 100%;
   position: relative;
-  width: min(#{map.get($docked-theme, container-width)}, 100%);
+  width: 100%;
 
   &__control {
     width: 100%;

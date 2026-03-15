@@ -76,7 +76,9 @@ import { MdElevatedButton } from 'vue-material-3';
 - `Slider`
 - `Snackbar`
 - `Switch`
+- `Tabs` (`Tabs`, `PrimaryTab`, `SecondaryTab`)
 - `TextField` (`FilledTextField`, `OutlinedTextField`)
+- `TimePicker` (`TimePicker`, `TimePickerField`)
 
 ## Planned Components
 
@@ -86,8 +88,6 @@ These components are planned and not published in the current API yet:
 - [ ] Carousel
 - [ ] NavigationRail
 - [ ] SideSheet
-- [ ] Tabs
-- [x] TimePicker
 - [ ] Tooltip
 - [ ] TopAppBar
 
