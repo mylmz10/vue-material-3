@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdTabs from '@/components/tabs/MdTabs.vue';
 import MdPrimaryTab from '@/components/tabs/MdPrimaryTab.vue';
+import MdSecondaryTab from '@/components/tabs/MdSecondaryTab.vue';
 
 describe('MdTabs', () => {
   it('syncs selected tab from modelValue', async () => {
@@ -86,5 +87,43 @@ describe('MdTabs', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1]);
 
     wrapper.unmount();
+  });
+
+  it('renders primary tab slot content outside tabs context', () => {
+    const wrapper = mount(MdPrimaryTab, {
+      props: {
+        selected: true,
+      },
+      slots: {
+        default: 'Flights',
+      },
+    });
+
+    expect(wrapper.text()).toContain('Flights');
+    expect(wrapper.attributes('aria-selected')).toBe('true');
+  });
+
+  it('supports secondary tabs inside tabs context', async () => {
+    const wrapper = mount(MdTabs, {
+      props: {
+        modelValue: 1,
+      },
+      slots: {
+        default: `
+          <MdSecondaryTab panel-id="panel-1">Overview</MdSecondaryTab>
+          <MdSecondaryTab panel-id="panel-2">Specifications</MdSecondaryTab>
+        `,
+      },
+      global: {
+        components: {
+          MdSecondaryTab,
+        },
+      },
+    });
+
+    await wrapper.vm.$nextTick();
+    const tabs = wrapper.findAll('.md-secondary-tab');
+    expect(tabs[1].attributes('aria-selected')).toBe('true');
+    expect(tabs[0].text()).toContain('Overview');
   });
 });

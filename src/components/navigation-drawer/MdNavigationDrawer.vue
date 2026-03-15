@@ -29,7 +29,6 @@ const close = () => {
 };
 
 onMounted(() => {
-  console.log(props.opened);
   _opened.value = props.opened;
 });
 

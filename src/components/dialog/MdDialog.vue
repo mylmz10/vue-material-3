@@ -1,14 +1,23 @@
 <template>
   <Transition>
-    <dialog v-if="_open" ref="dialogEl" class="md-modal" :class="{ 'md-modal--open': _open }" open @cancel.prevent="onCancel" @click="handleBackdropClick" @keydown="onDialogKeydown">
-      <div ref="containerEl" class="md-modal__container" tabindex="-1">
-        <div class="md-modal__header">
+    <dialog
+      v-if="_open"
+      ref="dialogEl"
+      class="md-modal"
+      :class="[dialogClass, { 'md-modal--open': _open }]"
+      open
+      @cancel.prevent="onCancel"
+      @click="handleBackdropClick"
+      @keydown="onDialogKeydown"
+    >
+      <div ref="containerEl" class="md-modal__container" :class="containerClass" tabindex="-1">
+        <div class="md-modal__header" :class="headerClass">
           <slot name="header" />
         </div>
-        <div class="md-modal__content">
+        <div class="md-modal__content" :class="contentClass">
           <slot />
         </div>
-        <div class="md-modal__footer">
+        <div class="md-modal__footer" :class="footerClass">
           <slot name="footer" />
         </div>
         <MdElevationOverlay />
@@ -51,6 +60,26 @@ const props = defineProps({
   },
   initialFocus: {
     type: [String, Function],
+    default: null,
+  },
+  dialogClass: {
+    type: [String, Array, Object],
+    default: null,
+  },
+  containerClass: {
+    type: [String, Array, Object],
+    default: null,
+  },
+  headerClass: {
+    type: [String, Array, Object],
+    default: null,
+  },
+  contentClass: {
+    type: [String, Array, Object],
+    default: null,
+  },
+  footerClass: {
+    type: [String, Array, Object],
     default: null,
   },
 });

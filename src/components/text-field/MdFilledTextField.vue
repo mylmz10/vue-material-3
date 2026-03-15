@@ -1,6 +1,10 @@
 <template>
   <span class="md-filled-text-field" @click="onClick">
     <MdFilledField :disabled="disabled" :error="error" :label="label" :populated="!!inputValue" :required="required" :style="{ '--md-field-label-offset': `${labelOffset}px` }">
+      <template v-if="slots.start" #start>
+        <slot name="start" />
+      </template>
+
       <MdTextFieldBase
         ref="textFieldEl"
         :autocomplete="autocomplete"
@@ -33,13 +37,17 @@
         @keydown="$emit('keydown', $event)"
         @invalid="$emit('invalid', $event)"
       >
-        <template v-if="showPrefixSlot" #prefix>
+      <template v-if="showPrefixSlot" #prefix>
           <slot name="prefix" />
         </template>
         <template v-if="slots.suffix" #suffix>
           <slot name="suffix" />
         </template>
       </MdTextFieldBase>
+
+      <template v-if="slots.end" #end>
+        <slot name="end" />
+      </template>
 
       <template #supporting-text>
         <slot name="supporting-text">{{ resolvedSupportingText }}</slot>

@@ -1,6 +1,10 @@
 <template>
   <span class="md-outlined-text-field" @click="onClick">
     <MdOutlinedField :disabled="disabled" :label="label" :populated="!!inputValue" :error="error" :required="required" :style="{ '--md-field-label-offset': `${labelOffsetWithBase}px` }">
+      <template v-if="slots.start" #start>
+        <slot name="start" />
+      </template>
+
       <MdTextFieldBase
         ref="textFieldEl"
         :autocomplete="autocomplete"
@@ -40,6 +44,10 @@
           <slot name="suffix" />
         </template>
       </MdTextFieldBase>
+
+      <template v-if="slots.end" #end>
+        <slot name="end" />
+      </template>
 
       <template #supporting-text>
         <slot name="supporting-text">{{ resolvedSupportingText }}</slot>
