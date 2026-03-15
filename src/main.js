@@ -46,6 +46,7 @@ export { default as MdDatePicker } from './components/datepicker/MdDatePicker.vu
 export { default as MdDatePickerField } from './components/datepicker/MdDatePickerField.vue';
 export { default as MdTimePicker } from './components/timepicker/MdTimePicker.vue';
 export { default as MdTimePickerField } from './components/timepicker/MdTimePickerField.vue';
+export { default as MdTooltip } from './components/tooltip/MdTooltip.vue';
 export { default as MdSnackbar } from './components/snackbar/MdSnackbar.vue';
 export { default as MdFilledAutoComplete } from './components/autocomplete/MdFilledAutoComplete.vue';
 export { default as MdOutlinedAutoComplete } from './components/autocomplete/MdOutlinedAutoComplete.vue';

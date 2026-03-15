@@ -3,6 +3,14 @@ import MdDivider from '../../../src/components/divider/MdDivider.vue';
 export default {
   title: 'Components/Divider',
   component: MdDivider,
+  args: {
+    tag: 'div',
+    vertical: false,
+  },
+  argTypes: {
+    tag: { control: 'text' },
+    vertical: { control: 'boolean' },
+  },
 };
 
 const HorizontalTemplate = (args) => ({
@@ -22,4 +30,13 @@ const VerticalTemplate = (args) => ({
 });
 
 export const Horizontal = HorizontalTemplate.bind({});
+Horizontal.args = {
+  tag: 'div',
+  vertical: false,
+};
+
 export const Vertical = VerticalTemplate.bind({});
+Vertical.args = {
+  tag: 'div',
+  vertical: true,
+};
