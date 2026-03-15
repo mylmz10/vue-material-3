@@ -7,6 +7,14 @@
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
 * component style token contracts were migrated to align with `v0.192` token maps
 
+## [0.11.0](https://github.com/mylmz10/vue-material-3/compare/v0.10.0...v0.11.0) (2026-03-15)
+
+
+### Features
+
+* add material time picker ([051e1e3](https://github.com/mylmz10/vue-material-3/commit/051e1e31df95a4e12d77e8be55f2801566ed0fea))
+* unify datepicker range selection ([eafd5e8](https://github.com/mylmz10/vue-material-3/commit/eafd5e8e7ca2a71ba7fd998561721b868ec31773))
+
 ## [0.10.0](https://github.com/mylmz10/vue-material-3/compare/v0.9.2...v0.10.0) (2026-03-13)
 
 
