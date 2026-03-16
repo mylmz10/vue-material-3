@@ -1,11 +1,12 @@
 import { computed, ref, watch } from 'vue';
 import MdTimePicker from '../../../src/components/timepicker/MdTimePicker.vue';
-import MdTimePickerField from '../../../src/components/timepicker/MdTimePickerField.vue';
+import MdFilledTimePickerField from '../../../src/components/timepicker/MdFilledTimePickerField.vue';
+import MdOutlinedTimePickerField from '../../../src/components/timepicker/MdOutlinedTimePickerField.vue';
 
 const cloneValue = (value) => value ?? null;
 
-const createFieldRender = (args, fallbackValue = '07:00') => ({
-  components: { MdTimePickerField },
+const createFieldRender = (FieldComponent, args, fallbackValue = '07:00') => ({
+  components: { FieldComponent },
   setup() {
     const value = ref(args.modelValue ?? fallbackValue);
     const boundArgs = computed(() => {
@@ -24,7 +25,7 @@ const createFieldRender = (args, fallbackValue = '07:00') => ({
   },
   template: `
     <div style="padding: 24px; min-height: 520px; background: #f7f2fa;">
-      <MdTimePickerField v-model="value" v-bind="boundArgs" />
+      <FieldComponent v-model="value" v-bind="boundArgs" />
       <p style="margin-top: 24px; font-family: sans-serif;">Selected: {{ value }}</p>
     </div>
   `,
@@ -66,11 +67,13 @@ const createSurfaceRender = (args, fallbackValue = '07:00', minHeight = 640) => 
 
 export default {
   title: 'Components/TimePicker',
-  component: MdTimePickerField,
-  subcomponents: { MdTimePicker },
+  component: MdOutlinedTimePickerField,
+  subcomponents: {
+    MdTimePicker,
+    MdFilledTimePickerField,
+    MdOutlinedTimePickerField,
+  },
   argTypes: {
-    cancelText: { control: 'text' },
-    confirmText: { control: 'text' },
     disabled: { control: 'boolean' },
     entryMode: {
       control: 'select',
@@ -78,10 +81,6 @@ export default {
     },
     error: { control: 'boolean' },
     errorText: { control: 'text' },
-    fieldVariant: {
-      control: 'select',
-      options: ['outlined', 'filled'],
-    },
     hourCycle: {
       control: 'select',
       options: [12, 24],
@@ -92,24 +91,33 @@ export default {
       control: false,
       table: { disable: true },
     },
-    open: { control: 'boolean' },
     supportingText: { control: 'text' },
   },
 };
 
-export const PlaygroundField = {
+export const OutlinedFieldPlayground = {
   args: {
     entryMode: 'dial',
-    fieldVariant: 'outlined',
     hourCycle: 12,
     label: 'Time',
     locale: 'en-US',
     supportingText: '',
   },
-  render: (args) => createFieldRender(args),
+  render: (args) => createFieldRender(MdOutlinedTimePickerField, args),
 };
 
-export const PlaygroundModalSurface = {
+export const FilledField = {
+  args: {
+    entryMode: 'dial',
+    hourCycle: 12,
+    label: 'Time',
+    locale: 'en-US',
+    supportingText: '',
+  },
+  render: (args) => createFieldRender(MdFilledTimePickerField, args),
+};
+
+export const SurfacePlayground = {
   args: {
     cancelText: 'Cancel',
     confirmText: 'OK',
@@ -117,87 +125,24 @@ export const PlaygroundModalSurface = {
     hourCycle: 12,
     locale: 'en-US',
     open: true,
+  },
+  argTypes: {
+    cancelText: { control: 'text' },
+    confirmText: { control: 'text' },
+    entryMode: {
+      control: 'select',
+      options: ['dial', 'input'],
+    },
+    hourCycle: {
+      control: 'select',
+      options: [12, 24],
+    },
+    locale: { control: 'text' },
+    modelValue: {
+      control: false,
+      table: { disable: true },
+    },
+    open: { control: 'boolean' },
   },
   render: (args) => createSurfaceRender(args),
-};
-
-export const FieldDial = {
-  args: {
-    entryMode: 'dial',
-    fieldVariant: 'outlined',
-    hourCycle: 12,
-    label: 'Time',
-    locale: 'en-US',
-  },
-  render: (args) => createFieldRender(args, '07:00'),
-};
-
-export const FieldInput = {
-  args: {
-    entryMode: 'input',
-    fieldVariant: 'outlined',
-    hourCycle: 12,
-    label: 'Time',
-    locale: 'en-US',
-  },
-  render: (args) => createFieldRender(args, '19:25'),
-};
-
-export const FieldDial24Hour = {
-  args: {
-    entryMode: 'dial',
-    fieldVariant: 'outlined',
-    hourCycle: 24,
-    label: 'Time',
-    locale: 'en-US',
-  },
-  render: (args) => createFieldRender(args, '20:00'),
-};
-
-export const ModalDial = {
-  args: {
-    cancelText: 'Cancel',
-    confirmText: 'OK',
-    entryMode: 'dial',
-    hourCycle: 12,
-    locale: 'en-US',
-    open: true,
-  },
-  render: (args) => createSurfaceRender(args, '07:00', 640),
-};
-
-export const ModalDial24Hour = {
-  args: {
-    cancelText: 'Cancel',
-    confirmText: 'OK',
-    entryMode: 'dial',
-    hourCycle: 24,
-    locale: 'en-US',
-    open: true,
-  },
-  render: (args) => createSurfaceRender(args, '20:00', 640),
-};
-
-export const ModalInput = {
-  args: {
-    cancelText: 'Cancel',
-    confirmText: 'OK',
-    entryMode: 'input',
-    hourCycle: 12,
-    locale: 'en-US',
-    open: true,
-  },
-  render: (args) => createSurfaceRender(args, '19:25', 520),
-};
-
-export const ModalInput24Hour = {
-  args: {
-    cancelText: 'Cancel',
-    confirmText: 'OK',
-    entryMode: 'input',
-    hourCycle: 24,
-    locale: 'en-US',
-    open: true,
-  },
-  render: (args) => createSurfaceRender(args, '20:15', 520),
 };

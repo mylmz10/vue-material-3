@@ -56,7 +56,7 @@ import { MdElevatedButton } from 'vue-material-3';
 - `Card`
 - `Checkbox`
 - `Chip` (`ChipSet`, `FilterChip`)
-- `DatePicker`
+- `DatePicker` (`DatePicker`, `FilledDatePickerField`, `OutlinedDatePickerField`)
 - `Dialog`
 - `Divider`
 - `Fab` (`Fab`, `BrandedFab`, `FabExtended`)
@@ -78,7 +78,7 @@ import { MdElevatedButton } from 'vue-material-3';
 - `Switch`
 - `Tabs` (`Tabs`, `PrimaryTab`, `SecondaryTab`)
 - `TextField` (`FilledTextField`, `OutlinedTextField`)
-- `TimePicker` (`TimePicker`, `TimePickerField`)
+- `TimePicker` (`TimePicker`, `FilledTimePickerField`, `OutlinedTimePickerField`)
 - `Tooltip`
 
 ## Planned Components

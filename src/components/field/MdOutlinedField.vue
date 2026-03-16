@@ -52,13 +52,18 @@ $theme: tokens.md-comp-outlined-text-field-values();
 
     #{$this}__outline-start,
     #{$this}__outline-end {
-      align-self: flex-start;
+      align-self: stretch;
       border-top: solid var(--md-field-outline-width) var(--md-field-outline-color);
       box-sizing: border-box;
-      height: 0;
+      height: auto;
+      min-height: 100%;
+      position: relative;
     }
 
     #{$this}__outline-start {
+      border-left: solid var(--md-field-outline-width) var(--md-field-outline-color);
+      border-bottom-left-radius: map.get($theme, container-shape);
+      border-top-left-radius: map.get($theme, container-shape);
       flex: 0 0 calc(var(--md-field-label-offset, 0px) + 6px);
       min-width: 6px;
     }
@@ -82,6 +87,9 @@ $theme: tokens.md-comp-outlined-text-field-values();
     }
 
     #{$this}__outline-end {
+      border-right: solid var(--md-field-outline-width) var(--md-field-outline-color);
+      border-bottom-right-radius: map.get($theme, container-shape);
+      border-top-right-radius: map.get($theme, container-shape);
       flex: 1 1 auto;
       min-width: 8px;
     }
