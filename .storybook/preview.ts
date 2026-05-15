@@ -1,4 +1,5 @@
 import type { Preview } from '@storybook/vue3-vite';
+import '../src/styles/typography/md-typescale-styles.scss';
 
 const preview: Preview = {
   parameters: {

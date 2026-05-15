@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { mergeConfig, type UserConfig } from 'vite';
 
 const config: StorybookConfig = {
-  stories: ['../stories/components/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../stories/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: ['@storybook/addon-links'],
   framework: {
     name: '@storybook/vue3-vite',

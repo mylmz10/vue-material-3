@@ -1,4 +1,4 @@
-name: deploy-storybook
+name: deploy-site
 
 on:
   release:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: deploy-storybook
+  group: deploy-site
   cancel-in-progress: true
 
 jobs:
@@ -31,12 +31,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Storybook
-        run: npm run build-storybook
+      - name: Build docs
+        run: npm run docs:build
 
-      - name: Deploy Storybook to gh-pages
+      - name: Build Storybook under docs
+        run: npm run build-storybook -- -o docs/.vitepress/dist/storybook
+
+      - name: Deploy site to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./storybook-static
+          publish_dir: ./docs/.vitepress/dist

@@ -1,0 +1,4 @@
+@use '../tokens';
+@use './typescale';
+
+@include typescale.styles(tokens.md-sys-typescale-values());
