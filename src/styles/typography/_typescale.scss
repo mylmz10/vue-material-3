@@ -1,0 +1,78 @@
+@use 'sass:list';
+@use 'sass:map';
+
+@use '../tokens';
+
+@mixin theme($tokens-map) {
+  @each $token, $value in $tokens-map {
+    @if list.index(tokens.$md-sys-typescale-supported-tokens, $token) == null {
+      @error 'md-sys-typescale `#{$token}` is not a supported token.';
+    }
+
+    @if $value {
+      --md-sys-typescale-#{$token}: #{$value};
+    }
+  }
+}
+
+@mixin styles($tokens-map) {
+  $typescale-properties: _tokens-to-typescale-properties-map($tokens-map);
+
+  @layer {
+    @each $typescale, $properties in $typescale-properties {
+      .md-typescale-#{$typescale} {
+        font-family: map.get($properties, 'font');
+        font-size: map.get($properties, 'size');
+        line-height: map.get($properties, 'line-height');
+        font-weight: map.get($properties, 'weight');
+        letter-spacing: map.get($properties, 'tracking');
+      }
+
+      .md-typescale-#{$typescale}-prominent {
+        @extend .md-typescale-#{$typescale};
+        font-weight: map.get($properties, 'weight-prominent');
+      }
+    }
+  }
+}
+
+@function _tokens-to-typescale-properties-map($tokens-map) {
+  $typescale-properties: ();
+  $typescales: ('display', 'headline', 'title', 'body', 'label');
+  $sizes: ('small', 'medium', 'large');
+  $required-properties: ('font', 'line-height', 'size', 'tracking', 'weight');
+  $optional-properties: ('weight-prominent');
+  $properties: list.join($required-properties, $optional-properties);
+
+  @each $typescale in $typescales {
+    @each $size in $sizes {
+      $typescale-and-size: #{$typescale}-#{$size};
+      $tokens-map: map.remove($tokens-map, $typescale-and-size);
+
+      @each $property in $properties {
+        $token: '#{$typescale-and-size}-#{$property}';
+        $value: map.get($tokens-map, $token);
+        @if $value == null and list.index($required-properties, $property) != null {
+          @error 'Missing required typescale token `#{$token}`';
+        }
+
+        $tokens-map: map.remove($tokens-map, $token);
+        $typescale-properties: map.set(
+          $typescale-properties,
+          $typescale-and-size,
+          $property,
+          $value
+        );
+      }
+    }
+  }
+
+  $unused-tokens: map.keys($tokens-map);
+  $unused-token-count: list.length($unused-tokens);
+
+  @if $unused-token-count > 0 {
+    @error 'Missing styles for #{$unused-token-count} typescale tokens (#{$unused-tokens})';
+  }
+
+  @return $typescale-properties;
+}
