@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [0.13.1](https://github.com/mylmz10/vue-material-3/compare/v0.13.0...v0.13.1) (2026-05-15)
+
+
+### Changes
+
+* Manual release.
+
 ### Breaking Changes
 
 * tokens baseline upgraded from Material 3 `v0.152` to `v0.192` (`src/styles/tokens`)
