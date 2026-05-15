@@ -3,10 +3,15 @@ name: manual-release-pr
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Version to prepare (example: 0.13.1)"
+      release_type:
+        description: "Version bump type"
         required: true
-        type: string
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
       notes:
         description: "Release notes to place in CHANGELOG"
         required: false
@@ -32,34 +37,33 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Validate version
+      - name: Calculate next version
+        id: version
         run: |
-          if ! echo "${VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
-            echo "Invalid version: ${VERSION}"
-            exit 1
-          fi
+          npm version "${RELEASE_TYPE}" --no-git-tag-version
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
         env:
-          VERSION: ${{ inputs.version }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
 
       - name: Update release files
         run: |
-          npm version "${VERSION}" --no-git-tag-version
           node scripts/prepare-manual-release.mjs "${VERSION}" "${NOTES}"
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
           NOTES: ${{ inputs.notes }}
 
       - name: Create release PR
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release/manual-v${{ inputs.version }}
+          branch: release/manual-v${{ steps.version.outputs.version }}
           base: master
           delete-branch: true
-          commit-message: "chore(master): release ${{ inputs.version }}"
-          title: "chore(master): release ${{ inputs.version }}"
+          commit-message: "chore(master): release ${{ steps.version.outputs.version }}"
+          title: "chore(master): release ${{ steps.version.outputs.version }}"
           body: |
-            Manual release PR for `v${{ inputs.version }}`.
+            Manual `${{ inputs.release_type }}` release PR for `v${{ steps.version.outputs.version }}`.
 
             This updates:
             - `package.json`
