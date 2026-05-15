@@ -15,6 +15,7 @@ hero:
     - theme: alt
       text: Storybook
       link: /storybook/
+      target: _blank
 
 features:
   - title: Vue 3 Components
