@@ -1,0 +1,74 @@
+name: manual-release-pr
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Version bump type"
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      notes:
+        description: "Release notes to place in CHANGELOG"
+        required: false
+        default: "Manual release."
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Setup Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Calculate next version
+        id: version
+        run: |
+          npm version "${RELEASE_TYPE}" --no-git-tag-version
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
+
+      - name: Update release files
+        run: |
+          node scripts/prepare-manual-release.mjs "${VERSION}" "${NOTES}"
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          NOTES: ${{ inputs.notes }}
+
+      - name: Create release PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/manual-v${{ steps.version.outputs.version }}
+          base: master
+          delete-branch: true
+          commit-message: "chore(master): release ${{ steps.version.outputs.version }}"
+          title: "chore(master): release ${{ steps.version.outputs.version }}"
+          body: |
+            Manual `${{ inputs.release_type }}` release PR for `v${{ steps.version.outputs.version }}`.
+
+            This updates:
+            - `package.json`
+            - `package-lock.json`
+            - `.release-please-manifest.json`
+            - `CHANGELOG.md`
+
+            After this PR is merged, the existing release workflow will publish the package and deploy docs + Storybook.
