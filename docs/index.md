@@ -27,4 +27,4 @@ features:
 
 ## Storybook
 
-Use [Storybook](/storybook/) to inspect component variants, controls, and visual states interactively.
+Use <a href="/vue-material-3/storybook/" target="_blank" rel="noreferrer">Storybook</a> to inspect component variants, controls, and visual states interactively.

@@ -14,7 +14,7 @@ export default defineConfig({
       { text: 'Components', link: '/components/' },
       { text: 'API', link: '/api/' },
       { text: 'Migration', link: '/migration/' },
-      { text: 'Storybook', link: '/storybook/' },
+      { text: 'Storybook', link: '/storybook/', target: '_blank' },
     ],
     sidebar: [
       {
