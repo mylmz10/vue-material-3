@@ -15,3 +15,121 @@
   --vp-c-brand-3: #6750a4;
   --vp-c-brand-soft: rgba(208, 188, 255, 0.16);
 }
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.md-doc-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+}
+
+.md-doc-preview--column {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.md-doc-preview__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.md-doc-preview__surface {
+  display: grid;
+  gap: 12px;
+  min-width: min(100%, 280px);
+  padding: 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+}
+
+.md-doc-preview__nav {
+  width: min(100%, 420px);
+  height: 96px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+.md-doc-preview__menu-anchor {
+  position: relative;
+  min-height: 220px;
+  width: min(100%, 360px);
+}
+
+.md-doc-preview__field {
+  width: min(100%, 320px);
+}
+
+.md-doc-preview__avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.md-doc-preview__tabs {
+  width: min(100%, 520px);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.md-doc-preview__slider {
+  width: min(100%, 420px);
+}
+
+.md-doc-preview__drawer {
+  width: min(100%, 320px);
+  min-height: 280px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+.md-doc-preview__badge-target {
+  position: relative;
+  display: inline-flex;
+}
+
+.md-doc-preview__tooltip-target {
+  position: relative;
+  display: inline-flex;
+  padding: 64px;
+}
