@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdDatePickerField from '@/components/datepicker/MdDatePickerField.vue';
+import MdFilledDatePickerField from '@/components/datepicker/MdFilledDatePickerField.vue';
+import MdOutlinedDatePickerField from '@/components/datepicker/MdOutlinedDatePickerField.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
 
@@ -172,5 +174,25 @@ describe('MdDatePickerField', () => {
     await input.trigger('change');
 
     expect(wrapper.emitted('invalid-input')?.at(-1)).toEqual(['not-a-range']);
+  });
+
+  it('renders the filled wrapper with the filled text field surface', () => {
+    const wrapper = mount(MdFilledDatePickerField, {
+      props: {
+        modelValue: '2026-03-14',
+      },
+    });
+
+    expect(wrapper.find('.md-filled-text-field').exists()).toBe(true);
+  });
+
+  it('renders the outlined wrapper with the outlined text field surface', () => {
+    const wrapper = mount(MdOutlinedDatePickerField, {
+      props: {
+        modelValue: '2026-03-14',
+      },
+    });
+
+    expect(wrapper.find('.md-outlined-text-field').exists()).toBe(true);
   });
 });

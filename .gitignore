@@ -15,6 +15,9 @@ coverage
 *.local
 
 storybook-static
+docs/.vitepress/dist
+docs/.vitepress/.temp
+docs/.vitepress/cache
 
 /cypress/videos/
 /cypress/screenshots/

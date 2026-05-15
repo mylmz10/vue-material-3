@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdTimePickerField from '@/components/timepicker/MdTimePickerField.vue';
+import MdFilledTimePickerField from '@/components/timepicker/MdFilledTimePickerField.vue';
+import MdOutlinedTimePickerField from '@/components/timepicker/MdOutlinedTimePickerField.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
 
@@ -57,5 +59,25 @@ describe('MdTimePickerField', () => {
     await findButtonByText(wrapper, 'OK').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['21:30']);
+  });
+
+  it('renders the filled wrapper with the filled text field surface', () => {
+    const wrapper = mount(MdFilledTimePickerField, {
+      props: {
+        modelValue: '07:00',
+      },
+    });
+
+    expect(wrapper.find('.md-filled-text-field').exists()).toBe(true);
+  });
+
+  it('renders the outlined wrapper with the outlined text field surface', () => {
+    const wrapper = mount(MdOutlinedTimePickerField, {
+      props: {
+        modelValue: '07:00',
+      },
+    });
+
+    expect(wrapper.find('.md-outlined-text-field').exists()).toBe(true);
   });
 });
