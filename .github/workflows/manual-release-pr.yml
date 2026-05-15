@@ -1,0 +1,70 @@
+name: manual-release-pr
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to prepare (example: 0.13.1)"
+        required: true
+        type: string
+      notes:
+        description: "Release notes to place in CHANGELOG"
+        required: false
+        default: "Manual release."
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Setup Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Validate version
+        run: |
+          if ! echo "${VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "Invalid version: ${VERSION}"
+            exit 1
+          fi
+        env:
+          VERSION: ${{ inputs.version }}
+
+      - name: Update release files
+        run: |
+          npm version "${VERSION}" --no-git-tag-version
+          node scripts/prepare-manual-release.mjs "${VERSION}" "${NOTES}"
+        env:
+          VERSION: ${{ inputs.version }}
+          NOTES: ${{ inputs.notes }}
+
+      - name: Create release PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/manual-v${{ inputs.version }}
+          base: master
+          delete-branch: true
+          commit-message: "chore(master): release ${{ inputs.version }}"
+          title: "chore(master): release ${{ inputs.version }}"
+          body: |
+            Manual release PR for `v${{ inputs.version }}`.
+
+            This updates:
+            - `package.json`
+            - `package-lock.json`
+            - `.release-please-manifest.json`
+            - `CHANGELOG.md`
+
+            After this PR is merged, the existing release workflow will publish the package and deploy docs + Storybook.

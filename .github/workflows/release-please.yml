@@ -6,11 +6,6 @@ on:
       - master
   workflow_dispatch:
     inputs:
-      release_as:
-        description: "Open a release PR for this exact version (example: 0.13.1)"
-        required: false
-        default: ''
-        type: string
       simulate_publish_failure:
         description: Simulate npm publish failure (for rollback test)
         required: false
@@ -30,20 +25,25 @@ jobs:
       - uses: actions/checkout@v4
 
   release-please-pr:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.reconcile_tag == '') }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.reconcile_tag == '' && inputs.simulate_publish_failure == true) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
       id-token: write
     steps:
+      - name: Checkout repository
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - id: release
         uses: GoogleCloudPlatform/release-please-action@v4
         with:
           include-component-in-tag: false
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          release-as: ${{ inputs.release_as }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Normalize release outputs
@@ -86,9 +86,38 @@ jobs:
           echo "tag_name=${TAG_NAME}"
           echo "sha=${RELEASE_SHA}"
 
+      - name: Resolve manual release commit
+        id: manual-release
+        if: ${{ github.event_name == 'push' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG_NAME="v${VERSION}"
+
+          if gh release view "${TAG_NAME}" >/dev/null 2>&1; then
+            echo "created=false" >> "${GITHUB_OUTPUT}"
+            echo "tag_name=" >> "${GITHUB_OUTPUT}"
+            echo "sha=" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo "created=true" >> "${GITHUB_OUTPUT}"
+          echo "tag_name=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "sha=${GITHUB_SHA}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create GitHub release for manual release
+        if: ${{ steps.release-meta.outputs.release_created != 'true' && steps.manual-release.outputs.created == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.manual-release.outputs.tag_name }}
+        run: |
+          awk '/^## \[/{section++} section == 1 {print} section == 2 {exit}' CHANGELOG.md > /tmp/release-notes.md
+          gh release create "${TAG_NAME}" --target "${GITHUB_SHA}" --title "${TAG_NAME}" --notes-file /tmp/release-notes.md
+
       - name: Checkout Repo
         uses: actions/checkout@v4
-        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
         with:
           fetch-depth: 0
           ref: master
@@ -97,23 +126,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
 
       - name: Ensure npm 11.5.1+
         run: |
           npm install -g npm@^11.5.1
           node --version
           npm --version
-        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
 
       - name: Install dependencies
         run: npm ci
-        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
 
       - name: Publish package on NPM 📦
         id: publish
         continue-on-error: true
-        if: ${{ steps.release-meta.outputs.release_created == 'true' }}
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.simulate_publish_failure }}" = "true" ]; then
             echo "Simulating publish failure."
@@ -123,15 +152,15 @@ jobs:
           npm publish --access public
 
       - name: Build docs
-        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
+        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true') && steps.publish.outcome == 'success' }}
         run: npm run docs:build
 
       - name: Build Storybook under docs
-        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
+        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true') && steps.publish.outcome == 'success' }}
         run: npm run build-storybook -- -o docs/.vitepress/dist/storybook
 
       - name: Deploy site to gh-pages
-        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
+        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true') && steps.publish.outcome == 'success' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -139,11 +168,11 @@ jobs:
           publish_dir: ./docs/.vitepress/dist
 
       - name: Roll back failed release by opening PR
-        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
+        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true') && steps.publish.outcome == 'failure' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ steps.release-meta.outputs.tag_name }}
-          RELEASE_SHA: ${{ steps.release-meta.outputs.sha }}
+          TAG_NAME: ${{ steps.release-meta.outputs.tag_name || steps.manual-release.outputs.tag_name }}
+          RELEASE_SHA: ${{ steps.release-meta.outputs.sha || steps.manual-release.outputs.sha }}
         run: |
           set -euo pipefail
           echo "Publish failed for ${TAG_NAME}. Cleaning release metadata and opening rollback PR."
@@ -205,7 +234,7 @@ jobs:
           fi
 
       - name: Mark workflow as failed after rollback
-        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
+        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true') && steps.publish.outcome == 'failure' }}
         run: |
           echo "Publish failed. Rollback PR was created."
           exit 1
