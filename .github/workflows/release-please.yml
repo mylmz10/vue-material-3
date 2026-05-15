@@ -117,17 +117,21 @@ jobs:
 
           npm publish --access public
 
-      - name: Build Storybook
+      - name: Build docs
         if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
-        run: npm run build-storybook
+        run: npm run docs:build
 
-      - name: Deploy Storybook to gh-pages
+      - name: Build Storybook under docs
+        if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
+        run: npm run build-storybook -- -o docs/.vitepress/dist/storybook
+
+      - name: Deploy site to gh-pages
         if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'success' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./storybook-static
+          publish_dir: ./docs/.vitepress/dist
 
       - name: Roll back failed release by opening PR
         if: ${{ steps.release-meta.outputs.release_created == 'true' && steps.publish.outcome == 'failure' }}
