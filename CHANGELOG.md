@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [0.14.1](https://github.com/mylmz10/vue-material-3/compare/v0.14.0...v0.14.1) (2026-06-27)
+
+
+### Bug Fixes
+
+* publish built package output ([cd21e92](https://github.com/mylmz10/vue-material-3/commit/cd21e929b23612662f05df044a53ac34d6782958))
+
 ## [0.14.0](https://github.com/mylmz10/vue-material-3/compare/v0.13.1...v0.14.0) (2026-05-15)
 
 
