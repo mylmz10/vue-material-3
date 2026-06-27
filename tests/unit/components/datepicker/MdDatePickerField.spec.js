@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdDatePickerField from '@/components/datepicker/MdDatePickerField.vue';
 import MdFilledDatePickerField from '@/components/datepicker/MdFilledDatePickerField.vue';
@@ -7,6 +7,15 @@ import MdOutlinedDatePickerField from '@/components/datepicker/MdOutlinedDatePic
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
 
 describe('MdDatePickerField', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-01T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('opens the docked picker and commits the selected date', async () => {
     const wrapper = mount(MdDatePickerField, {
       attachTo: document.body,

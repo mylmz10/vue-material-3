@@ -2,8 +2,24 @@
   "name": "vue-material-3",
   "version": "0.14.0",
   "description": "Material Design 3 styled components for Vue 3",
-  "main": "src/main.js",
+  "main": "dist/vue-material-3.umd.js",
+  "module": "dist/vue-material-3.es.js",
+  "style": "dist/vue-material-3.css",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-material-3.es.js",
+      "require": "./dist/vue-material-3.umd.js",
+      "default": "./dist/vue-material-3.es.js"
+    },
+    "./style.css": "./dist/vue-material-3.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "vite build",
+    "prepack": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",

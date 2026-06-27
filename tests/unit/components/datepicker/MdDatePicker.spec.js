@@ -1,10 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdDatePicker from '@/components/datepicker/MdDatePicker.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
 
 describe('MdDatePicker', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-01T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('commits the selected date on confirm in modal mode', async () => {
     const wrapper = mount(MdDatePicker, {
       attachTo: document.body,
