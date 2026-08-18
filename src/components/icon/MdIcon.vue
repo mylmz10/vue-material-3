@@ -1,5 +1,5 @@
 <template>
-  <i class="material-symbols-outlined"><slot></slot></i>
+  <i class="material-symbols-outlined md-icon"><slot></slot></i>
 </template>
 <script>
 export default {
@@ -9,7 +9,7 @@ export default {
 
 <style>
 .md-icon {
-  font-family: 'Material Icons';
+  font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;

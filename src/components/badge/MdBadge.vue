@@ -18,9 +18,6 @@ defineProps({
 $theme: tokens.md-comp-badge-values();
 
 .md-badge {
-  inset-inline-start: 50%;
-  margin-inline-start: 6px;
-  margin-block-start: 4px;
   background: map.get($theme, color);
   color: map.get($theme, large-label-text-color);
   border-radius: map.get($theme, shape);
@@ -33,14 +30,14 @@ $theme: tokens.md-comp-badge-values();
   &--absolute {
     position: absolute;
     inset-block-start: 0;
+    inset-inline-end: 0;
+    transform: translate(50%, -50%);
   }
 
   &--large {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    margin-inline-start: 2px;
-    margin-block-start: 1px;
     min-width: map.get($theme, large-size);
     height: map.get($theme, large-size);
     border-radius: map.get($theme, large-shape);

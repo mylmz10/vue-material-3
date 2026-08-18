@@ -77,6 +77,15 @@ $sys-color: tokens.md-sys-color-values-light();
     box-shadow: elevation.resolve-box-shadow(map.get($theme, standard-container-elevation), map.get($sys-color, shadow));
     padding: 12px;
 
+    .md-list {
+      min-width: auto;
+      max-height: none;
+      width: 100%;
+      padding-block: 0;
+      background-color: transparent;
+      overflow: visible;
+    }
+
     .md-list-item {
       padding: 12px 16px;
       box-sizing: border-box;

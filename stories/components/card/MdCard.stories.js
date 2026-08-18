@@ -3,7 +3,9 @@ import MdCard from '../../../src/components/card/MdCard.vue';
 export default {
   title: 'Components/Card',
   component: MdCard,
-  argTypes: {},
+  argTypes: {
+    interactive: { control: 'boolean' },
+  },
 };
 
 const Template = (args) => ({
@@ -23,4 +25,5 @@ Card.args = {
   type: 'elevated',
   headerTitle: 'Header',
   headerSubTitle: 'Subhead',
+  interactive: false,
 };

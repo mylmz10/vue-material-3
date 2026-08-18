@@ -3,7 +3,9 @@ import MdSwitch from '../../../src/components/switch/MdSwitch.vue';
 export default {
   title: 'Components/Switch',
   component: MdSwitch,
-  argTypes: {},
+  argTypes: {
+    icon: { control: 'boolean' },
+  },
 };
 
 const Template = (args) => ({
@@ -15,4 +17,6 @@ const Template = (args) => ({
 });
 
 export const Switch = Template.bind({});
-Switch.args = {};
+Switch.args = {
+  icon: false,
+};

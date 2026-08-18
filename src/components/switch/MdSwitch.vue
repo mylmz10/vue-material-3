@@ -1,5 +1,5 @@
 <template>
-  <div class="md-switch" :class="{ 'md-switch--disabled': disabled, 'md-switch--checked': _checked }">
+  <div class="md-switch" :class="{ 'md-switch--disabled': disabled, 'md-switch--checked': _checked, 'md-switch--with-icon': icon }">
     <input
       ref="inputEl"
       :checked="_checked"
@@ -17,7 +17,9 @@
     />
     <div class="md-switch__track">
       <div class="md-switch__handle-container">
-        <div class="md-switch__handle"></div>
+        <div class="md-switch__handle">
+          <MdIcon v-if="icon" class="md-switch__icon">{{ _checked ? 'check' : 'close' }}</MdIcon>
+        </div>
       </div>
     </div>
   </div>
@@ -25,6 +27,7 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import MdIcon from '../icon/MdIcon.vue';
 
 const _checked = ref(false);
 const inputEl = ref(null);
@@ -39,6 +42,7 @@ const props = defineProps({
   form: { type: String, default: '' },
   modelValue: { type: Boolean, default: undefined },
   name: { type: String, default: '' },
+  icon: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
   value: { type: [String, Number], default: 'on' },
@@ -182,18 +186,29 @@ $theme: tokens.md-comp-switch-values();
     border-style: solid;
 
     #{$this}__handle-container {
-      position: relative;
-      margin-inline-start: initial;
-      margin-inline-end: calc(#{map.get($theme, track-width)} - #{map.get($theme, track-height)});
+      position: absolute;
+      inset-inline-start: 0;
+      inset-block-start: 50%;
       width: map.get($theme, unselected-handle-width);
       height: map.get($theme, unselected-handle-height);
-      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
+      transform: translate(
+        calc((#{map.get($theme, track-height)} - #{map.get($theme, unselected-handle-width)}) / 2),
+        -50%
+      );
+      transition:
+        transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        width 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        height 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
       #{$this}__handle {
-        width: inherit;
-        height: inherit;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
         background-color: map.get($theme, unselected-handle-color);
         border-radius: map.get($theme, handle-shape);
+        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
@@ -201,6 +216,10 @@ $theme: tokens.md-comp-switch-values();
       #{$this}__handle-container {
         width: map.get($theme, pressed-handle-width);
         height: map.get($theme, pressed-handle-height);
+        transform: translate(
+          calc((#{map.get($theme, track-height)} - #{map.get($theme, pressed-handle-width)}) / 2),
+          -50%
+        );
         #{$this}__handle {
           background-color: map.get($theme, unselected-pressed-handle-color);
         }
@@ -221,15 +240,38 @@ $theme: tokens.md-comp-switch-values();
       border-color: map.get($theme, selected-track-color);
 
       #{$this}__handle-container {
-        margin-inline-end: initial;
-        margin-inline-start: calc(#{map.get($theme, track-width)} - #{map.get($theme, track-height)});
         width: map.get($theme, selected-handle-width);
         height: map.get($theme, selected-handle-height);
+        transform: translate(
+          calc(
+            (#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) +
+              ((#{map.get($theme, track-height)} - #{map.get($theme, selected-handle-width)}) / 2) -
+              2px
+          ),
+          -50%
+        );
 
         #{$this}__handle {
-          width: map.get($theme, selected-handle-width);
-          height: map.get($theme, selected-handle-height);
           background-color: map.get($theme, selected-handle-color);
+        }
+      }
+
+      &:active {
+        #{$this}__handle-container {
+          width: map.get($theme, pressed-handle-width);
+          height: map.get($theme, pressed-handle-height);
+          transform: translate(
+            calc(
+              (#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) +
+                ((#{map.get($theme, track-height)} - #{map.get($theme, pressed-handle-width)}) / 2) -
+                2px
+            ),
+            -50%
+          );
+
+          #{$this}__handle {
+            background-color: map.get($theme, selected-pressed-handle-color);
+          }
         }
       }
 
@@ -266,6 +308,58 @@ $theme: tokens.md-comp-switch-values();
             background-color: map.get($theme, disabled-selected-handle-color);
             opacity: map.get($theme, disabled-selected-handle-opacity);
           }
+        }
+      }
+    }
+  }
+
+  &--with-icon {
+    #{$this}__track {
+      #{$this}__handle-container {
+        width: map.get($theme, with-icon-handle-width);
+        height: map.get($theme, with-icon-handle-height);
+        transform: translate(
+          calc((#{map.get($theme, track-height)} - #{map.get($theme, with-icon-handle-width)}) / 2),
+          -50%
+        );
+      }
+    }
+
+    #{$this}__icon {
+      font-size: map.get($theme, unselected-icon-size);
+      color: map.get($theme, unselected-icon-color);
+    }
+
+    &#{$this}--checked {
+      #{$this}__track {
+        #{$this}__handle-container {
+          transform: translate(
+            calc(
+              (#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) +
+                ((#{map.get($theme, track-height)} - #{map.get($theme, with-icon-handle-width)}) / 2) -
+                2px
+            ),
+            -50%
+          );
+        }
+      }
+
+      #{$this}__icon {
+        font-size: map.get($theme, selected-icon-size);
+        color: map.get($theme, selected-icon-color);
+      }
+    }
+
+    &#{$this}--disabled {
+      #{$this}__icon {
+        color: map.get($theme, disabled-unselected-icon-color);
+        opacity: map.get($theme, disabled-unselected-icon-opacity);
+      }
+
+      &#{$this}--checked {
+        #{$this}__icon {
+          color: map.get($theme, disabled-selected-icon-color);
+          opacity: map.get($theme, disabled-selected-icon-opacity);
         }
       }
     }

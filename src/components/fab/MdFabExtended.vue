@@ -79,6 +79,10 @@ defineProps({
 
   .md-fab__icon {
     margin-right: 12px;
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
+    --mdc-icon-size: 28px;
   }
 
   .md-fab__label {

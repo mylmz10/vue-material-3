@@ -20,14 +20,13 @@ describe('MdSearch', () => {
     const wrapper = mount(MdSearch, {
       props: {
         showAvatar: true,
-        trailingIcon: 'close',
       },
       slots: {
         avatar: '<span class="avatar-slot">VM</span>',
       },
     });
 
-    const buttons = wrapper.findAll('.md-icon-button');
+    const buttons = wrapper.findAll('.search-action');
     await buttons[0].trigger('click');
     await buttons[1].trigger('click');
 

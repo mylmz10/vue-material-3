@@ -9,6 +9,7 @@ Switches toggle a single setting on or off.
 
 <div class="md-doc-preview">
   <MdSwitch v-model="enabled" />
+  <MdSwitch v-model="enabled" icon />
   <MdSwitch disabled />
 </div>
 
@@ -22,6 +23,7 @@ import { MdSwitch } from 'vue-material-3';
 
 ```vue
 <MdSwitch v-model="enabled" />
+<MdSwitch v-model="enabled" icon />
 ```
 
 ## Storybook

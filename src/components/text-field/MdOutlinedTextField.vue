@@ -19,7 +19,7 @@
         :minlength="minlength"
         :name="name"
         :pattern="pattern"
-        :placeholder="placeholder"
+        :placeholder="resolvedPlaceholder"
         :prefix="resolvedPrefix"
         :readonly="readonly"
         :required="required"
@@ -119,6 +119,13 @@ const resolvedSupportingText = computed(() => {
 });
 const ariaInvalid = computed(() => ((props.error || props.invalid) ? 'true' : ''));
 const showPrefix = computed(() => hasInputValue.value || isInputFocused.value || props.focused);
+const resolvedPlaceholder = computed(() => {
+  if (!props.label) {
+    return props.placeholder;
+  }
+
+  return isInputFocused.value || props.focused ? props.placeholder : '';
+});
 const showPrefixSlot = computed(() => showPrefix.value && !!slots.prefix);
 const resolvedPrefix = computed(() => (showPrefix.value ? props.prefix : ''));
 const labelOffsetWithBase = computed(() => labelOffset.value + 8);

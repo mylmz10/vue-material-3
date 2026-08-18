@@ -74,7 +74,6 @@
 
 .md-doc-preview__surface {
   display: grid;
-  gap: 12px;
   min-width: min(100%, 280px);
   padding: 16px;
   border: 1px solid var(--vp-c-divider);
@@ -116,8 +115,8 @@
 }
 
 .md-doc-preview__drawer {
-  width: min(100%, 320px);
-  min-height: 280px;
+  width: min(100%, 360px);
+  min-height: auto;
   overflow: hidden;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
@@ -132,4 +131,12 @@
   position: relative;
   display: inline-flex;
   padding: 64px;
+}
+
+.vp-doc .md-list,
+.vp-doc ul.md-list,
+.vp-doc ol.md-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

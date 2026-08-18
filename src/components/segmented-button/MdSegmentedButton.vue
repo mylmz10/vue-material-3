@@ -1,5 +1,11 @@
 <template>
-  <button class="md-segmented-button" :class="{ 'md-segmented-button--selected': selected, 'md-segmented-button--disabled': disabled }" v-bind:disabled="disabled">
+  <button
+    class="md-segmented-button"
+    :class="{ 'md-segmented-button--selected': selected, 'md-segmented-button--disabled': disabled }"
+    v-bind:disabled="disabled"
+    @mouseup="handlePointerRelease"
+    @touchend="handlePointerRelease"
+  >
     <span class="md-segmented-button__checkmark" :class="{ 'md-segmented-button__checkmark--show': !noCheckmark && selected }"><MdIcon v-if="selected">check</MdIcon></span>
     <span class="md-segmented-button__label">{{ label }}</span>
     <span class="md-segmented-button__outline"></span>
@@ -28,6 +34,10 @@ const props = defineProps({
     type: String,
   },
 });
+
+const handlePointerRelease = (event) => {
+  event.currentTarget?.blur?.();
+};
 </script>
 
 <style lang="scss">

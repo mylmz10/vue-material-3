@@ -75,10 +75,26 @@ $theme: tokens.md-comp-fab-surface-values();
   --surface-tint-layer-color: #{map.get($theme, container-color)};
   --overlay-opacity: 0.11;
 }
+
+.md-fab:not(.md-fab--small):not(.md-fab--large) {
+  .md-fab__icon {
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
+    --mdc-icon-size: 28px;
+  }
+}
 .md-fab--small.md-fab {
   @include root-static-styles(tokens.md-comp-fab-surface-small-values());
 }
 .md-fab--large.md-fab {
   @include root-static-styles(tokens.md-comp-fab-surface-large-values());
+
+  .md-fab__icon {
+    width: 36px;
+    height: 36px;
+    font-size: 36px;
+    --mdc-icon-size: 36px;
+  }
 }
 </style>

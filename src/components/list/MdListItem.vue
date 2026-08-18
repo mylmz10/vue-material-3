@@ -85,13 +85,15 @@ const renderSupportingText = computed(() => {
 
 $theme: tokens.md-comp-list-values();
 
-$theme: map.set($theme, 'list-item-three-line-container-height', 96px);
-
 .md-list-item {
   $this: &;
   position: relative;
   display: flex;
   align-items: center;
+  margin: 0;
+  padding-inline-start: map.get($theme, list-item-leading-space);
+  padding-inline-end: map.get($theme, list-item-trailing-space);
+  list-style: none;
   min-height: map.get($theme, list-item-one-line-container-height);
   border-radius: map.get($theme, list-item-container-shape);
   --line: 1;
@@ -135,7 +137,7 @@ $theme: map.set($theme, 'list-item-three-line-container-height', 96px);
 
     .md-icon,
     .md-avatar {
-      margin-left: 16px;
+      display: block;
     }
   }
 
@@ -143,7 +145,7 @@ $theme: map.set($theme, 'list-item-three-line-container-height', 96px);
     flex: 1 1 100%;
     display: flex;
     flex-direction: column;
-    padding-inline-start: 16px;
+    padding-inline-start: map.get($theme, list-item-leading-space);
 
     #{$this}__label-text {
       color: map.get($theme, list-item-label-text-color);
@@ -173,11 +175,10 @@ $theme: map.set($theme, 'list-item-three-line-container-height', 96px);
 
   &__end {
     flex: 0 0 auto;
-    padding-inline-end: 24px;
     position: relative;
 
     #{$this}__trailing-text {
-      padding-inline-start: 16px;
+      padding-inline-start: map.get($theme, list-item-leading-space);
       color: map.get($theme, list-item-trailing-supporting-text-color);
       font-family: map.get($theme, list-item-trailing-supporting-text-font);
       line-height: map.get($theme, list-item-trailing-supporting-text-line-height);

@@ -1,5 +1,14 @@
 <template>
-  <div class="md-card" :class="{ 'md-card--elevated': type === 'elevated', 'md-card--filled': type === 'filled', 'md-card--outlined': type === 'outlined' }">
+  <div
+    class="md-card"
+    :class="{
+      'md-card--elevated': type === 'elevated',
+      'md-card--filled': type === 'filled',
+      'md-card--outlined': type === 'outlined',
+      'md-card--interactive': interactive,
+      'md-card--with-footer': actionButtonText || cancelButtonText,
+    }"
+  >
     <div class="md-card__state-layer"></div>
 
     <div v-if="avatar || avatarInitials || headerTitle || headerSubTitle" class="md-card__header">
@@ -58,6 +67,10 @@ const props = defineProps({
   avatarInitials: {
     type: String,
   },
+  interactive: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 
@@ -115,9 +128,10 @@ const props = defineProps({
   }
 
   #{$this}__image-container {
-    max-height: 250px;
     #{$this}__image {
+      display: block;
       width: 100%;
+      height: auto;
     }
   }
 
@@ -125,17 +139,20 @@ const props = defineProps({
     padding: 16px;
   }
 
+  &#{$this}--with-footer {
+    #{$this}__content {
+      padding-bottom: 0;
+    }
+  }
+
   &__footer {
     padding: 16px;
 
     #{$this}__action {
       display: flex;
+      gap: 8px;
       width: 100%;
       justify-content: flex-end;
-
-      > * {
-        margin-left: 8px;
-      }
     }
   }
 
@@ -150,6 +167,10 @@ const props = defineProps({
     z-index: -1;
   }
 
+  &--interactive {
+    cursor: pointer;
+  }
+
   &--elevated {
     $theme: tokens.md-comp-elevated-card-values();
     border-radius: map.get($theme, container-shape);
@@ -159,7 +180,7 @@ const props = defineProps({
       background: map.get($theme, container-color);
     }
 
-    &:hover {
+    &#{$this}--interactive:hover {
       box-shadow: elevation.resolve-box-shadow(map.get($theme, hover-container-elevation), map.get($theme, container-shadow-color));
 
       #{$this}__state-layer {
@@ -177,7 +198,7 @@ const props = defineProps({
       background: map.get($theme, container-color);
     }
 
-    &:hover {
+    &#{$this}--interactive:hover {
       box-shadow: elevation.resolve-box-shadow(map.get($theme, hover-container-elevation), map.get($theme, container-shadow-color));
 
       #{$this}__state-layer {
@@ -198,12 +219,10 @@ const props = defineProps({
       background: map.get($theme, container-color);
     }
 
-    &:hover {
+    &#{$this}--interactive:hover {
       box-shadow: elevation.resolve-box-shadow(map.get($theme, hover-container-elevation), map.get($theme, container-shadow-color));
 
-      #{$this}__container {
-        border-color: map.get($theme, hover-outline-color);
-      }
+      border-color: map.get($theme, hover-outline-color);
 
       #{$this}__state-layer {
         visibility: visible;
