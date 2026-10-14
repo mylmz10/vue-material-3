@@ -478,19 +478,20 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-outlined-select-values();
 
 .md-outlined-select-menu {
   --md-select-option-container-height: #{map.get($theme, menu-list-item-container-height)};
-  --md-select-option-label-text-color: #{map.get($theme, menu-list-item-label-text-color)};
+  --md-select-option-label-text-color: #{theme.value('on-surface')};
   --md-select-option-label-text-font: #{map.get($theme, menu-list-item-label-text-font)};
   --md-select-option-label-text-line-height: #{map.get($theme, menu-list-item-label-text-line-height)};
   --md-select-option-label-text-size: #{map.get($theme, menu-list-item-label-text-size)};
   --md-select-option-label-text-tracking: #{map.get($theme, menu-list-item-label-text-tracking)};
   --md-select-option-label-text-weight: #{map.get($theme, menu-list-item-label-text-weight)};
-  --md-select-option-selected-container-color: #{map.get($theme, menu-list-item-selected-container-color)};
-  --md-select-option-container-color: #{map.get($theme, menu-container-color)};
+  --md-select-option-selected-container-color: #{theme.value('surface-container-highest')};
+  --md-select-option-container-color: #{theme.value('surface-container')};
   width: 100%;
 
   .md-menu__activator {
@@ -534,7 +535,7 @@ $theme: tokens.md-comp-outlined-select-values();
 
   &__value {
     align-items: center;
-    color: map.get($theme, text-field-input-text-color);
+    color: #{theme.value('on-surface')};
     display: inline-flex;
     font-family: map.get($theme, text-field-input-text-font);
     font-size: map.get($theme, text-field-input-text-size);
@@ -545,11 +546,11 @@ $theme: tokens.md-comp-outlined-select-values();
   }
 
   &__value--placeholder {
-    color: map.get($theme, text-field-label-text-color);
+    color: #{theme.value('on-surface-variant')};
   }
 
   &__icon {
-    color: map.get($theme, text-field-label-text-color);
+    color: #{theme.value('on-surface-variant')};
     transition: transform 0.2s ease;
     user-select: none;
   }

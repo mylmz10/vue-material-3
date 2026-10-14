@@ -143,6 +143,7 @@ const onFocus = (event) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-primary-navigation-tab-values();
 
@@ -152,7 +153,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   appearance: none;
   background: none;
   border: none;
-  color: map.get($theme, with-label-text-inactive-label-text-color);
+  color: #{theme.value('on-surface-variant')};
   cursor: pointer;
   display: flex;
   height: map.get($theme, with-icon-and-label-text-container-height);
@@ -160,9 +161,9 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   min-width: 96px;
   padding: 0 12px;
 
-  --md-ripple-hover-state-layer-color: #{map.get($theme, inactive-hover-state-layer-color)};
-  --md-ripple-focus-state-layer-color: #{map.get($theme, inactive-focus-state-layer-color)};
-  --md-ripple-pressed-state-layer-color: #{map.get($theme, inactive-pressed-state-layer-color)};
+  --md-ripple-hover-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-focus-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-pressed-state-layer-color: #{theme.value('primary')};
   --md-ripple-hover-state-layer-opacity: #{map.get($theme, inactive-hover-state-layer-opacity)};
   --md-ripple-focus-state-layer-opacity: #{map.get($theme, inactive-focus-state-layer-opacity)};
   --md-ripple-pressed-state-layer-opacity: #{map.get($theme, inactive-pressed-state-layer-opacity)};
@@ -177,7 +178,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   }
 
   &__icon {
-    color: map.get($theme, with-icon-inactive-icon-color);
+    color: #{theme.value('on-surface-variant')};
     font-size: map.get($theme, with-icon-icon-size);
   }
 
@@ -192,7 +193,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   }
 
   &__indicator {
-    background-color: map.get($theme, active-indicator-color);
+    background-color: #{theme.value('primary')};
     border-radius: map.get($theme, active-indicator-shape);
     bottom: 0;
     height: map.get($theme, active-indicator-height);
@@ -208,10 +209,10 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   }
 
   &--selected {
-    color: map.get($theme, with-label-text-active-label-text-color);
-    --md-ripple-hover-state-layer-color: #{map.get($theme, active-hover-state-layer-color)};
-    --md-ripple-focus-state-layer-color: #{map.get($theme, active-focus-state-layer-color)};
-    --md-ripple-pressed-state-layer-color: #{map.get($theme, active-pressed-state-layer-color)};
+    color: #{theme.value('primary')};
+    --md-ripple-hover-state-layer-color: #{theme.value('primary')};
+    --md-ripple-focus-state-layer-color: #{theme.value('primary')};
+    --md-ripple-pressed-state-layer-color: #{theme.value('primary')};
     --md-ripple-hover-state-layer-opacity: #{map.get($theme, active-hover-state-layer-opacity)};
     --md-ripple-focus-state-layer-opacity: #{map.get($theme, active-focus-state-layer-opacity)};
     --md-ripple-pressed-state-layer-opacity: #{map.get($theme, active-pressed-state-layer-opacity)};
@@ -222,7 +223,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
     }
 
     .md-primary-tab__icon {
-      color: map.get($theme, with-icon-active-icon-color);
+      color: #{theme.value('primary')};
     }
   }
 

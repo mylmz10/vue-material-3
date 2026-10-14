@@ -210,15 +210,20 @@ watch([showPrefix, () => props.prefix, inputValue], async () => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-filled-text-field-values();
 
 .md-filled-text-field {
+  --md-filled-text-field-caret-color: #{theme.value('primary')};
+  --md-filled-text-field-input-text-color: #{theme.value('on-surface')};
+  --md-filled-text-field-input-text-prefix-color: #{theme.value('on-surface-variant')};
+  --md-filled-text-field-input-text-suffix-color: #{theme.value('on-surface-variant')};
   border-radius: map.get($theme, container-shape);
 
   .md-text-field__input {
-    caret-color: map.get($theme, caret-color);
-    color: map.get($theme, input-text-color);
+    caret-color: var(--md-filled-text-field-caret-color);
+    color: var(--md-filled-text-field-input-text-color);
     font-family: map.get($theme, input-text-font);
     line-height: map.get($theme, input-text-line-height);
     font-size: map.get($theme, input-text-size);
@@ -243,12 +248,12 @@ $theme: tokens.md-comp-filled-text-field-values();
   }
 
   .md-text-field__affix--prefix {
-    color: map.get($theme, input-text-prefix-color);
+    color: var(--md-filled-text-field-input-text-prefix-color);
     padding-inline-end: 2px;
   }
 
   .md-text-field__affix--suffix {
-    color: map.get($theme, input-text-suffix-color);
+    color: var(--md-filled-text-field-input-text-suffix-color);
     padding-inline-start: 2px;
   }
 }

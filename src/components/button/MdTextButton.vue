@@ -43,6 +43,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-text-button-values();
@@ -51,7 +52,7 @@ $theme: tokens.md-comp-text-button-values();
   background-color: transparent;
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
-  color: map.get($theme, label-text-color);
+  color: #{theme.value('primary')};
   font-family: map.get($theme, label-text-font);
   font-size: map.get($theme, label-text-size);
   font-weight: map.get($theme, label-text-weight);
@@ -66,7 +67,7 @@ $theme: tokens.md-comp-text-button-values();
 
   &:disabled,
   &.md-button--soft-disabled {
-    color: rgba(map.get($theme, disabled-label-text-color), map.get($theme, disabled-label-text-opacity));
+    color: #{theme.value('on-surface')};
 
     .md-button__trailing-icon {
       opacity: map.get($theme, disabled-label-text-opacity);

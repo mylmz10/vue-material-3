@@ -196,6 +196,7 @@ const handleKeydown = (event) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 @use '../ripple/ripple';
 
@@ -371,22 +372,22 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
   &--assist {
     --md-chip-container-height: #{map.get($assist-theme, container-height)};
     --md-chip-container-shape: #{map.get($assist-theme, container-shape)};
-    --md-chip-label-color: #{map.get($assist-theme, label-text-color)};
-    --md-chip-label-disabled-color: #{map.get($assist-theme, disabled-label-text-color)};
+    --md-chip-label-color: #{theme.value('on-surface')};
+    --md-chip-label-disabled-color: #{theme.value('on-surface')};
     --md-chip-label-disabled-opacity: #{map.get($assist-theme, disabled-label-text-opacity)};
     --md-chip-label-font: #{map.get($assist-theme, label-text-type)};
-    --md-chip-outline-color: #{map.get($assist-theme, flat-outline-color)};
+    --md-chip-outline-color: #{theme.value('outline')};
     --md-chip-outline-width: #{map.get($assist-theme, flat-outline-width)};
     --md-chip-background-color: transparent;
-    --md-chip-disabled-background-color: #{map.get($assist-theme, elevated-disabled-container-color)};
+    --md-chip-disabled-background-color: #{theme.value('on-surface')};
     --md-chip-disabled-background-opacity: #{map.get($assist-theme, elevated-disabled-container-opacity)};
-    --md-chip-leading-icon-color: #{map.get($assist-theme, with-icon-icon-color)};
+    --md-chip-leading-icon-color: #{theme.value('primary')};
     --md-chip-leading-icon-size: #{map.get($assist-theme, with-icon-icon-size)};
-    --md-chip-trailing-icon-color: #{map.get($assist-theme, with-icon-icon-color)};
+    --md-chip-trailing-icon-color: #{theme.value('primary')};
     --md-chip-trailing-icon-size: #{map.get($assist-theme, with-icon-icon-size)};
 
     &.md-chip--elevated {
-      --md-chip-background-color: #{map.get($assist-theme, elevated-container-color)};
+      --md-chip-background-color: #{theme.value('surface-container-low')};
       box-shadow: elevation.resolve-box-shadow(map.get($assist-theme, elevated-container-elevation), map.get($assist-theme, elevated-container-shadow-color));
     }
 
@@ -406,21 +407,21 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
   &--suggestion {
     --md-chip-container-height: #{map.get($suggestion-theme, container-height)};
     --md-chip-container-shape: #{map.get($suggestion-theme, container-shape)};
-    --md-chip-label-color: #{map.get($suggestion-theme, label-text-color)};
-    --md-chip-label-disabled-color: #{map.get($suggestion-theme, disabled-label-text-color)};
+    --md-chip-label-color: #{theme.value('on-surface-variant')};
+    --md-chip-label-disabled-color: #{theme.value('on-surface')};
     --md-chip-label-disabled-opacity: #{map.get($suggestion-theme, disabled-label-text-opacity)};
     --md-chip-label-font: #{map.get($suggestion-theme, label-text-type)};
-    --md-chip-outline-color: #{map.get($suggestion-theme, flat-outline-color)};
+    --md-chip-outline-color: #{theme.value('outline')};
     --md-chip-outline-width: #{map.get($suggestion-theme, flat-outline-width)};
-    --md-chip-leading-icon-color: #{map.get($suggestion-theme, with-leading-icon-leading-icon-color)};
+    --md-chip-leading-icon-color: #{theme.value('primary')};
     --md-chip-leading-icon-size: #{map.get($suggestion-theme, with-leading-icon-leading-icon-size)};
-    --md-chip-trailing-icon-color: #{map.get($suggestion-theme, with-leading-icon-leading-icon-color)};
+    --md-chip-trailing-icon-color: #{theme.value('primary')};
     --md-chip-trailing-icon-size: #{map.get($suggestion-theme, with-leading-icon-leading-icon-size)};
-    --md-chip-disabled-background-color: #{map.get($suggestion-theme, elevated-disabled-container-color)};
+    --md-chip-disabled-background-color: #{theme.value('on-surface')};
     --md-chip-disabled-background-opacity: #{map.get($suggestion-theme, elevated-disabled-container-opacity)};
 
     &.md-chip--elevated {
-      --md-chip-background-color: #{map.get($suggestion-theme, elevated-container-color)};
+      --md-chip-background-color: #{theme.value('surface-container-low')};
       box-shadow: elevation.resolve-box-shadow(map.get($suggestion-theme, elevated-container-elevation), map.get($suggestion-theme, elevated-container-shadow-color));
     }
 
@@ -440,26 +441,26 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
   &--filter {
     --md-chip-container-height: #{map.get($filter-theme, container-height)};
     --md-chip-container-shape: #{map.get($filter-theme, container-shape)};
-    --md-chip-label-color: #{map.get($filter-theme, unselected-label-text-color)};
-    --md-chip-label-disabled-color: #{map.get($filter-theme, disabled-label-text-color)};
+    --md-chip-label-color: #{theme.value('on-surface-variant')};
+    --md-chip-label-disabled-color: #{theme.value('on-surface')};
     --md-chip-label-disabled-opacity: #{map.get($filter-theme, disabled-label-text-opacity)};
     --md-chip-label-font: #{map.get($filter-theme, label-text-type)};
-    --md-chip-outline-color: #{map.get($filter-theme, flat-unselected-outline-color)};
+    --md-chip-outline-color: #{theme.value('outline')};
     --md-chip-outline-width: #{map.get($filter-theme, flat-unselected-outline-width)};
-    --md-chip-leading-icon-color: #{map.get($filter-theme, with-leading-icon-unselected-leading-icon-color)};
+    --md-chip-leading-icon-color: #{theme.value('primary')};
     --md-chip-leading-icon-size: #{map.get($filter-theme, with-icon-icon-size)};
-    --md-chip-trailing-icon-color: #{map.get($filter-theme, with-trailing-icon-unselected-trailing-icon-color)};
+    --md-chip-trailing-icon-color: #{theme.value('on-surface-variant')};
     --md-chip-trailing-icon-size: #{map.get($filter-theme, with-icon-icon-size)};
-    --md-chip-selected-background-color: #{map.get($filter-theme, flat-selected-container-color)};
-    --md-chip-selected-label-color: #{map.get($filter-theme, selected-label-text-color)};
-    --md-chip-selected-leading-icon-color: #{map.get($filter-theme, with-leading-icon-selected-leading-icon-color)};
-    --md-chip-selected-trailing-icon-color: #{map.get($filter-theme, with-trailing-icon-selected-trailing-icon-color)};
-    --md-chip-disabled-background-color: #{map.get($filter-theme, flat-disabled-selected-container-color)};
+    --md-chip-selected-background-color: #{theme.value('secondary-container')};
+    --md-chip-selected-label-color: #{theme.value('on-secondary-container')};
+    --md-chip-selected-leading-icon-color: #{theme.value('on-secondary-container')};
+    --md-chip-selected-trailing-icon-color: #{theme.value('on-secondary-container')};
+    --md-chip-disabled-background-color: #{theme.value('on-surface')};
     --md-chip-disabled-background-opacity: #{map.get($filter-theme, flat-disabled-selected-container-opacity)};
 
     &.md-chip--elevated {
-      --md-chip-background-color: #{map.get($filter-theme, elevated-unselected-container-color)};
-      --md-chip-selected-background-color: #{map.get($filter-theme, elevated-selected-container-color)};
+      --md-chip-background-color: #{theme.value('surface-container-low')};
+      --md-chip-selected-background-color: #{theme.value('secondary-container')};
       box-shadow: elevation.resolve-box-shadow(map.get($filter-theme, elevated-container-elevation), map.get($filter-theme, elevated-container-shadow-color));
     }
 
@@ -490,22 +491,22 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
   &--input {
     --md-chip-container-height: #{map.get($input-theme, container-height)};
     --md-chip-container-shape: #{map.get($input-theme, container-shape)};
-    --md-chip-label-color: #{map.get($input-theme, unselected-label-text-color)};
-    --md-chip-label-disabled-color: #{map.get($input-theme, disabled-label-text-color)};
+    --md-chip-label-color: #{theme.value('on-surface-variant')};
+    --md-chip-label-disabled-color: #{theme.value('on-surface')};
     --md-chip-label-disabled-opacity: #{map.get($input-theme, disabled-label-text-opacity)};
     --md-chip-label-font: #{map.get($input-theme, label-text-type)};
-    --md-chip-outline-color: #{map.get($input-theme, unselected-outline-color)};
+    --md-chip-outline-color: #{theme.value('outline')};
     --md-chip-outline-width: #{map.get($input-theme, unselected-outline-width)};
-    --md-chip-leading-icon-color: #{map.get($input-theme, with-leading-icon-unselected-leading-icon-color)};
+    --md-chip-leading-icon-color: #{theme.value('on-surface-variant')};
     --md-chip-leading-icon-size: #{map.get($input-theme, with-leading-icon-leading-icon-size)};
-    --md-chip-trailing-icon-color: #{map.get($input-theme, with-trailing-icon-unselected-trailing-icon-color)};
+    --md-chip-trailing-icon-color: #{theme.value('on-surface-variant')};
     --md-chip-trailing-icon-size: #{map.get($input-theme, with-trailing-icon-trailing-icon-size)};
     --md-chip-avatar-size: #{map.get($input-theme, with-avatar-avatar-size)};
-    --md-chip-selected-background-color: #{map.get($input-theme, selected-container-color)};
-    --md-chip-selected-label-color: #{map.get($input-theme, selected-label-text-color)};
-    --md-chip-selected-leading-icon-color: #{map.get($input-theme, with-leading-icon-selected-leading-icon-color)};
-    --md-chip-selected-trailing-icon-color: #{map.get($input-theme, with-trailing-icon-selected-trailing-icon-color)};
-    --md-chip-disabled-background-color: #{map.get($input-theme, disabled-selected-container-color)};
+    --md-chip-selected-background-color: #{theme.value('secondary-container')};
+    --md-chip-selected-label-color: #{theme.value('on-secondary-container')};
+    --md-chip-selected-leading-icon-color: #{theme.value('on-secondary-container')};
+    --md-chip-selected-trailing-icon-color: #{theme.value('on-secondary-container')};
+    --md-chip-disabled-background-color: #{theme.value('on-surface')};
     --md-chip-disabled-background-opacity: #{map.get($input-theme, disabled-selected-container-opacity)};
 
     @include ripple.ripple(

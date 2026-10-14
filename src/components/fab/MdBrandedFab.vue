@@ -30,6 +30,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../elevation/elevation';
 
@@ -44,7 +45,7 @@ defineProps({
   align-items: center;
   justify-content: center;
 
-  background-color: map.get($theme, container-color);
+  background-color: var(--md-branded-fab-container-color, #{map.get($theme, container-color)});
   width: map.get($theme, container-width);
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
@@ -56,7 +57,7 @@ defineProps({
   }
 
   .md-branded-fab__icon {
-    color: map.get($theme, icon-color);
+    color: #{theme.value('on-surface')};
     width: map.get($theme, icon-size);
     height: map.get($theme, icon-size);
     font-size: map.get($theme, icon-size);
@@ -82,11 +83,14 @@ defineProps({
 }
 
 .md-branded-fab {
+  --md-branded-fab-container-color: #{theme.value('surface-container-high')};
+  --md-branded-fab-label-text-color: #{theme.value('on-surface')};
+
   &:not(.md-branded-fab--extended) {
     $theme: tokens.md-comp-fab-branded-values();
     @include root-static-styles($theme);
 
-    --surface-tint-layer-color: #{map.get($theme, container-color)};
+    --surface-tint-layer-color: #{theme.value('surface-container-high')};
     --overlay-opacity: 0.11;
 
     .md-branded-fab__icon {
@@ -122,7 +126,7 @@ defineProps({
   justify-content: center;
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
-  background-color: map.get($theme, container-color);
+  background-color: var(--md-branded-fab-container-color);
   box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
 
   &:hover:not(:focus):not(:active) {
@@ -131,7 +135,7 @@ defineProps({
 
   .md-branded-fab__icon {
     margin-right: 12px;
-    color: map.get($theme, icon-color);
+    color: #{theme.value('on-surface')};
     width: 28px;
     height: 28px;
     font-size: 28px;
@@ -142,7 +146,7 @@ defineProps({
   }
 
   .md-branded-fab__label {
-    color: map.get($theme, label-text-color);
+    color: var(--md-branded-fab-label-text-color);
     font-family: map.get($theme, label-text-font);
     line-height: map.get($theme, label-text-line-height);
     font-size: map.get($theme, label-text-size);

@@ -135,6 +135,7 @@ const onFocus = (event) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-secondary-navigation-tab-values();
 
@@ -144,7 +145,7 @@ $theme: tokens.md-comp-secondary-navigation-tab-values();
   appearance: none;
   background: none;
   border: none;
-  color: map.get($theme, inactive-label-text-color);
+  color: #{theme.value('on-surface-variant')};
   cursor: pointer;
   display: flex;
   gap: 8px;
@@ -153,15 +154,15 @@ $theme: tokens.md-comp-secondary-navigation-tab-values();
   min-width: 96px;
   padding: 0 24px;
 
-  --md-ripple-hover-state-layer-color: #{map.get($theme, hover-state-layer-color)};
-  --md-ripple-focus-state-layer-color: #{map.get($theme, focus-state-layer-color)};
-  --md-ripple-pressed-state-layer-color: #{map.get($theme, pressed-state-layer-color)};
+  --md-ripple-hover-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-focus-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-pressed-state-layer-color: #{theme.value('on-surface')};
   --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
   --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
   --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
 
   &__icon {
-    color: map.get($theme, with-icon-inactive-icon-color);
+    color: #{theme.value('on-surface-variant')};
     font-size: map.get($theme, with-icon-icon-size);
   }
 
@@ -176,7 +177,7 @@ $theme: tokens.md-comp-secondary-navigation-tab-values();
   }
 
   &__indicator {
-    background-color: map.get($theme, active-indicator-color);
+    background-color: #{theme.value('primary')};
     bottom: 0;
     height: map.get($theme, active-indicator-height);
     left: 0;
@@ -189,10 +190,10 @@ $theme: tokens.md-comp-secondary-navigation-tab-values();
   }
 
   &--selected {
-    color: map.get($theme, active-label-text-color);
+    color: #{theme.value('on-surface')};
 
     .md-secondary-tab__icon {
-      color: map.get($theme, with-icon-active-icon-color);
+      color: #{theme.value('on-surface')};
     }
 
     .md-secondary-tab__indicator {

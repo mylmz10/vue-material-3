@@ -4,3 +4,4 @@ if [ -f "$HOME/.nvm/nvm.sh" ]; then
 fi
 
 npm test
+npm run build-storybook

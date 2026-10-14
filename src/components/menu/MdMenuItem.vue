@@ -130,6 +130,7 @@ defineExpose({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $menu-theme: tokens.md-comp-menu-values();
 $list-theme: tokens.md-comp-list-values();
@@ -140,7 +141,7 @@ $list-theme: tokens.md-comp-list-values();
   appearance: none;
   background: transparent;
   border: none;
-  color: map.get($list-theme, list-item-label-text-color);
+  color: var(--md-menu-item-label-text-color);
   cursor: pointer;
   display: flex;
   font: inherit;
@@ -149,9 +150,13 @@ $list-theme: tokens.md-comp-list-values();
   text-align: left;
   width: 100%;
 
-  --md-ripple-hover-state-layer-color: #{map.get($list-theme, list-item-hover-state-layer-color)};
-  --md-ripple-focus-state-layer-color: #{map.get($list-theme, list-item-focus-state-layer-color)};
-  --md-ripple-pressed-state-layer-color: #{map.get($list-theme, list-item-pressed-state-layer-color)};
+  --md-menu-item-label-text-color: #{theme.value('on-surface')};
+  --md-menu-item-icon-color: #{theme.value('on-secondary-container')};
+  --md-menu-item-selected-container-color: #{theme.value('secondary-container')};
+  --md-menu-item-selected-label-text-color: #{theme.value('on-secondary-container')};
+  --md-ripple-hover-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-focus-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-pressed-state-layer-color: #{theme.value('on-surface')};
   --md-ripple-hover-state-layer-opacity: #{map.get($list-theme, list-item-hover-state-layer-opacity)};
   --md-ripple-focus-state-layer-opacity: #{map.get($list-theme, list-item-focus-state-layer-opacity)};
   --md-ripple-pressed-state-layer-opacity: #{map.get($list-theme, list-item-pressed-state-layer-opacity)};
@@ -170,7 +175,7 @@ $list-theme: tokens.md-comp-list-values();
 
   &__start {
     align-items: center;
-    color: map.get($menu-theme, menu-list-item-with-leading-icon-icon-color);
+    color: var(--md-menu-item-icon-color);
     display: inline-flex;
     margin-inline-end: 12px;
     z-index: 1;
@@ -189,19 +194,19 @@ $list-theme: tokens.md-comp-list-values();
 
   &__end {
     align-items: center;
-    color: map.get($menu-theme, menu-list-item-with-leading-icon-icon-color);
+    color: var(--md-menu-item-icon-color);
     display: inline-flex;
     margin-inline-start: 12px;
     z-index: 1;
   }
 
   &--selected {
-    background-color: map.get($menu-theme, list-item-selected-container-color);
-    color: map.get($menu-theme, list-item-selected-label-text-color);
+    background-color: var(--md-menu-item-selected-container-color);
+    color: var(--md-menu-item-selected-label-text-color);
 
     .md-menu-item__end,
     .md-menu-item__start {
-      color: map.get($menu-theme, list-item-selected-with-leading-icon-trailing-icon-color);
+      color: var(--md-menu-item-selected-label-text-color);
     }
   }
 

@@ -78,6 +78,7 @@ const props = defineProps({
 @use 'sass:map';
 @use '../elevation/elevation';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 .md-card {
   margin: 0 8px;
@@ -91,6 +92,7 @@ const props = defineProps({
   overflow: hidden;
   z-index: 0;
   border-radius: inherit;
+  color: #{theme.value('on-surface')};
 
   &:before {
     border-radius: inherit;
@@ -177,7 +179,7 @@ const props = defineProps({
     box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
 
     &:before {
-      background: map.get($theme, container-color);
+      background: #{theme.value('surface-container-low')};
     }
 
     &#{$this}--interactive:hover {
@@ -185,7 +187,7 @@ const props = defineProps({
 
       #{$this}__state-layer {
         visibility: visible;
-        background-color: map.get($theme, hover-state-layer-color);
+        background-color: #{theme.value('on-surface')};
         opacity: map.get($theme, hover-state-layer-opacity);
       }
     }
@@ -195,7 +197,7 @@ const props = defineProps({
     border-radius: map.get($theme, container-shape);
 
     &:before {
-      background: map.get($theme, container-color);
+      background: #{theme.value('surface-container-highest')};
     }
 
     &#{$this}--interactive:hover {
@@ -203,7 +205,7 @@ const props = defineProps({
 
       #{$this}__state-layer {
         visibility: visible;
-        background-color: map.get($theme, hover-state-layer-color);
+        background-color: #{theme.value('on-surface')};
         opacity: map.get($theme, hover-state-layer-opacity);
       }
     }
@@ -214,19 +216,19 @@ const props = defineProps({
 
     border-style: solid;
     border-width: map.get($theme, outline-width);
-    border-color: map.get($theme, outline-color);
+    border-color: #{theme.value('outline-variant')};
     &:before {
-      background: map.get($theme, container-color);
+      background: #{theme.value('surface')};
     }
 
     &#{$this}--interactive:hover {
       box-shadow: elevation.resolve-box-shadow(map.get($theme, hover-container-elevation), map.get($theme, container-shadow-color));
 
-      border-color: map.get($theme, hover-outline-color);
+      border-color: #{theme.value('outline-variant')};
 
       #{$this}__state-layer {
         visibility: visible;
-        background-color: map.get($theme, hover-state-layer-color);
+        background-color: #{theme.value('on-surface')};
         opacity: map.get($theme, hover-state-layer-opacity);
       }
     }

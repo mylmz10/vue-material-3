@@ -21,6 +21,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../elevation/elevation';
 
@@ -35,7 +36,7 @@ defineProps({
   align-items: center;
   justify-content: center;
 
-  background-color: map.get($theme, container-color);
+  background-color: var(--md-fab-extended-container-color, #{map.get($theme, container-color)});
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
 
@@ -46,7 +47,7 @@ defineProps({
   }
 
   &__icon {
-    color: map.get($theme, icon-color);
+    color: var(--md-fab-extended-icon-color, #{map.get($theme, icon-color)});
     width: map.get($theme, icon-size);
     height: map.get($theme, icon-size);
     font-size: map.get($theme, icon-size);
@@ -74,7 +75,10 @@ defineProps({
 
   padding: 16px;
 
-  --surface-tint-layer-color: #{map.get($theme, container-color)};
+  --md-fab-extended-container-color: #{theme.value('surface-container-high')};
+  --md-fab-extended-icon-color: #{theme.value('primary')};
+  --md-fab-extended-label-text-color: #{theme.value('primary')};
+  --surface-tint-layer-color: #{theme.value('surface-container-high')};
   --overlay-opacity: 0.11;
 
   .md-fab__icon {
@@ -86,7 +90,7 @@ defineProps({
   }
 
   .md-fab__label {
-    color: map.get($theme, label-text-color);
+    color: var(--md-fab-extended-label-text-color);
     font-family: map.get($theme, label-text-font);
     line-height: map.get($theme, label-text-line-height);
     font-size: map.get($theme, label-text-size);

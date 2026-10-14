@@ -43,6 +43,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../elevation/elevation';
 @use '../ripple/ripple';
@@ -61,7 +62,7 @@ $theme: tokens.md-comp-elevated-button-values();
   }
 
   .md-button__label {
-    color: map.get($theme, label-text-color);
+    color: #{theme.value('primary')};
     font-family: map.get($theme, label-text-font);
     font-size: map.get($theme, label-text-size);
     font-weight: map.get($theme, label-text-weight);
@@ -69,8 +70,12 @@ $theme: tokens.md-comp-elevated-button-values();
     line-height: map.get($theme, label-text-line-height);
   }
 
+  .md-button__trailing-icon {
+    color: #{theme.value('primary')};
+  }
+
   .md-button__background {
-    background-color: map.get($theme, container-color);
+    background-color: #{theme.value('surface-container-low')};
   }
 
   &:disabled,
@@ -78,12 +83,12 @@ $theme: tokens.md-comp-elevated-button-values();
     box-shadow: none;
 
     .md-button__background {
-      background-color: map.get($theme, disabled-container-color);
+      background-color: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-container-opacity);
     }
     .md-button__label,
     .md-button__trailing-icon {
-      color: map.get($theme, disabled-label-text-color);
+      color: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-label-text-opacity);
     }
   }

@@ -12,6 +12,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-divider-values();
 
@@ -21,14 +22,14 @@ $theme: tokens.md-comp-divider-values();
     height: 0;
     border-bottom-style: solid;
     border-bottom-width: map.get($theme, thickness);
-    border-bottom-color: map.get($theme, color);
+    border-bottom-color: #{theme.value('outline-variant')};
   }
   &--vertical {
     width: 0;
     min-height: 100%;
     border-right-style: solid;
     border-right-width: map.get($theme, thickness);
-    border-right-color: map.get($theme, color);
+    border-right-color: #{theme.value('outline-variant')};
   }
 }
 </style>

@@ -83,23 +83,31 @@ const handleTrailingClick = () => {
 <style lang="scss" scoped>
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-search-bar-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
 
 .search-wrapper {
   width: 100%;
 }
 
 .search-container {
+  --md-search-container-color: #{theme.value('surface-container-high')};
+  --md-search-leading-icon-color: #{theme.value('on-surface')};
+  --md-search-trailing-icon-color: #{theme.value('on-surface-variant')};
+  --md-search-input-text-color: #{theme.value('on-surface')};
+  --md-search-supporting-text-color: #{theme.value('on-surface-variant')};
+  --md-search-hover-state-layer-color: #{theme.value('on-surface')};
+  --md-search-pressed-state-layer-color: #{theme.value('on-surface')};
   position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
   min-height: map.get($theme, container-height);
   padding-inline: 4px;
-  background: map.get($theme, container-color);
+  background: var(--md-search-container-color);
   border-radius: map.get($theme, container-shape);
   box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($sys-color, shadow));
   overflow: hidden;
@@ -115,7 +123,7 @@ $sys-color: tokens.md-sys-color-values-light();
   border: 0;
   border-radius: 9999px;
   background: transparent;
-  color: map.get($theme, trailing-icon-color);
+  color: var(--md-search-trailing-icon-color);
   cursor: pointer;
   flex: 0 0 auto;
 
@@ -125,16 +133,16 @@ $sys-color: tokens.md-sys-color-values-light();
   }
 
   &:hover {
-    background: color-mix(in srgb, map.get($theme, hover-state-layer-color) calc(map.get($theme, hover-state-layer-opacity) * 100%), transparent);
+    background: color-mix(in srgb, var(--md-search-hover-state-layer-color) calc(map.get($theme, hover-state-layer-opacity) * 100%), transparent);
   }
 
   &:active {
-    background: color-mix(in srgb, map.get($theme, pressed-state-layer-color) calc(map.get($theme, pressed-state-layer-opacity) * 100%), transparent);
+    background: color-mix(in srgb, var(--md-search-pressed-state-layer-color) calc(map.get($theme, pressed-state-layer-opacity) * 100%), transparent);
   }
 }
 
 .search-action--leading {
-  color: map.get($theme, leading-icon-color);
+  color: var(--md-search-leading-icon-color);
 }
 
 .search-input {
@@ -142,7 +150,7 @@ $sys-color: tokens.md-sys-color-values-light();
   border: none;
   outline: none;
   background: transparent;
-  color: map.get($theme, input-text-color);
+  color: var(--md-search-input-text-color);
   font-family: map.get($theme, input-text-font);
   font-size: map.get($theme, input-text-size);
   font-weight: map.get($theme, input-text-weight);
@@ -150,12 +158,12 @@ $sys-color: tokens.md-sys-color-values-light();
   line-height: map.get($theme, input-text-line-height);
 
   &::placeholder {
-    color: map.get($theme, supporting-text-color);
+    color: var(--md-search-supporting-text-color);
   }
 }
 
 .supporting-text {
-  color: map.get($theme, supporting-text-color);
+  color: var(--md-search-supporting-text-color);
   font-family: map.get($theme, supporting-text-font);
   font-size: map.get($theme, supporting-text-size);
   font-weight: map.get($theme, supporting-text-weight);

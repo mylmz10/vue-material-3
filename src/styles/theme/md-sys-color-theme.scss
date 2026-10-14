@@ -1,0 +1,21 @@
+@use '../tokens';
+@use './md-sys-color' as theme;
+
+:root {
+  color-scheme: light;
+  @include theme.emit-theme(tokens.md-sys-color-values-light());
+}
+
+.light,
+[data-theme='light'],
+[data-color-scheme='light'] {
+  color-scheme: light;
+  @include theme.emit-theme(tokens.md-sys-color-values-light());
+}
+
+.dark,
+[data-theme='dark'],
+[data-color-scheme='dark'] {
+  color-scheme: dark;
+  @include theme.emit-theme(tokens.md-sys-color-values-dark());
+}

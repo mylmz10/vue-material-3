@@ -22,6 +22,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-outlined-text-field-values();
 
@@ -30,6 +31,9 @@ $theme: tokens.md-comp-outlined-text-field-values();
   $this: &;
 
   &--outlined {
+    --md-field-outline-color: #{theme.value('outline')};
+    --md-field-label-color: #{theme.value('on-surface-variant')};
+    --md-field-supporting-text-color: #{theme.value('on-surface-variant')};
     #{$this}__outline {
       position: absolute;
       inset: 0;
@@ -37,7 +41,6 @@ $theme: tokens.md-comp-outlined-text-field-values();
       border-radius: map.get($theme, container-shape);
       color: var(--md-field-outline-color, #{map.get($theme, outline-color)});
       pointer-events: none;
-      --md-field-outline-color: #{map.get($theme, outline-color)};
       --md-field-outline-width: #{map.get($theme, outline-width)};
     }
 
@@ -117,35 +120,35 @@ $theme: tokens.md-comp-outlined-text-field-values();
 
     &#{$this}--focused {
       #{$this}__outline {
-        --md-field-outline-color: #{map.get($theme, focus-outline-color)};
+        --md-field-outline-color: #{theme.value('primary')};
         --md-field-outline-width: #{map.get($theme, focus-outline-width)};
       }
     }
 
     &#{$this}--error {
       .md-text-field__input {
-        caret-color: map.get($theme, error-focus-caret-color);
+        caret-color: #{theme.value('error')};
       }
 
       #{$this}__supporting-text {
-        color: map.get($theme, error-supporting-text-color);
+        color: #{theme.value('error')};
       }
 
       #{$this}__middle {
         #{$this}__label {
-          color: map.get($theme, error-label-text-color);
+          color: #{theme.value('error')};
         }
       }
 
       #{$this}__outline {
-        --md-field-outline-color: #{map.get($theme, error-outline-color)};
+        --md-field-outline-color: #{theme.value('error')};
         --md-field-outline-width: #{map.get($theme, outline-width)};
       }
     }
 
     &#{$this}--error#{$this}--focused {
       #{$this}__outline {
-        --md-field-outline-color: #{map.get($theme, error-focus-outline-color)};
+        --md-field-outline-color: #{theme.value('error')};
         --md-field-outline-width: #{map.get($theme, focus-outline-width)};
       }
     }
@@ -157,14 +160,14 @@ $theme: tokens.md-comp-outlined-text-field-values();
         font-family: map.get($theme, label-text-font);
         font-weight: map.get($theme, label-text-weight);
         letter-spacing: map.get($theme, label-text-tracking);
-        color: map.get($theme, label-text-color);
+        color: var(--md-field-label-color);
         left: calc(var(--md-field-label-offset, 0px) + 10px);
         padding-inline: 4px;
       }
     }
 
     #{$this}__supporting-text {
-      color: map.get($theme, supporting-text-color);
+      color: var(--md-field-supporting-text-color);
       font-family: map.get($theme, supporting-text-font);
       line-height: map.get($theme, supporting-text-line-height);
       font-size: map.get($theme, supporting-text-size);
@@ -175,7 +178,7 @@ $theme: tokens.md-comp-outlined-text-field-values();
     &#{$this}--focused {
       #{$this}__middle {
         #{$this}__label {
-          color: map.get($theme, focus-label-text-color);
+          color: #{theme.value('primary')};
         }
         #{$this}__content {
         }
@@ -184,12 +187,12 @@ $theme: tokens.md-comp-outlined-text-field-values();
 
     &#{$this}--error {
       #{$this}__supporting-text {
-        color: map.get($theme, error-supporting-text-color);
+        color: #{theme.value('error')};
       }
 
       #{$this}__middle {
         #{$this}__label {
-          color: map.get($theme, error-label-text-color);
+          color: #{theme.value('error')};
         }
       }
     }

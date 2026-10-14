@@ -211,6 +211,7 @@ const handleClick = (event) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../ripple/ripple';
 
@@ -610,6 +611,29 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values();
         opacity: map.get($outlined-theme, disabled-icon-opacity);
       }
     }
+  }
+
+  & {
+    color: #{theme.value('on-surface-variant')};
+  }
+
+  &--filled {
+    color: #{theme.value('on-primary')};
+    background-color: #{theme.value('primary')};
+  }
+
+  &--tonal {
+    color: #{theme.value('on-secondary-container')};
+    background-color: #{theme.value('secondary-container')};
+  }
+
+  &--outlined {
+    color: #{theme.value('on-surface-variant')};
+    border-color: #{theme.value('outline')};
+  }
+
+  &--selected:not(&--filled):not(&--tonal) {
+    color: #{theme.value('primary')};
   }
 }
 </style>

@@ -132,10 +132,11 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-radio-button-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
 
 .md-radio {
   $this: &;
@@ -180,7 +181,7 @@ $sys-color: tokens.md-sys-color-values-light();
       border-width: 2px;
       border-style: solid;
       border-radius: 50%;
-      border-color: map.get($sys-color, outline);
+      border-color: #{theme.value('outline')};
     }
     #{$this}__inner-circle {
       position: absolute;
@@ -196,10 +197,10 @@ $sys-color: tokens.md-sys-color-values-light();
   &--checked {
     #{$this}__background {
       #{$this}__outer-circle {
-        border-color: map.get($theme, selected-icon-color);
+        border-color: #{theme.value('primary')};
       }
       #{$this}__inner-circle {
-        background-color: map.get($theme, selected-icon-color);
+        background-color: #{theme.value('primary')};
         transform: scale(1);
         transition: transform 120ms cubic-bezier(0, 0, 0.2, 1) 0s, border-color 120ms cubic-bezier(0, 0, 0.2, 1) 0s;
       }
@@ -212,7 +213,7 @@ $sys-color: tokens.md-sys-color-values-light();
     #{$this}__background {
       #{$this}__outer-circle {
         opacity: map.get($theme, disabled-unselected-icon-opacity);
-        border-color: map.get($theme, disabled-unselected-icon-color);
+        border-color: #{theme.value('on-surface')};
       }
       #{$this}__inner-circle {
       }
@@ -222,7 +223,7 @@ $sys-color: tokens.md-sys-color-values-light();
         #{$this}__outer-circle {
         }
         #{$this}__inner-circle {
-          background-color: map.get($theme, disabled-selected-icon-color);
+          background-color: #{theme.value('on-surface')};
           opacity: map.get($theme, disabled-selected-icon-opacity);
         }
       }

@@ -43,6 +43,7 @@ const handlePointerRelease = (event) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-outlined-segmented-button-values();
@@ -58,6 +59,13 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
   height: map.get($theme, container-height);
   min-width: 100px;
   $this: &;
+
+  --md-segmented-button-outline-color: #{theme.value('outline')};
+  --md-segmented-button-label-color: #{theme.value('on-surface')};
+  --md-segmented-button-selected-container-color: #{theme.value('secondary-container')};
+  --md-segmented-button-selected-label-color: #{theme.value('on-secondary-container')};
+  --md-segmented-button-disabled-color: #{theme.value('on-surface')};
+  --md-segmented-button-ripple-color: #{theme.value('on-surface')};
 
   &:hover:not(:disabled) {
     cursor: pointer;
@@ -97,10 +105,10 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
     inset: 0;
     pointer-events: none;
     position: absolute;
-    border-color: map.get($theme, outline-color);
+    border-color: var(--md-segmented-button-outline-color);
   }
 
-  &:last-child &__outline {
+  &:not(:first-child) &__outline {
     border-left: none;
   }
 
@@ -124,7 +132,7 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
   }
 
   &__label {
-    color: map.get($theme, unselected-label-text-color);
+    color: var(--md-segmented-button-label-color);
     font-family: map.get($theme, label-text-font);
     font-size: map.get($theme, label-text-size);
     font-weight: map.get($theme, label-text-weight);
@@ -133,18 +141,31 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
   }
 
   &--selected {
-    background-color: map.get($theme, selected-container-color);
+    background-color: var(--md-segmented-button-selected-container-color);
+
+    #{$this}__label,
+    #{$this}__checkmark {
+      color: var(--md-segmented-button-selected-label-color);
+    }
+
+    --md-segmented-button-ripple-color: #{theme.value('on-secondary-container')};
   }
 
   &--disabled {
     #{$this}__outline {
-      border-color: map.get($theme, disabled-outline-color);
+      border-color: var(--md-segmented-button-disabled-color);
       opacity: map.get($theme, disabled-outline-opacity);
     }
     #{$this}__label {
-      color: map.get($theme, disabled-label-text-color);
+      color: var(--md-segmented-button-disabled-color);
       opacity: map.get($theme, disabled-label-text-opacity);
     }
+  }
+
+  .md-ripple {
+    --md-ripple-hover-state-layer-color: var(--md-segmented-button-ripple-color);
+    --md-ripple-focus-state-layer-color: var(--md-segmented-button-ripple-color);
+    --md-ripple-pressed-state-layer-color: var(--md-segmented-button-ripple-color);
   }
 }
 </style>

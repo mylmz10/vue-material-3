@@ -478,21 +478,22 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
 $picker-theme: tokens.md-comp-time-picker-values();
 $input-theme: tokens.md-comp-time-input-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
 $motion: tokens.md-sys-motion-values();
 
 .md-time-picker-dialog {
-  --time-picker-container-color: #{map.get($picker-theme, container-color)};
+  --time-picker-container-color: #{theme.value('surface-container-high')};
   --time-picker-container-shape: #{map.get($picker-theme, container-shape)};
   --time-picker-dialog-padding-inline: 24px;
   --time-picker-dialog-padding-block-start: 24px;
   --time-picker-display-row-gap: 12px;
   --time-picker-separator-width: 24px;
-  --time-picker-headline-color: #{map.get($picker-theme, headline-color)};
+  --time-picker-headline-color: #{theme.value('on-surface-variant')};
   --time-picker-headline-font: #{map.get($picker-theme, headline-font)};
   --time-picker-headline-size: #{map.get($picker-theme, headline-size)};
   --time-picker-headline-weight: #{map.get($picker-theme, headline-weight)};
@@ -502,15 +503,15 @@ $motion: tokens.md-sys-motion-values();
   --time-selector-24h-width: #{map.get($picker-theme, time-selector-24h-vertical-container-width)};
   --time-selector-height: #{map.get($picker-theme, time-selector-container-height)};
   --time-selector-shape: #{map.get($picker-theme, time-selector-container-shape)};
-  --time-selector-selected-container-color: #{map.get($picker-theme, time-selector-selected-container-color)};
-  --time-selector-selected-label-color: #{map.get($picker-theme, time-selector-selected-label-text-color)};
-  --time-selector-unselected-container-color: #{map.get($picker-theme, time-selector-unselected-container-color)};
-  --time-selector-unselected-label-color: #{map.get($picker-theme, time-selector-unselected-label-text-color)};
+  --time-selector-selected-container-color: #{theme.value('primary-container')};
+  --time-selector-selected-label-color: #{theme.value('on-primary-container')};
+  --time-selector-unselected-container-color: #{theme.value('surface-container-highest')};
+  --time-selector-unselected-label-color: #{theme.value('on-surface')};
   --time-selector-label-font: #{map.get($picker-theme, time-selector-label-text-font)};
   --time-selector-label-size: #{map.get($picker-theme, time-selector-label-text-size)};
   --time-selector-label-weight: #{map.get($picker-theme, time-selector-label-text-weight)};
   --time-selector-label-line-height: #{map.get($picker-theme, time-selector-label-text-line-height)};
-  --time-selector-separator-color: #{map.get($picker-theme, time-selector-separator-color)};
+  --time-selector-separator-color: #{theme.value('on-surface')};
   --time-selector-separator-font: #{map.get($picker-theme, time-selector-separator-font)};
   --time-selector-separator-size: #{map.get($picker-theme, time-selector-separator-size)};
   --time-selector-separator-weight: #{map.get($picker-theme, time-selector-separator-weight)};
@@ -518,28 +519,28 @@ $motion: tokens.md-sys-motion-values();
   --period-selector-width: #{map.get($picker-theme, period-selector-vertical-container-width)};
   --period-selector-height: #{map.get($picker-theme, period-selector-vertical-container-height)};
   --period-selector-shape: #{map.get($picker-theme, period-selector-container-shape)};
-  --period-selector-outline-color: #{map.get($picker-theme, period-selector-outline-color)};
+  --period-selector-outline-color: #{theme.value('outline')};
   --period-selector-outline-width: #{map.get($picker-theme, period-selector-outline-width)};
-  --period-selector-selected-container-color: #{map.get($picker-theme, period-selector-selected-container-color)};
-  --period-selector-selected-label-color: #{map.get($picker-theme, period-selector-selected-label-text-color)};
-  --period-selector-unselected-label-color: #{map.get($picker-theme, period-selector-unselected-label-text-color)};
+  --period-selector-selected-container-color: #{theme.value('tertiary-container')};
+  --period-selector-selected-label-color: #{theme.value('on-tertiary-container')};
+  --period-selector-unselected-label-color: #{theme.value('on-surface-variant')};
   --period-selector-label-font: #{map.get($picker-theme, period-selector-label-text-font)};
   --period-selector-label-size: #{map.get($picker-theme, period-selector-label-text-size)};
   --period-selector-label-weight: #{map.get($picker-theme, period-selector-label-text-weight)};
   --period-selector-label-line-height: #{map.get($picker-theme, period-selector-label-text-line-height)};
   --clock-dial-size: #{map.get($picker-theme, clock-dial-container-size)};
-  --clock-dial-color: #{map.get($picker-theme, clock-dial-color)};
+  --clock-dial-color: #{theme.value('surface-container-highest')};
   --clock-dial-shape: #{map.get($picker-theme, clock-dial-shape)};
   --clock-dial-label-font: #{map.get($picker-theme, clock-dial-label-text-font)};
   --clock-dial-label-size: #{map.get($picker-theme, clock-dial-label-text-size)};
   --clock-dial-label-weight: #{map.get($picker-theme, clock-dial-label-text-weight)};
   --clock-dial-label-line-height: #{map.get($picker-theme, clock-dial-label-text-line-height)};
-  --clock-dial-selected-label-color: #{map.get($picker-theme, clock-dial-selected-label-text-color)};
-  --clock-dial-unselected-label-color: #{map.get($picker-theme, clock-dial-unselected-label-text-color)};
-  --clock-selector-center-color: #{map.get($picker-theme, clock-dial-selector-center-container-color)};
-  --clock-selector-handle-color: #{map.get($picker-theme, clock-dial-selector-handle-container-color)};
+  --clock-dial-selected-label-color: #{theme.value('on-primary')};
+  --clock-dial-unselected-label-color: #{theme.value('on-surface')};
+  --clock-selector-center-color: #{theme.value('primary')};
+  --clock-selector-handle-color: #{theme.value('primary')};
   --clock-selector-handle-shape: #{map.get($picker-theme, clock-dial-selector-handle-container-shape)};
-  --clock-selector-track-color: #{map.get($picker-theme, clock-dial-selector-track-container-color)};
+  --clock-selector-track-color: #{theme.value('primary')};
   --clock-selector-track-width: #{map.get($picker-theme, clock-dial-selector-track-container-width)};
   --time-picker-display-row-width: calc(
     (var(--time-selector-width) * 2) +
@@ -583,8 +584,8 @@ $motion: tokens.md-sys-motion-values();
 }
 
 .md-time-picker-dialog--input {
-  --time-picker-container-color: #{map.get($input-theme, container-color)};
-  --time-picker-headline-color: #{map.get($input-theme, headline-color)};
+  --time-picker-container-color: #{theme.value('surface-container-high')};
+  --time-picker-headline-color: #{theme.value('on-surface-variant')};
   --time-picker-headline-font: #{map.get($input-theme, headline-font)};
   --time-picker-headline-size: #{map.get($input-theme, headline-size)};
   --time-picker-headline-weight: #{map.get($input-theme, headline-weight)};
@@ -593,15 +594,15 @@ $motion: tokens.md-sys-motion-values();
   --time-selector-width: #{map.get($input-theme, time-input-field-container-width)};
   --time-selector-height: #{map.get($input-theme, time-input-field-container-height)};
   --time-selector-shape: #{map.get($input-theme, time-input-field-container-shape)};
-  --time-selector-selected-container-color: #{map.get($input-theme, time-input-field-focus-container-color)};
-  --time-selector-selected-label-color: #{map.get($input-theme, time-input-field-focus-label-text-color)};
-  --time-selector-unselected-container-color: #{map.get($input-theme, time-input-field-container-color)};
-  --time-selector-unselected-label-color: #{map.get($input-theme, time-input-field-label-text-color)};
+  --time-selector-selected-container-color: #{theme.value('primary-container')};
+  --time-selector-selected-label-color: #{theme.value('on-primary-container')};
+  --time-selector-unselected-container-color: #{theme.value('surface-container-highest')};
+  --time-selector-unselected-label-color: #{theme.value('on-surface')};
   --time-selector-label-font: #{map.get($input-theme, time-input-field-label-text-font)};
   --time-selector-label-size: #{map.get($input-theme, time-input-field-label-text-size)};
   --time-selector-label-weight: #{map.get($input-theme, time-input-field-label-text-weight)};
   --time-selector-label-line-height: #{map.get($input-theme, time-input-field-label-text-line-height)};
-  --time-selector-separator-color: #{map.get($input-theme, time-input-field-separator-color)};
+  --time-selector-separator-color: #{theme.value('on-surface')};
   --time-selector-separator-font: #{map.get($input-theme, time-input-field-separator-font)};
   --time-selector-separator-size: #{map.get($input-theme, time-input-field-separator-size)};
   --time-selector-separator-weight: #{map.get($input-theme, time-input-field-separator-weight)};
@@ -609,11 +610,11 @@ $motion: tokens.md-sys-motion-values();
   --period-selector-width: #{map.get($input-theme, period-selector-container-width)};
   --period-selector-height: #{map.get($input-theme, period-selector-container-height)};
   --period-selector-shape: #{map.get($input-theme, period-selector-container-shape)};
-  --period-selector-outline-color: #{map.get($input-theme, period-selector-outline-color)};
+  --period-selector-outline-color: #{theme.value('outline')};
   --period-selector-outline-width: #{map.get($input-theme, period-selector-outline-width)};
-  --period-selector-selected-container-color: #{map.get($input-theme, period-selector-selected-container-color)};
-  --period-selector-selected-label-color: #{map.get($input-theme, period-selector-selected-label-text-color)};
-  --period-selector-unselected-label-color: #{map.get($input-theme, period-selector-unselected-label-text-color)};
+  --period-selector-selected-container-color: #{theme.value('tertiary-container')};
+  --period-selector-selected-label-color: #{theme.value('on-tertiary-container')};
+  --period-selector-unselected-label-color: #{theme.value('on-surface-variant')};
   --period-selector-label-font: #{map.get($input-theme, period-selector-label-text-font)};
   --period-selector-label-size: #{map.get($input-theme, period-selector-label-text-size)};
   --period-selector-label-weight: #{map.get($input-theme, period-selector-label-text-weight)};
@@ -688,7 +689,7 @@ $motion: tokens.md-sys-motion-values();
 
 .md-time-picker__time-field--active {
   background-color: var(--time-selector-selected-container-color);
-  border-color: #{map.get($input-theme, time-input-field-focus-outline-color)};
+  border-color: #{theme.value('primary')};
 }
 
 .md-time-picker__time-input {
@@ -752,7 +753,7 @@ $motion: tokens.md-sys-motion-values();
 }
 
 .md-time-picker__supporting-row {
-  color: #{map.get($input-theme, time-input-field-supporting-text-color)};
+  color: #{theme.value('on-surface-variant')};
   display: grid;
   font-family: #{map.get($input-theme, time-input-field-supporting-text-font)};
   font-size: #{map.get($input-theme, time-input-field-supporting-text-size)};
@@ -789,7 +790,7 @@ $motion: tokens.md-sys-motion-values();
   background: transparent;
   border: 0;
   border-radius: 24px;
-  color: #{map.get($picker-theme, time-selector-unselected-label-text-color)};
+  color: #{theme.value('on-surface')};
   display: inline-flex;
   justify-content: center;
   min-block-size: 48px;

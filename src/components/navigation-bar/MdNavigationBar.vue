@@ -29,16 +29,17 @@ const onItemClick = ($event, item, index) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-navigation-bar-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
 
 .md-navigation-bar {
   display: flex;
   position: relative;
   width: 100%;
-  background-color: map.get($theme, container-color);
+  background-color: theme.value('surface-container');
   border-radius: map.get($theme, container-shape);
   height: map.get($theme, container-height);
   box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($sys-color, shadow));

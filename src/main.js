@@ -1,4 +1,5 @@
 import './styles/typography/md-typescale-styles.scss';
+import './styles/theme/md-sys-color-theme.scss';
 
 export { default as MdElevatedButton } from './components/button/MdElevatedButton.vue';
 export { default as MdFilledButton } from './components/button/MdFilledButton.vue';
