@@ -1,6 +1,4 @@
 import type { StorybookConfig } from '@storybook/vue3-vite';
-import vue from '@vitejs/plugin-vue';
-import { mergeConfig, type UserConfig } from 'vite';
 
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -9,10 +7,6 @@ const config: StorybookConfig = {
     name: '@storybook/vue3-vite',
     options: {},
   },
-  viteFinal: async (config: UserConfig) =>
-    mergeConfig(config, {
-      plugins: [vue()],
-    }),
 };
 
 export default config;
