@@ -30,6 +30,7 @@ const indeterminateIndicatorStyle = computed(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-linear-progress-indicator-values();
 
@@ -46,14 +47,14 @@ $theme: tokens.md-comp-linear-progress-indicator-values();
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     width: 100%;
-    background-color: map.get($theme, track-color);
+    background-color: #{theme.value('secondary-container')};
     height: map.get($theme, track-height);
   }
   &__indicator {
     position: absolute;
     grid-column: 1 / 2;
     grid-row: 1 / 2;
-    background-color: map.get($theme, active-indicator-color);
+    background-color: #{theme.value('primary')};
     height: map.get($theme, active-indicator-height);
     transition: width cubic-bezier(0.4, 0, 0.2, 1) 2s;
   }

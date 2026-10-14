@@ -32,13 +32,14 @@ const indeterminateIndicatorStyle = computed(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-circular-progress-indicator-values();
 
 .md-circular-progress-indicator {
   width: map.get($theme, size);
   height: map.get($theme, size);
-  color: map.get($theme, active-indicator-color);
+  color: #{theme.value('primary')};
   --b: #{map.get($theme, active-indicator-width)};
   --p: 0;
   --c: currentColor;

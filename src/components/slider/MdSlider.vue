@@ -520,6 +520,7 @@ defineExpose({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-slider-values();
 
@@ -528,9 +529,9 @@ $theme: tokens.md-comp-slider-values();
   --md-slider-thumb-size: #{map.get($theme, handle-width)};
   --md-slider-state-layer-size: #{map.get($theme, state-layer-size)};
   --md-slider-label-height: #{map.get($theme, label-container-height)};
-  --md-slider-hover-overlay-color: #{map.get($theme, hover-state-layer-color)}1f;
-  --md-slider-focus-overlay-color: #{map.get($theme, focus-state-layer-color)}33;
-  --md-slider-pressed-overlay-color: #{map.get($theme, pressed-state-layer-color)}4d;
+  --md-slider-hover-overlay-color: color-mix(in srgb, #{theme.value('primary')} 12%, transparent);
+  --md-slider-focus-overlay-color: color-mix(in srgb, #{theme.value('primary')} 20%, transparent);
+  --md-slider-pressed-overlay-color: color-mix(in srgb, #{theme.value('primary')} 30%, transparent);
   --md-slider-top-offset: 0px;
   box-sizing: border-box;
   position: relative;
@@ -561,8 +562,8 @@ $theme: tokens.md-comp-slider-values();
     min-block-size: var(--md-slider-label-height);
     padding: 4px;
     border-radius: 999px;
-    background: map.get($theme, label-container-color);
-    color: map.get($theme, label-label-text-color);
+    background: #{theme.value('primary')};
+    color: #{theme.value('on-primary')};
     font: map.get($theme, label-label-text-type);
     transform: translateX(-50%) scale(0);
     transform-origin: center bottom;
@@ -604,11 +605,11 @@ $theme: tokens.md-comp-slider-values();
 
     &--inactive {
       inset-inline: 0;
-      background: map.get($theme, inactive-track-color);
+      background: #{theme.value('secondary-container')};
     }
 
     &--active {
-      background: map.get($theme, active-track-color);
+      background: #{theme.value('primary')};
     }
   }
 
@@ -680,7 +681,7 @@ $theme: tokens.md-comp-slider-values();
       block-size: var(--md-slider-thumb-size);
       margin-top: calc((var(--md-slider-track-height) - var(--md-slider-thumb-size)) / 2);
       border-radius: map.get($theme, handle-shape);
-      background-color: map.get($theme, handle-color);
+      background-color: #{theme.value('primary')};
       border: 0;
       transition: box-shadow 120ms ease;
     }
@@ -690,7 +691,7 @@ $theme: tokens.md-comp-slider-values();
       inline-size: var(--md-slider-thumb-size);
       block-size: var(--md-slider-thumb-size);
       border-radius: map.get($theme, handle-shape);
-      background-color: map.get($theme, handle-color);
+      background-color: #{theme.value('primary')};
       border: 0;
       transition: box-shadow 120ms ease;
     }
@@ -735,12 +736,12 @@ $theme: tokens.md-comp-slider-values();
     pointer-events: none;
 
     .md-slider__track--inactive {
-      background: map.get($theme, disabled-inactive-track-color);
+      background: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-inactive-track-opacity);
     }
 
     .md-slider__track--active {
-      background: map.get($theme, disabled-active-track-color);
+      background: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-active-track-opacity);
     }
 
@@ -753,7 +754,7 @@ $theme: tokens.md-comp-slider-values();
     .md-slider__input {
       &::-webkit-slider-thumb,
       &::-moz-range-thumb {
-        background-color: map.get($theme, disabled-handle-color);
+        background-color: #{theme.value('on-surface')};
         opacity: map.get($theme, disabled-handle-opacity);
         box-shadow: none;
       }

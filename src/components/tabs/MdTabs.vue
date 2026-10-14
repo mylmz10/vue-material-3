@@ -341,12 +341,11 @@ defineExpose({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
-
-$sys-color: tokens.md-sys-color-values-light();
+@use '../../styles/theme/md-sys-color' as theme;
 
 .md-tabs {
   align-items: stretch;
-  border-bottom: 1px solid map.get($sys-color, outline-variant);
+  border-bottom: 1px solid #{theme.value('outline-variant')};
   display: flex;
   flex-wrap: nowrap;
   width: 100%;

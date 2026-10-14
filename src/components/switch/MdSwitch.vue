@@ -139,6 +139,7 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-switch-values();
@@ -363,6 +364,32 @@ $theme: tokens.md-comp-switch-values();
         }
       }
     }
+  }
+
+  &__track {
+    background-color: #{theme.value('surface-container-highest')};
+    border-color: #{theme.value('outline')};
+  }
+
+  &__handle-container #{$this}__handle {
+    background-color: #{theme.value('outline')};
+  }
+
+  &--checked #{$this}__track {
+    background-color: #{theme.value('primary')};
+    border-color: #{theme.value('primary')};
+
+    #{$this}__handle-container #{$this}__handle {
+      background-color: #{theme.value('on-primary')};
+    }
+  }
+
+  &--with-icon #{$this}__icon {
+    color: #{theme.value('on-surface-variant')};
+  }
+
+  &--with-icon#{$this}--checked #{$this}__icon {
+    color: #{theme.value('on-primary')};
   }
 }
 </style>

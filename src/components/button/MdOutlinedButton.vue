@@ -44,6 +44,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-outlined-button-values();
@@ -59,15 +60,18 @@ $theme: tokens.md-comp-outlined-button-values();
     inset: 0;
     z-index: 0;
     border-radius: inherit;
-    outline: map.get($theme, outline-color) solid map.get($theme, outline-width);
+    outline: #{theme.value('outline')} solid map.get($theme, outline-width);
   }
   .md-button__label {
-    color: map.get($theme, label-text-color);
+    color: #{theme.value('primary')};
     font-family: map.get($theme, label-text-font);
     font-size: map.get($theme, label-text-size);
     font-weight: map.get($theme, label-text-weight);
     letter-spacing: map.get($theme, label-text-tracking);
     line-height: map.get($theme, label-text-line-height);
+  }
+  .md-button__trailing-icon {
+    color: #{theme.value('primary')};
   }
   .md-button__background {
     background-color: transparent;
@@ -82,7 +86,7 @@ $theme: tokens.md-comp-outlined-button-values();
     box-shadow: none;
 
     .md-button__outline {
-      outline-color: rgba(map.get($theme, disabled-outline-color), map.get($theme, disabled-outline-opacity));
+      outline-color: #{theme.value('on-surface')};
     }
     .md-button__background {
       background-color: transparent;
@@ -90,7 +94,7 @@ $theme: tokens.md-comp-outlined-button-values();
     }
     .md-button__label,
     .md-button__trailing-icon {
-      color: map.get($theme, disabled-label-text-color);
+      color: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-label-text-opacity);
     }
   }

@@ -179,6 +179,7 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-checkbox-values();
@@ -186,6 +187,11 @@ $theme: tokens.md-comp-checkbox-values();
 .md-checkbox {
   $this: &;
   --md-checkbox-touch-target-size: 48px;
+  --md-checkbox-unselected-outline-color: #{theme.value('on-surface-variant')};
+  --md-checkbox-selected-container-color: #{theme.value('primary')};
+  --md-checkbox-selected-icon-color: #{theme.value('on-primary')};
+  --md-checkbox-disabled-color: #{theme.value('on-surface')};
+  --md-checkbox-ripple-color: #{theme.value('on-surface')};
   position: relative;
   width: var(--md-checkbox-touch-target-size);
   height: var(--md-checkbox-touch-target-size);
@@ -222,7 +228,7 @@ $theme: tokens.md-comp-checkbox-values();
   &__background {
     position: relative;
     border-style: solid;
-    border-color: map.get($theme, unselected-outline-color);
+    border-color: var(--md-checkbox-unselected-outline-color);
     border-width: map.get($theme, unselected-outline-width);
     width: map.get($theme, container-size);
     height: map.get($theme, container-size);
@@ -234,7 +240,7 @@ $theme: tokens.md-comp-checkbox-values();
     box-sizing: border-box;
 
     svg {
-      color: map.get($theme, selected-icon-color);
+      color: var(--md-checkbox-selected-icon-color);
       padding: 1px;
       position: absolute;
       inset: 0px;
@@ -273,16 +279,17 @@ $theme: tokens.md-comp-checkbox-values();
   }
 
   &--indeterminate {
+    --md-checkbox-ripple-color: #{theme.value('primary')};
     #{$this}__background {
-      background-color: map.get($theme, selected-container-color);
-      border-color: map.get($theme, selected-container-color);
+      background-color: var(--md-checkbox-selected-container-color);
+      border-color: var(--md-checkbox-selected-container-color);
 
       svg {
         opacity: 0;
       }
 
       #{$this}__indeterminate-mark {
-        color: map.get($theme, selected-icon-color);
+        color: var(--md-checkbox-selected-icon-color);
         opacity: 1;
       }
     }
@@ -297,7 +304,7 @@ $theme: tokens.md-comp-checkbox-values();
     &#{$this}--checked {
       #{$this}__background {
         #{$this}__indeterminate-mark {
-          color: map.get($theme, selected-icon-color);
+          color: var(--md-checkbox-selected-icon-color);
           transform: rotate(45deg) translate(0px, 4px) scale(0.7);
           opacity: 0;
         }
@@ -305,9 +312,9 @@ $theme: tokens.md-comp-checkbox-values();
     }
 
     .md-ripple {
-      --md-ripple-hover-state-layer-color: #{map.get($theme, selected-hover-state-layer-color)};
-      --md-ripple-focus-state-layer-color: #{map.get($theme, selected-focus-state-layer-color)};
-      --md-ripple-pressed-state-layer-color: #{map.get($theme, selected-pressed-state-layer-color)};
+      --md-ripple-hover-state-layer-color: var(--md-checkbox-ripple-color);
+      --md-ripple-focus-state-layer-color: var(--md-checkbox-ripple-color);
+      --md-ripple-pressed-state-layer-color: var(--md-checkbox-ripple-color);
       --md-ripple-hover-state-layer-opacity: #{map.get($theme, selected-hover-state-layer-opacity)};
       --md-ripple-focus-state-layer-opacity: #{map.get($theme, selected-focus-state-layer-opacity)};
       --md-ripple-pressed-state-layer-opacity: #{map.get($theme, selected-pressed-state-layer-opacity)};
@@ -315,9 +322,10 @@ $theme: tokens.md-comp-checkbox-values();
   }
 
   &--checked {
+    --md-checkbox-ripple-color: #{theme.value('primary')};
     #{$this}__background {
-      background-color: map.get($theme, selected-container-color);
-      border-color: map.get($theme, selected-container-color);
+      background-color: var(--md-checkbox-selected-container-color);
+      border-color: var(--md-checkbox-selected-container-color);
 
       svg {
         path {
@@ -327,9 +335,9 @@ $theme: tokens.md-comp-checkbox-values();
     }
 
     .md-ripple {
-      --md-ripple-hover-state-layer-color: #{map.get($theme, selected-hover-state-layer-color)};
-      --md-ripple-focus-state-layer-color: #{map.get($theme, selected-focus-state-layer-color)};
-      --md-ripple-pressed-state-layer-color: #{map.get($theme, selected-pressed-state-layer-color)};
+      --md-ripple-hover-state-layer-color: var(--md-checkbox-ripple-color);
+      --md-ripple-focus-state-layer-color: var(--md-checkbox-ripple-color);
+      --md-ripple-pressed-state-layer-color: var(--md-checkbox-ripple-color);
       --md-ripple-hover-state-layer-opacity: #{map.get($theme, selected-hover-state-layer-opacity)};
       --md-ripple-focus-state-layer-opacity: #{map.get($theme, selected-focus-state-layer-opacity)};
       --md-ripple-pressed-state-layer-opacity: #{map.get($theme, selected-pressed-state-layer-opacity)};
@@ -341,13 +349,13 @@ $theme: tokens.md-comp-checkbox-values();
 
     #{$this}__background {
       opacity: map.get($theme, unselected-disabled-container-opacity);
-      border-color: map.get($theme, unselected-disabled-outline-color);
+      border-color: var(--md-checkbox-disabled-color);
       border-width: map.get($theme, unselected-disabled-outline-width);
     }
     &#{$this}--checked,
     &#{$this}--indeterminate {
       #{$this}__background {
-        background-color: map.get($theme, selected-disabled-container-color);
+        background-color: var(--md-checkbox-disabled-color);
         opacity: map.get($theme, selected-disabled-container-opacity);
         border-color: transparent;
       }
@@ -365,5 +373,11 @@ $theme: tokens.md-comp-checkbox-values();
       pressed-state-layer-opacity: unselected-pressed-state-layer-opacity,
     )
   );
+
+  .md-ripple {
+    --md-ripple-hover-state-layer-color: var(--md-checkbox-ripple-color);
+    --md-ripple-focus-state-layer-color: var(--md-checkbox-ripple-color);
+    --md-ripple-pressed-state-layer-color: var(--md-checkbox-ripple-color);
+  }
 }
 </style>

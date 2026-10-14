@@ -20,6 +20,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../elevation/elevation';
 
@@ -34,7 +35,7 @@ defineProps({
   align-items: center;
   justify-content: center;
 
-  background-color: map.get($theme, container-color);
+  background-color: var(--md-fab-container-color, #{map.get($theme, container-color)});
   width: map.get($theme, container-width);
   height: map.get($theme, container-height);
   border-radius: map.get($theme, container-shape);
@@ -46,7 +47,7 @@ defineProps({
   }
 
   &__icon {
-    color: map.get($theme, icon-color);
+    color: var(--md-fab-icon-color, #{map.get($theme, icon-color)});
     width: map.get($theme, icon-size);
     height: map.get($theme, icon-size);
     font-size: map.get($theme, icon-size);
@@ -72,7 +73,9 @@ defineProps({
 $theme: tokens.md-comp-fab-surface-values();
   @include root-static-styles($theme);
 
-  --surface-tint-layer-color: #{map.get($theme, container-color)};
+  --md-fab-container-color: #{theme.value('surface-container-high')};
+  --md-fab-icon-color: #{theme.value('primary')};
+  --surface-tint-layer-color: #{theme.value('surface-container-high')};
   --overlay-opacity: 0.11;
 }
 

@@ -6,6 +6,7 @@ Progress indicators communicate that a process is underway.
   <MdLinearProgressIndicator :value="40" />
   <MdCircularProgressIndicator :value="40" />
   <MdLinearProgressIndicator indeterminate />
+  <MdCircularProgressIndicator indeterminate />
 </div>
 
 ## Import

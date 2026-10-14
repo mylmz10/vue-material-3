@@ -23,6 +23,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-navigation-bar-values();
 
@@ -46,6 +47,17 @@ $theme: tokens.md-comp-navigation-bar-values();
   width: 100%;
   font: inherit;
 
+  --md-navigation-tab-inactive-color: #{theme.value('on-surface-variant')};
+  --md-navigation-tab-active-label-color: #{theme.value('on-surface')};
+  --md-navigation-tab-active-icon-color: #{theme.value('on-secondary-container')};
+  --md-navigation-tab-active-indicator-color: #{theme.value('secondary-container')};
+  --md-ripple-hover-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-focus-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-pressed-state-layer-color: #{theme.value('on-surface')};
+  --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
+  --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
+  --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
+
   &__content {
     position: relative;
     display: flex;
@@ -68,7 +80,7 @@ $theme: tokens.md-comp-navigation-bar-values();
     .md-navigation-tab__icon {
       position: relative;
       z-index: 1;
-      color: map.get($theme, inactive-icon-color);
+      color: var(--md-navigation-tab-inactive-color);
       font-size: map.get($theme, icon-size);
       --mdc-icon-size: #{map.get($theme, icon-size)};
     }
@@ -80,21 +92,21 @@ $theme: tokens.md-comp-navigation-bar-values();
     line-height: map.get($theme, label-text-line-height);
     letter-spacing: map.get($theme, label-text-tracking);
     font-weight: map.get($theme, label-text-weight);
-    color: map.get($theme, inactive-label-text-color);
+    color: var(--md-navigation-tab-inactive-color);
   }
 
   &--selected {
     .md-navigation-tab__label {
-      color: map.get($theme, active-label-text-color);
+      color: var(--md-navigation-tab-active-label-color);
       font-weight: map.get($theme, active-label-text-weight);
     }
 
     .md-navigation-tab__icon {
-      color: map.get($theme, active-icon-color);
+      color: var(--md-navigation-tab-active-icon-color);
     }
 
     .md-navigation-tab__active-indicator {
-      background-color: map.get($theme, active-indicator-color);
+      background-color: var(--md-navigation-tab-active-indicator-color);
       width: map.get($theme, active-indicator-width);
       opacity: 1;
     }

@@ -1,0 +1,26 @@
+@use 'sass:map';
+@use '../tokens';
+
+@function value($token, $fallbacks: tokens.md-sys-color-values-light()) {
+  $fallback: map.get($fallbacks, $token);
+
+  @return unquote('var(--md-sys-color-#{$token}, #{$fallback})');
+}
+
+@function values($fallbacks: tokens.md-sys-color-values-light()) {
+  $result: ();
+
+  @each $token, $fallback in $fallbacks {
+    $result: map.set($result, $token, value($token, $fallbacks));
+  }
+
+  @return $result;
+}
+
+@mixin emit-theme($values) {
+  @each $token, $color in $values {
+    @if $color != null {
+      --md-sys-color-#{$token}: #{$color};
+    }
+  }
+}

@@ -22,6 +22,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-filled-text-field-values();
 
@@ -30,9 +31,21 @@ $theme: tokens.md-comp-filled-text-field-values();
   $this: &;
 
   &--filled {
+    --md-filled-field-active-indicator-color: #{theme.value('on-surface-variant')};
+    --md-filled-field-container-color: #{theme.value('surface-container-highest')};
+    --md-filled-field-label-text-color: #{theme.value('on-surface-variant')};
+    --md-filled-field-hover-state-layer-color: #{theme.value('on-surface')};
+    --md-filled-field-supporting-text-color: #{theme.value('on-surface-variant')};
+    --md-filled-field-focus-active-indicator-color: #{theme.value('primary')};
+    --md-filled-field-focus-label-text-color: #{theme.value('primary')};
+    --md-filled-field-error-caret-color: #{theme.value('error')};
+    --md-filled-field-error-supporting-text-color: #{theme.value('error')};
+    --md-filled-field-error-label-text-color: #{theme.value('error')};
+    --md-filled-field-error-active-indicator-color: #{theme.value('error')};
+
     #{$this}__outline {
       border-style: solid;
-      border-color: map.get($theme, active-indicator-color);
+      border-color: var(--md-filled-field-active-indicator-color);
       border-left: none;
       border-right: none;
       border-top: none;
@@ -47,7 +60,7 @@ $theme: tokens.md-comp-filled-text-field-values();
     }
 
     #{$this}__container {
-      background-color: map.get($theme, container-color);
+      background-color: var(--md-filled-field-container-color);
       border-radius: map.get($theme, container-shape);
       #{$this}__label {
         font-size: map.get($theme, label-text-size);
@@ -55,19 +68,19 @@ $theme: tokens.md-comp-filled-text-field-values();
         font-family: map.get($theme, label-text-font);
         font-weight: map.get($theme, label-text-weight);
         letter-spacing: map.get($theme, label-text-tracking);
-        color: map.get($theme, label-text-color);
+        color: var(--md-filled-field-label-text-color);
       }
     }
 
     #{$this}__container:hover {
       .md-field__state-layer {
-        background-color: map.get($theme, hover-state-layer-color);
+        background-color: var(--md-filled-field-hover-state-layer-color);
         opacity: map.get($theme, hover-state-layer-opacity);
       }
     }
 
     #{$this}__supporting-text {
-      color: map.get($theme, supporting-text-color);
+      color: var(--md-filled-field-supporting-text-color);
       font-family: map.get($theme, supporting-text-font);
       line-height: map.get($theme, supporting-text-line-height);
       font-size: map.get($theme, supporting-text-size);
@@ -77,13 +90,13 @@ $theme: tokens.md-comp-filled-text-field-values();
 
     &#{$this}--focused {
       #{$this}__outline {
-        border-color: map.get($theme, focus-active-indicator-color);
+        border-color: var(--md-filled-field-focus-active-indicator-color);
         border-bottom-width: map.get($theme, focus-active-indicator-height);
       }
 
       #{$this}__middle {
         #{$this}__label {
-          color: map.get($theme, focus-label-text-color);
+          color: var(--md-filled-field-focus-label-text-color);
         }
         #{$this}__content {
         }
@@ -92,24 +105,24 @@ $theme: tokens.md-comp-filled-text-field-values();
 
     &#{$this}--error {
       .md-text-field__input {
-        caret-color: map.get($theme, error-focus-caret-color);
+        caret-color: var(--md-filled-field-error-caret-color);
       }
 
       #{$this}__supporting-text {
-        color: map.get($theme, error-supporting-text-color);
+        color: var(--md-filled-field-error-supporting-text-color);
       }
 
       #{$this}__middle {
         #{$this}__label {
-          color: map.get($theme, error-label-text-color);
+          color: var(--md-filled-field-error-label-text-color);
         }
       }
 
       #{$this}__label {
-        color: map.get($theme, error-label-text-color);
+        color: var(--md-filled-field-error-label-text-color);
       }
       #{$this}__outline {
-        border-color: map.get($theme, error-active-indicator-color);
+        border-color: var(--md-filled-field-error-active-indicator-color);
         border-bottom-width: map.get($theme, active-indicator-height);
       }
     }

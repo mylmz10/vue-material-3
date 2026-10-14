@@ -80,12 +80,17 @@ const renderSupportingText = computed(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 @use '../elevation/surface';
 
 $theme: tokens.md-comp-list-values();
 
 .md-list-item {
+  --md-list-item-label-text-color: #{theme.value('on-surface')};
+  --md-list-item-supporting-text-color: #{theme.value('on-surface-variant')};
+  --md-list-item-trailing-text-color: #{theme.value('on-surface-variant')};
+  --md-list-item-selected-state-layer-color: #{theme.value('on-secondary-container')};
   $this: &;
   position: relative;
   display: flex;
@@ -120,7 +125,7 @@ $theme: tokens.md-comp-list-values();
 
   &--selected {
     #{$this}__state-layer {
-      background-color: map.get($theme, list-item-hover-state-layer-color);
+      background-color: var(--md-list-item-selected-state-layer-color);
       opacity: map.get($theme, list-item-hover-state-layer-opacity);
     }
   }
@@ -148,7 +153,7 @@ $theme: tokens.md-comp-list-values();
     padding-inline-start: map.get($theme, list-item-leading-space);
 
     #{$this}__label-text {
-      color: map.get($theme, list-item-label-text-color);
+      color: var(--md-list-item-label-text-color);
       font-family: map.get($theme, list-item-label-text-font);
       line-height: map.get($theme, list-item-label-text-line-height);
       font-size: map.get($theme, list-item-label-text-size);
@@ -156,7 +161,7 @@ $theme: tokens.md-comp-list-values();
       font-weight: map.get($theme, list-item-label-text-weight);
     }
     #{$this}__supporting-text {
-      color: map.get($theme, list-item-supporting-text-color);
+      color: var(--md-list-item-supporting-text-color);
       font-family: map.get($theme, list-item-supporting-text-font);
       line-height: map.get($theme, list-item-supporting-text-line-height);
       font-size: map.get($theme, list-item-supporting-text-size);
@@ -179,7 +184,7 @@ $theme: tokens.md-comp-list-values();
 
     #{$this}__trailing-text {
       padding-inline-start: map.get($theme, list-item-leading-space);
-      color: map.get($theme, list-item-trailing-supporting-text-color);
+      color: var(--md-list-item-trailing-text-color);
       font-family: map.get($theme, list-item-trailing-supporting-text-font);
       line-height: map.get($theme, list-item-trailing-supporting-text-line-height);
       font-size: map.get($theme, list-item-trailing-supporting-text-size);

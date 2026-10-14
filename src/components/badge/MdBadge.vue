@@ -14,12 +14,13 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-badge-values();
 
 .md-badge {
-  background: map.get($theme, color);
-  color: map.get($theme, large-label-text-color);
+  background: #{theme.value('error')};
+  color: #{theme.value('on-error')};
   border-radius: map.get($theme, shape);
   height: map.get($theme, size);
 

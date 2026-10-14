@@ -809,22 +809,23 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
 $docked-theme: tokens.md-comp-date-picker-docked-values();
 $modal-theme: tokens.md-comp-date-picker-modal-values();
 $date-input-theme: tokens.md-comp-date-input-modal-values();
 $divider-theme: tokens.md-comp-divider-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
 $motion: tokens.md-sys-motion-values();
 
 .md-date-picker-dialog {
   --md-date-picker-dialog-width: #{map.get($modal-theme, container-width)};
-  --md-date-picker-dialog-container-color: #{map.get($modal-theme, container-color)};
+  --md-date-picker-dialog-container-color: #{theme.value('surface-container-high')};
 
   &--input {
     --md-date-picker-dialog-width: #{map.get($date-input-theme, container-width)};
-    --md-date-picker-dialog-container-color: #{map.get($date-input-theme, container-color)};
+    --md-date-picker-dialog-container-color: #{theme.value('surface-container-high')};
   }
 
   .md-date-picker-dialog__container {
@@ -1024,7 +1025,7 @@ $motion: tokens.md-sys-motion-values();
   }
 
   &__divider {
-    background-color: #{map.get($divider-theme, color)};
+    background-color: #{theme.value('outline-variant')};
     height: #{map.get($divider-theme, thickness)};
     width: 100%;
   }
@@ -1120,6 +1121,37 @@ $motion: tokens.md-sys-motion-values();
 
   &--input .md-date-picker__actions {
     padding: 8px 16px 12px;
+  }
+
+  &--docked,
+  &--modal,
+  &--input {
+    --container-color: #{theme.value('surface-container-high')};
+    --date-unselected-label-text-color: #{theme.value('on-surface')};
+    --date-unselected-outside-month-label-text-color: #{theme.value('on-surface-variant')};
+    --date-unselected-hover-state-layer-color: #{theme.value('on-surface-variant')};
+    --date-today-container-outline-color: #{theme.value('primary')};
+    --date-today-label-text-color: #{theme.value('primary')};
+    --date-selected-container-color: #{theme.value('primary')};
+    --date-selected-label-text-color: #{theme.value('on-primary')};
+    --date-selected-hover-state-layer-color: #{theme.value('on-primary')};
+    --weekdays-label-text-color: #{theme.value('on-surface')};
+    --menu-button-hover-state-layer-color: #{theme.value('on-surface-variant')};
+    --menu-button-focus-state-layer-color: #{theme.value('on-surface-variant')};
+    --menu-list-item-label-text-color: #{theme.value('on-surface')};
+    --menu-list-item-hover-state-layer-color: #{theme.value('on-surface-variant')};
+    --menu-list-item-focus-state-layer-color: #{theme.value('on-surface-variant')};
+    --menu-list-item-selected-container-color: #{theme.value('surface-container-highest')};
+    --range-selection-active-indicator-container-color: #{theme.value('secondary-container')};
+    --range-selection-date-in-range-label-text-color: #{theme.value('on-secondary-container')};
+    --modal-menu-button-label-text-color: #{theme.value('on-surface-variant')};
+    --modal-header-headline-color: #{theme.value('on-surface-variant')};
+    --modal-header-supporting-text-color: #{theme.value('on-surface-variant')};
+    --year-selection-year-unselected-label-text-color: #{theme.value('on-surface-variant')};
+    --year-selection-year-unselected-hover-state-layer-color: #{theme.value('on-surface-variant')};
+    --year-selection-year-unselected-focus-state-layer-color: #{theme.value('on-surface-variant')};
+    --year-selection-year-selected-container-color: #{theme.value('primary')};
+    --year-selection-year-selected-label-text-color: #{theme.value('on-primary')};
   }
 
   .fade-grow-enter-active,

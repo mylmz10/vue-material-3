@@ -44,12 +44,21 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-navigation-drawer-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
 
 .md-navigation-drawer {
+  --md-navigation-drawer-container-color: #{theme.value('surface')};
+  --md-navigation-drawer-modal-container-color: #{theme.value('surface-container-low')};
+  --md-navigation-drawer-item-color: #{theme.value('on-surface-variant')};
+  --md-navigation-drawer-active-indicator-color: #{theme.value('secondary-container')};
+  --md-navigation-drawer-active-label-text-color: #{theme.value('on-secondary-container')};
+  --md-navigation-drawer-active-hover-state-layer-color: #{theme.value('on-secondary-container')};
+  --md-navigation-drawer-active-focus-state-layer-color: #{theme.value('on-secondary-container')};
+  --md-navigation-drawer-active-pressed-state-layer-color: #{theme.value('on-secondary-container')};
   display: flex;
   inline-size: 0;
   box-sizing: border-box;
@@ -72,7 +81,7 @@ $sys-color: tokens.md-sys-color-values-light();
     box-sizing: border-box;
     min-inline-size: map.get($theme, container-width);
     max-inline-size: map.get($theme, container-width);
-    background-color: map.get($theme, standard-container-color);
+    background-color: var(--md-navigation-drawer-container-color);
     border-radius: map.get($theme, container-shape);
     box-shadow: elevation.resolve-box-shadow(map.get($theme, standard-container-elevation), map.get($sys-color, shadow));
     padding: 12px;
@@ -87,19 +96,26 @@ $sys-color: tokens.md-sys-color-values-light();
     }
 
     .md-list-item {
+      color: var(--md-navigation-drawer-item-color);
       padding: 12px 16px;
       box-sizing: border-box;
 
+      .md-list-item__label-text,
+      .md-list-item__trailing-text,
+      .md-icon {
+        color: inherit;
+      }
+
       &:hover {
         cursor: pointer;
-        color: map.get($theme, active-hover-label-text-color);
+        color: var(--md-navigation-drawer-active-label-text-color);
 
         .md-list-item__label-text {
-          color: map.get($theme, active-hover-label-text-color);
+          color: inherit;
         }
 
         .md-list-item__state-layer {
-          background-color: map.get($theme, active-hover-state-layer-color);
+          background-color: var(--md-navigation-drawer-active-hover-state-layer-color);
           border-radius: map.get($theme, active-indicator-shape);
           opacity: 0.08;
         }
@@ -108,14 +124,15 @@ $sys-color: tokens.md-sys-color-values-light();
       &--selected {
         width: map.get($theme, active-indicator-width);
         height: map.get($theme, active-indicator-height);
-        background-color: map.get($theme, active-indicator-color);
+        color: var(--md-navigation-drawer-active-label-text-color);
+        background-color: var(--md-navigation-drawer-active-indicator-color);
         border-radius: map.get($theme, active-indicator-shape);
       }
 
       .md-ripple {
-        --md-ripple-hover-state-layer-color: #{map.get($theme, active-hover-state-layer-color)};
-        --md-ripple-focus-state-layer-color: #{map.get($theme, active-focus-state-layer-color)};
-        --md-ripple-pressed-state-layer-color: #{map.get($theme, active-pressed-state-layer-color)};
+        --md-ripple-hover-state-layer-color: var(--md-navigation-drawer-active-hover-state-layer-color);
+        --md-ripple-focus-state-layer-color: var(--md-navigation-drawer-active-focus-state-layer-color);
+        --md-ripple-pressed-state-layer-color: var(--md-navigation-drawer-active-pressed-state-layer-color);
         --md-ripple-hover-state-layer-opacity: #{map.get($theme, hover-state-layer-opacity)};
         --md-ripple-focus-state-layer-opacity: #{map.get($theme, focus-state-layer-opacity)};
         --md-ripple-pressed-state-layer-opacity: #{map.get($theme, pressed-state-layer-opacity)};
@@ -131,7 +148,7 @@ $sys-color: tokens.md-sys-color-values-light();
     z-index: 1000;
 
     .md-navigation-drawer__slot-content {
-      background-color: map.get($theme, modal-container-color);
+      background-color: var(--md-navigation-drawer-modal-container-color);
       box-shadow: elevation.resolve-box-shadow(map.get($theme, modal-container-elevation), map.get($sys-color, shadow));
     }
   }

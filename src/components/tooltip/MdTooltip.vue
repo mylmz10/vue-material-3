@@ -635,6 +635,7 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
 $plain-theme: tokens.md-comp-plain-tooltip-values();
@@ -657,9 +658,9 @@ $rich-theme: tokens.md-comp-rich-tooltip-values();
 
   &__surface--plain {
     align-items: center;
-    background-color: map.get($plain-theme, container-color);
+    background-color: #{theme.value('inverse-surface')};
     border-radius: map.get($plain-theme, container-shape);
-    color: map.get($plain-theme, supporting-text-color);
+    color: #{theme.value('inverse-on-surface')};
     display: inline-flex;
     min-block-size: 24px;
     padding: 4px 8px;
@@ -676,10 +677,10 @@ $rich-theme: tokens.md-comp-rich-tooltip-values();
   }
 
   &__surface--rich {
-    background-color: map.get($rich-theme, container-color);
+    background-color: #{theme.value('surface-container')};
     border-radius: map.get($rich-theme, container-shape);
     box-shadow: elevation.resolve-box-shadow(map.get($rich-theme, container-elevation), map.get($rich-theme, container-shadow-color));
-    color: map.get($rich-theme, supporting-text-color);
+    color: #{theme.value('on-surface-variant')};
     max-inline-size: min(320px, calc(100vw - 32px));
     min-inline-size: min(200px, calc(100vw - 32px));
     padding: 12px 16px 8px;
@@ -691,7 +692,7 @@ $rich-theme: tokens.md-comp-rich-tooltip-values();
   }
 
   &__headline {
-    color: map.get($rich-theme, subhead-color);
+    color: #{theme.value('on-surface-variant')};
     font-family: map.get($rich-theme, subhead-font);
     font-size: map.get($rich-theme, subhead-size);
     font-weight: map.get($rich-theme, subhead-weight);
@@ -701,7 +702,7 @@ $rich-theme: tokens.md-comp-rich-tooltip-values();
   }
 
   &__supporting-text {
-    color: map.get($rich-theme, supporting-text-color);
+    color: #{theme.value('on-surface-variant')};
     font-family: map.get($rich-theme, supporting-text-font);
     font-size: map.get($rich-theme, supporting-text-size);
     font-weight: map.get($rich-theme, supporting-text-weight);
@@ -716,7 +717,7 @@ $rich-theme: tokens.md-comp-rich-tooltip-values();
   &__action {
     background: transparent;
     border: 0;
-    color: map.get($rich-theme, action-label-text-color);
+    color: #{theme.value('primary')};
     cursor: pointer;
     font-family: map.get($rich-theme, action-label-text-font);
     font-size: map.get($rich-theme, action-label-text-size);

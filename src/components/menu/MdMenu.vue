@@ -340,12 +340,14 @@ defineExpose({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-menu-values();
 
 .md-menu {
+  --md-menu-container-color: #{theme.value('surface-container')};
   border-radius: map.get($theme, container-shape);
   position: relative;
   user-select: none;
@@ -367,7 +369,7 @@ $theme: tokens.md-comp-menu-values();
     left: 0;
     box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
     border-radius: inherit;
-    background-color: map.get($theme, container-color);
+    background-color: var(--md-menu-container-color);
     transform-origin: top;
     transition: transform 0.25s ease-in-out;
     overflow: visible;

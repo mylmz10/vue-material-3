@@ -152,8 +152,8 @@ function handleRippleMouseLeave() {
   hovered.value = false;
 }
 
-function handleRippleFocus() {
-  focused.value = true;
+function handleRippleFocus(event) {
+  focused.value = event.target?.matches?.(':focus-visible') ?? false;
 }
 
 function handleRippleBlur() {

@@ -60,6 +60,7 @@ onMounted(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 @use '../elevation/elevation';
 
@@ -76,7 +77,7 @@ $theme: tokens.md-comp-snackbar-values();
   box-sizing: content-box;
   line-height: map.get($theme, supporting-text-line-height);
 
-  background-color: map.get($theme, container-color);
+  background-color: #{theme.value('inverse-surface')};
   border-radius: map.get($theme, container-shape);
   height: map.get($theme, with-single-line-container-height);
 
@@ -116,7 +117,7 @@ $theme: tokens.md-comp-snackbar-values();
     user-select: none;
 
     #{$this}__icon {
-      color: map.get($theme, icon-color);
+      color: #{theme.value('inverse-on-surface')};
       width: map.get($theme, icon-size);
       height: map.get($theme, icon-size);
     }
@@ -137,7 +138,7 @@ $theme: tokens.md-comp-snackbar-values();
   }
 
   &__action-text {
-    color: map.get($theme, action-label-text-color);
+    color: #{theme.value('inverse-primary')};
     font-size: map.get($theme, action-label-text-size);
     line-height: map.get($theme, action-label-text-line-height);
     font-family: map.get($theme, action-label-text-font);
@@ -164,7 +165,7 @@ $theme: tokens.md-comp-snackbar-values();
   }
 
   &__supporting-text {
-    color: map.get($theme, supporting-text-color);
+    color: #{theme.value('inverse-on-surface')};
     font-size: map.get($theme, supporting-text-size);
     margin-left: 16px;
     margin-right: 16px;

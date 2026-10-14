@@ -43,6 +43,7 @@ defineProps({
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 @use '../elevation/elevation';
 
@@ -59,7 +60,7 @@ $theme: tokens.md-comp-filled-tonal-button-values();
   }
 
   .md-button__label {
-    color: map.get($theme, label-text-color);
+    color: #{theme.value('on-secondary-container')};
     font-family: map.get($theme, label-text-font);
     font-size: map.get($theme, label-text-size);
     font-weight: map.get($theme, label-text-weight);
@@ -67,8 +68,12 @@ $theme: tokens.md-comp-filled-tonal-button-values();
     line-height: map.get($theme, label-text-line-height);
   }
 
+  .md-button__trailing-icon {
+    color: #{theme.value('on-secondary-container')};
+  }
+
   .md-button__background {
-    background-color: map.get($theme, container-color);
+    background-color: #{theme.value('secondary-container')};
   }
 
   &:disabled,
@@ -76,12 +81,12 @@ $theme: tokens.md-comp-filled-tonal-button-values();
     box-shadow: elevation.resolve-box-shadow(map.get($theme, disabled-container-elevation), map.get($theme, container-shadow-color));
 
     .md-button__background {
-      background-color: map.get($theme, disabled-container-color);
+      background-color: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-container-opacity);
     }
     .md-button__label,
     .md-button__trailing-icon {
-      color: map.get($theme, disabled-label-text-color);
+      color: #{theme.value('on-surface')};
       opacity: map.get($theme, disabled-label-text-opacity);
     }
   }

@@ -287,10 +287,15 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
 $theme: tokens.md-comp-dialog-values();
-$sys-color: tokens.md-sys-color-values-light();
+$sys-color: theme.values();
+
+@function dialog-token($token) {
+  @return unquote('var(--md-dialog-#{$token}, #{map.get($theme, $token)})');
+}
 
 .md-modal {
   position: fixed;
@@ -312,6 +317,9 @@ $sys-color: tokens.md-sys-color-values-light();
 
   --overlay-z-index: 1;
   --overlay-opacity: 0.14;
+  --md-dialog-container-color: #{theme.value('surface-container-high')};
+  --md-dialog-headline-color: #{theme.value('on-surface')};
+  --md-dialog-supporting-text-color: #{theme.value('on-surface-variant')};
   --surface-tint-layer-color: #{map.get($sys-color, surface-tint)};
 
   $this: &;
@@ -328,7 +336,7 @@ $sys-color: tokens.md-sys-color-values-light();
 
   &__container {
     position: absolute;
-    background-color: map.get($theme, 'container-color');
+    background-color: dialog-token(container-color);
     border-radius: map.get($theme, 'container-shape');
     display: flex;
     flex-direction: column;
@@ -345,7 +353,7 @@ $sys-color: tokens.md-sys-color-values-light();
     #{$this}__header {
       padding-inline-start: 24px;
       padding-inline-end: 24px;
-      color: map.get($theme, headline-color);
+      color: dialog-token(headline-color);
       font-size: map.get($theme, headline-size);
       font-family: map.get($theme, headline-font);
       letter-spacing: map.get($theme, headline-tracking);
@@ -356,7 +364,7 @@ $sys-color: tokens.md-sys-color-values-light();
       padding-inline-end: 24px;
       margin-block-start: 16px;
       margin-block-end: 24px;
-      color: map.get($theme, supporting-text-color);
+      color: dialog-token(supporting-text-color);
       font-size: map.get($theme, supporting-text-size);
       font-family: map.get($theme, supporting-text-font);
       letter-spacing: map.get($theme, supporting-text-tracking);
