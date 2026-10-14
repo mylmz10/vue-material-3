@@ -34,6 +34,34 @@ describe('MdOutlinedTextField', () => {
     expect(wrapper.text()).toContain('$');
   });
 
+  it('hides placeholder until focus when label is present', async () => {
+    const wrapper = mount(MdOutlinedTextField, {
+      props: {
+        label: 'Email',
+        placeholder: 'Enter your email',
+      },
+    });
+
+    const input = wrapper.get('input');
+    expect(input.attributes('placeholder')).toBe('');
+
+    await input.trigger('focus');
+    expect(input.attributes('placeholder')).toBe('Enter your email');
+
+    await input.trigger('blur');
+    expect(input.attributes('placeholder')).toBe('');
+  });
+
+  it('keeps placeholder visible when label is absent', () => {
+    const wrapper = mount(MdOutlinedTextField, {
+      props: {
+        placeholder: 'Enter your email',
+      },
+    });
+
+    expect(wrapper.get('input').attributes('placeholder')).toBe('Enter your email');
+  });
+
   it('supports reset from associated form', async () => {
     const form = document.createElement('form');
     form.id = 'outlined-form';

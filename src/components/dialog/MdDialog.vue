@@ -366,6 +366,7 @@ $sys-color: tokens.md-sys-color-values-light();
       padding-inline-start: 24px;
       padding-inline-end: 24px;
       display: flex;
+      gap: 8px;
       position: relative;
       flex-wrap: wrap;
       align-items: center;

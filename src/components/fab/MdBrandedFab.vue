@@ -66,11 +66,6 @@ defineProps({
     justify-content: center;
   }
 
-  .md-branded-fab__icon > * {
-    width: 100%;
-    height: 100%;
-  }
-
   &:hover {
     cursor: pointer;
   }
@@ -93,11 +88,25 @@ defineProps({
 
     --surface-tint-layer-color: #{map.get($theme, container-color)};
     --overlay-opacity: 0.11;
+
+    .md-branded-fab__icon {
+      width: 28px;
+      height: 28px;
+      font-size: 28px;
+      --mdc-icon-size: 28px;
+    }
   }
 }
 
 .md-branded-fab--large.md-branded-fab {
   @include root-static-styles(tokens.md-comp-fab-branded-large-values());
+
+  .md-branded-fab__icon {
+    width: 36px;
+    height: 36px;
+    font-size: 36px;
+    --mdc-icon-size: 36px;
+  }
 }
 
 .md-branded-fab--extended {
@@ -123,10 +132,13 @@ defineProps({
   .md-branded-fab__icon {
     margin-right: 12px;
     color: map.get($theme, icon-color);
-    width: map.get($theme, icon-size);
-    height: map.get($theme, icon-size);
-    font-size: map.get($theme, icon-size);
-    --mdc-icon-size: map.get($theme, icon-size);
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
+    --mdc-icon-size: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .md-branded-fab__label {

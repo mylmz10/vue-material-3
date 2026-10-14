@@ -60,11 +60,11 @@
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/test-utils": "^2.4.6",
-    "cz-conventional-changelog": "^3.3.0",
+    "cz-conventional-changelog": "^3.0.1",
     "eslint": "^8.57.1",
     "eslint-plugin-storybook": "^10.2.17",
     "eslint-plugin-vue": "^8.2.0",
-    "gh-pages": "^6.3.0",
+    "gh-pages": "^6.1.1",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "prettier": "^2.5.1",
@@ -72,11 +72,18 @@
     "storybook": "^10.2.17",
     "vite": "^7.3.1",
     "vitepress": "^1.6.4",
-    "vitest": "^3.2.4",
+    "vitest": "^5.0.4",
     "vue": "^3.5.29"
   },
   "overrides": {
-    "semver": "^7.5.2"
+    "semver": "^7.5.2",
+    "esbuild": "0.28.2",
+    "vitepress": {
+      "vite": {
+        ".": "6.4.3",
+        "esbuild": "0.25.12"
+      }
+    }
   },
   "prettier": {
     "printWidth": 200,

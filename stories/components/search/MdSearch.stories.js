@@ -1,21 +1,18 @@
 import { ref } from 'vue';
 import MdSearch from '../../../src/components/search/MdSearch.vue';
-import MdAvatar from '../../../src/components/avatar/MdAvatar.vue';
-
 export default {
   title: 'Components/Search',
   component: MdSearch,
   args: {
     modelValue: '',
-    placeholder: 'Search components',
-    supportingText: 'Press Enter to search',
-    showAvatar: true,
-    trailingIcon: 'close',
+    placeholder: 'Search trips',
+    supportingText: '',
+    showAvatar: false,
   },
 };
 
 const Template = (args) => ({
-  components: { MdSearch, MdAvatar },
+  components: { MdSearch },
   setup() {
     const value = ref(args.modelValue);
     return { args, value };
@@ -26,12 +23,7 @@ const Template = (args) => ({
       :placeholder="args.placeholder"
       :supporting-text="args.supportingText"
       :show-avatar="args.showAvatar"
-      :trailing-icon="args.trailingIcon"
-    >
-      <template #avatar>
-        <MdAvatar initials="VM" />
-      </template>
-    </MdSearch>
+    />
   </div>`,
 });
 

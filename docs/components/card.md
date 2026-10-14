@@ -2,6 +2,8 @@
 
 Cards group related content and actions in a contained surface.
 
+Set `interactive` when the card itself should react to pointer hover as an interactive surface.
+
 <div class="md-doc-preview">
   <MdCard
     style="min-height: 300px; width: 300px;"
@@ -28,6 +30,10 @@ import { MdCard } from 'vue-material-3';
 ```vue
 <MdCard header-title="Header" header-sub-title="Subhead" type="elevated">
   Card content
+</MdCard>
+
+<MdCard interactive header-title="Header" type="outlined">
+  Clickable card content
 </MdCard>
 ```
 
