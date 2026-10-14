@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [0.14.2](https://github.com/mylmz10/vue-material-3/compare/v0.14.1...v0.14.2) (2026-10-14)
+
+
+### Bug Fixes
+
+* resolve dependency vulnerabilities ([1053683](https://github.com/mylmz10/vue-material-3/commit/105368323afaefbfc186201d11e7e0a01b6f26e1))
+* resolve dependency vulnerabilities ([4de2534](https://github.com/mylmz10/vue-material-3/commit/4de25344e4d5885db0d6a540391feb032699dca4))
+
 ## [0.14.1](https://github.com/mylmz10/vue-material-3/compare/v0.14.0...v0.14.1) (2026-06-27)
 
 
