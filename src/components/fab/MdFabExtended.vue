@@ -1,5 +1,5 @@
 <template>
-  <button class="md-fab--extended" :disabled="disabled">
+  <button type="button" class="md-fab--extended" :disabled="disabled">
     <MdRipple></MdRipple>
     <i class="material-icons md-fab__icon">{{ icon }}</i>
     <span class="md-fab__label">{{ label }}</span>

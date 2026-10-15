@@ -256,7 +256,10 @@ const onTabListKeydown = (event) => {
 
   const currentIndex = resolveCurrentFocusIndex(event.target);
 
-  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+  const nextKey = props.orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
+  const previousKey = props.orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+
+  if (event.key === nextKey) {
     event.preventDefault();
     const nextIndex = moveFocus(currentIndex, 1);
     if (nextIndex !== -1) {
@@ -268,7 +271,7 @@ const onTabListKeydown = (event) => {
     return;
   }
 
-  if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+  if (event.key === previousKey) {
     event.preventDefault();
     const previousIndex = moveFocus(currentIndex, -1);
     if (previousIndex !== -1) {

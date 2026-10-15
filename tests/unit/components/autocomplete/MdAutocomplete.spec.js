@@ -35,4 +35,17 @@ describe('autocomplete components', () => {
 
     expect(wrapper.text()).toContain('No data available');
   });
+
+  it('handles omitted items and external model updates', async () => {
+    const wrapper = mount(MdFilledAutoComplete, {
+      props: {
+        label: 'City',
+      },
+    });
+
+    expect(wrapper.text()).toContain('No data available');
+
+    await wrapper.setProps({ modelValue: 'Izmir' });
+    expect(wrapper.get('input').element.value).toBe('Izmir');
+  });
 });

@@ -31,6 +31,7 @@ import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 
 let bodyScrollLockCount = 0;
+let bodyOverflowBeforeLock = '';
 
 const _open = ref(false);
 const dialogEl = ref(null);
@@ -95,6 +96,7 @@ const lockBodyScroll = () => {
 
   bodyScrollLockCount += 1;
   if (bodyScrollLockCount === 1) {
+    bodyOverflowBeforeLock = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
   }
 };
@@ -106,7 +108,8 @@ const unlockBodyScroll = () => {
 
   bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
   if (bodyScrollLockCount === 0) {
-    document.body.style.overflow = '';
+    document.body.style.overflow = bodyOverflowBeforeLock;
+    bodyOverflowBeforeLock = '';
   }
 };
 

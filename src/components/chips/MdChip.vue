@@ -7,9 +7,10 @@
     :target="anchorTarget"
     :download="anchorDownload"
     :tabindex="resolvedTabIndex"
-    :role="isLink ? undefined : 'button'"
+    :role="resolvedRole"
     :aria-disabled="ariaDisabled"
     :aria-pressed="ariaPressed"
+    :aria-selected="ariaSelected"
     data-md-chip="true"
     @click="handleClick"
     @keydown="handleKeydown"
@@ -56,11 +57,12 @@
 </template>
 
 <script setup>
-import { computed, ref, useSlots, watch } from 'vue';
+import { computed, inject, ref, useSlots, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
 const slots = useSlots();
+const chipSetContext = inject('mdChipSetContext', null);
 
 const props = defineProps({
   alwaysFocusable: { type: Boolean, default: false },
@@ -102,6 +104,7 @@ const hasTrailingSlot = computed(() => !!slots['trailing-icon']);
 const hasAvatarSlot = computed(() => !!slots.avatar);
 
 const isLink = computed(() => !!props.href);
+const isInChipSet = computed(() => !!chipSetContext);
 const isDisabledLike = computed(() => props.disabled || props.softDisabled);
 const isFilterVariant = computed(() => props.variant === 'filter');
 const isInputVariant = computed(() => props.variant === 'input');
@@ -137,12 +140,14 @@ const resolvedTabIndex = computed(() => {
 });
 
 const ariaDisabled = computed(() => (isDisabledLike.value ? 'true' : undefined));
-const ariaPressed = computed(() => (isFilterVariant.value ? String(selectedState.value) : undefined));
+const resolvedRole = computed(() => (isInChipSet.value ? 'option' : isLink.value ? undefined : 'button'));
+const ariaPressed = computed(() => (isInChipSet.value || !isFilterVariant.value ? undefined : String(selectedState.value)));
+const ariaSelected = computed(() => (isInChipSet.value ? String(selectedState.value) : undefined));
 
 const showLeadingCheckIcon = computed(() => isFilterVariant.value && selectedState.value && !hasLeadingSlot.value && !props.avatar);
 const showLeadingVisual = computed(() => showLeadingCheckIcon.value || !!props.leadingIcon || hasLeadingSlot.value || !!props.avatar || hasAvatarSlot.value);
 const showTrailingVisual = computed(() => !!props.trailingIcon || hasTrailingSlot.value);
-const showRemoveButton = computed(() => props.removable);
+const showRemoveButton = computed(() => props.removable && !isLink.value);
 const showRipple = computed(() => !isDisabledLike.value);
 
 const emitSelectedChange = (nextValue) => {

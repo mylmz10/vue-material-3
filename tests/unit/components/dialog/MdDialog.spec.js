@@ -73,4 +73,19 @@ describe('MdDialog', () => {
 
     wrapper.unmount();
   });
+
+  it('restores the body overflow style after closing', async () => {
+    document.body.style.overflow = 'scroll';
+    const wrapper = mount(MdDialog, {
+      props: {
+        modelValue: true,
+      },
+    });
+
+    await wrapper.setProps({ modelValue: false });
+    expect(document.body.style.overflow).toBe('scroll');
+
+    document.body.style.overflow = '';
+    wrapper.unmount();
+  });
 });

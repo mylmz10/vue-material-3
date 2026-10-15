@@ -89,6 +89,25 @@ describe('MdTabs', () => {
     wrapper.unmount();
   });
 
+  it('uses vertical arrow keys for vertical tabs only', async () => {
+    const wrapper = mount(MdTabs, {
+      attachTo: document.body,
+      props: { modelValue: 0, orientation: 'vertical' },
+      slots: {
+        default: '<MdPrimaryTab label="First" /><MdPrimaryTab label="Second" />',
+      },
+      global: { components: { MdPrimaryTab } },
+    });
+
+    const tabList = wrapper.get('.md-tabs');
+    await tabList.trigger('keydown', { key: 'ArrowRight' });
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+    await tabList.trigger('keydown', { key: 'ArrowDown' });
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1]);
+    wrapper.unmount();
+  });
+
   it('renders primary tab slot content outside tabs context', () => {
     const wrapper = mount(MdPrimaryTab, {
       props: {

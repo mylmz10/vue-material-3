@@ -71,12 +71,14 @@ const handleInput = () => {
 };
 
 const handleTrailingClick = () => {
-  if (inputValue.value) {
+  const action = resolvedTrailingIcon.value;
+
+  if (action === 'close') {
     inputValue.value = '';
     emit('update:modelValue', '');
   }
 
-  emit('trailingClick', resolvedTrailingIcon.value);
+  emit('trailingClick', action);
 };
 </script>
 

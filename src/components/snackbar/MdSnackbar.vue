@@ -2,26 +2,25 @@
   <Transition>
     <div v-if="modelValue" class="md-snackbar" :class="{ 'md-snackbar--multiline': multiLine, 'md-snackbar--longer-action': longerAction }">
       <div class="md-snackbar__supporting-text">
-        Two-line snackbar with <br />
-        longer action and close affordance
+        <slot>{{ text }}</slot>
       </div>
-      <div v-if="actionText" class="md-snackbar__action-text">
+      <button v-if="actionText" type="button" class="md-snackbar__action-text" @click="onActionClick">
         <div class="md-snackbar__state-layer"></div>
-        <span @click="onActionClick">{{ actionText }}</span>
-      </div>
-      <div class="md-snackbar__actions" @click="close">
+        {{ actionText }}
+      </button>
+      <button type="button" class="md-snackbar__actions" aria-label="Close snackbar" @click="close">
         <MdIcon class="md-snackbar__icon">close</MdIcon>
         <div class="md-snackbar__state-layer"></div>
-      </div>
+      </button>
     </div>
   </Transition>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onBeforeUnmount, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 
-const { timeout, multiLine, modelValue } = defineProps({
+const props = defineProps({
   timeout: {
     type: Number,
     default: 20000,
@@ -37,6 +36,10 @@ const { timeout, multiLine, modelValue } = defineProps({
   actionText: {
     type: String,
   },
+  text: {
+    type: String,
+    default: '',
+  },
   longerAction: {
     type: Boolean,
   },
@@ -50,10 +53,36 @@ const close = () => {
 const onActionClick = ($event) => {
   emit('action', $event);
 };
-onMounted(() => {
-  setTimeout(() => {
+
+let closeTimer;
+
+const clearCloseTimer = () => {
+  if (closeTimer) {
+    clearTimeout(closeTimer);
+    closeTimer = undefined;
+  }
+};
+
+const scheduleClose = () => {
+  clearCloseTimer();
+  if (!props.modelValue || props.timeout <= 0) {
+    return;
+  }
+
+  closeTimer = setTimeout(() => {
+    closeTimer = undefined;
     close();
-  }, timeout);
+  }, props.timeout);
+};
+
+watch(
+  () => [props.modelValue, props.timeout],
+  scheduleClose,
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  clearCloseTimer();
 });
 </script>
 
@@ -107,6 +136,8 @@ $theme: tokens.md-comp-snackbar-values();
   &__actions {
     display: flex;
     align-items: center;
+    background: transparent;
+    border: 0;
     justify-content: center;
     position: relative;
     margin: 0 12px;
@@ -114,7 +145,14 @@ $theme: tokens.md-comp-snackbar-values();
     height: calc(#{map.get($theme, icon-size)} * 1.5);
     border-radius: 24px;
     cursor: pointer;
+    isolation: isolate;
+    outline: none;
     user-select: none;
+
+    &:focus-visible {
+      outline: 2px solid #{theme.value('inverse-primary')};
+      outline-offset: 2px;
+    }
 
     #{$this}__icon {
       color: #{theme.value('inverse-on-surface')};
@@ -123,21 +161,23 @@ $theme: tokens.md-comp-snackbar-values();
     }
 
     #{$this}__icon:hover {
-      color: map.get($theme, icon-hover-icon-color);
+      color: #{theme.value('inverse-on-surface')};
     }
 
     #{$this}__icon:hover ~ #{$this}__state-layer {
-      background-color: map.get($theme, icon-hover-state-layer-color);
+      background-color: #{theme.value('inverse-on-surface')};
       opacity: map.get($theme, icon-hover-state-layer-opacity);
     }
 
     #{$this}__icon:active ~ #{$this}__state-layer {
-      background-color: map.get($theme, icon-pressed-state-layer-color);
+      background-color: #{theme.value('inverse-on-surface')};
       opacity: map.get($theme, icon-pressed-state-layer-opacity);
     }
   }
 
   &__action-text {
+    background: transparent;
+    border: 0;
     color: #{theme.value('inverse-primary')};
     font-size: map.get($theme, action-label-text-size);
     line-height: map.get($theme, action-label-text-line-height);
@@ -146,20 +186,29 @@ $theme: tokens.md-comp-snackbar-values();
     padding: 8px 12px;
     border-radius: 24px;
     cursor: pointer;
+    isolation: isolate;
+    outline: none;
     user-select: none;
 
+    &:focus-visible {
+      outline: 2px solid #{theme.value('inverse-primary')};
+      outline-offset: 2px;
+    }
+
     &:hover {
+      color: #{theme.value('inverse-primary')};
+
       #{$this}__state-layer {
         opacity: map.get($theme, action-hover-state-layer-opacity);
-        color: map.get($theme, action-hover-label-text-color);
-        background-color: map.get($theme, action-hover-state-layer-color);
+        background-color: #{theme.value('inverse-primary')};
       }
     }
     &:active {
+      color: #{theme.value('inverse-primary')};
+
       #{$this}__state-layer {
         opacity: map.get($theme, action-pressed-state-layer-opacity);
-        color: map.get($theme, action-pressed-label-text-color);
-        background-color: map.get($theme, action-pressed-state-layer-color);
+        background-color: #{theme.value('inverse-primary')};
       }
     }
   }

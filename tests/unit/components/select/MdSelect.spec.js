@@ -79,4 +79,27 @@ describe('select components', () => {
 
     expect(wrapper.text()).toContain('Istanbul (TR)');
   });
+
+  it('participates in required form validation', async () => {
+    const wrapper = mount(MdFilledSelect, {
+      props: {
+        required: true,
+      },
+      slots: {
+        default: '<MdSelectOption value="istanbul">Istanbul</MdSelectOption>',
+      },
+      global: {
+        components: {
+          MdSelectOption,
+        },
+      },
+    });
+
+    const formInput = wrapper.get('.md-filled-select__hidden-input').element;
+    expect(formInput.checkValidity()).toBe(false);
+
+    await wrapper.get('.md-filled-select__trigger').trigger('click');
+    await wrapper.get('.md-select-option').trigger('click');
+    expect(formInput.checkValidity()).toBe(true);
+  });
 });

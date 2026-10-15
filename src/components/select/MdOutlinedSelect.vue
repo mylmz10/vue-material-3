@@ -2,7 +2,7 @@
   <MdMenu class="md-outlined-select-menu" v-model="menuOpened">
     <template #activator>
       <span class="md-outlined-select" :class="{ 'md-outlined-select--open': menuOpened, 'md-outlined-select--disabled': disabled }">
-        <input v-if="name" class="md-outlined-select__hidden-input" type="hidden" :name="name" :value="formValue" />
+        <input v-if="name || required" class="md-outlined-select__hidden-input" type="text" :name="name || undefined" :value="formValue" :required="required" :disabled="disabled" tabindex="-1" aria-hidden="true" />
 
         <MdOutlinedField :disabled="disabled" :error="error" :label="label" :populated="isPopulated">
           <button
@@ -515,7 +515,11 @@ $theme: tokens.md-comp-outlined-select-values();
   }
 
   &__hidden-input {
-    display: none;
+    block-size: 1px;
+    inline-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
   }
 
   &__trigger {

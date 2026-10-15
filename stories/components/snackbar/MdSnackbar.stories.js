@@ -7,6 +7,7 @@ export default {
   component: MdSnackbar,
   args: {
     timeout: 6000,
+    text: 'Message sent',
     actionText: 'Undo',
     multiLine: false,
     longerAction: false,
@@ -35,6 +36,7 @@ const Template = (args) => ({
       :key="snackbarKey"
       v-model="open"
       :timeout="args.timeout"
+      :text="args.text"
       :action-text="args.actionText"
       :multi-line="args.multiLine"
       :longer-action="args.longerAction"

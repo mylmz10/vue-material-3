@@ -1,5 +1,6 @@
 <template>
   <button
+    type="button"
     class="md-segmented-button"
     :class="{ 'md-segmented-button--selected': selected, 'md-segmented-button--disabled': disabled }"
     v-bind:disabled="disabled"

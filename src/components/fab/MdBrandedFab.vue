@@ -1,5 +1,5 @@
 <template>
-  <button class="md-branded-fab" :class="{ 'md-branded-fab--large': size === 'large' && !label, 'md-branded-fab--extended': !!label }" :disabled="disabled">
+  <button type="button" class="md-branded-fab" :class="{ 'md-branded-fab--large': size === 'large' && !label, 'md-branded-fab--extended': !!label }" :disabled="disabled">
     <MdRipple></MdRipple>
     <span class="md-branded-fab__icon">
       <slot name="icon">

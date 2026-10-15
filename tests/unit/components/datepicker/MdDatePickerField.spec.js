@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import MdDatePickerField from '@/components/datepicker/MdDatePickerField.vue';
 import MdFilledDatePickerField from '@/components/datepicker/MdFilledDatePickerField.vue';
 import MdOutlinedDatePickerField from '@/components/datepicker/MdOutlinedDatePickerField.vue';
+import { isRangeAllowed } from '@/components/datepicker/datePickerUtils';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
 
@@ -203,5 +204,22 @@ describe('MdDatePickerField', () => {
     });
 
     expect(wrapper.find('.md-outlined-text-field').exists()).toBe(true);
+  });
+
+  it('does not walk a large range when there is no disabled-date predicate', () => {
+    expect(isRangeAllowed({
+      start: '0001-01-01',
+      end: '9999-12-31',
+    })).toBe(true);
+  });
+
+  it('rejects oversized ranges that need per-day disabled-date checks', () => {
+    const isDateDisabled = vi.fn(() => false);
+
+    expect(isRangeAllowed({
+      start: '2000-01-01',
+      end: '2011-01-01',
+    }, { isDateDisabled })).toBe(false);
+    expect(isDateDisabled).toHaveBeenCalledTimes(2);
   });
 });

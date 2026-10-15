@@ -9,7 +9,7 @@ Snackbars show short messages about app processes.
 
 <div class="md-doc-preview md-doc-preview--column" style="min-height: 180px;">
   <MdFilledButton label="Open snackbar" @click="open = true" />
-  <MdSnackbar v-model="open" action-text="Undo" :timeout="6000" />
+  <MdSnackbar v-model="open" text="Message sent" action-text="Undo" :timeout="6000" />
 </div>
 
 ## Import
@@ -21,7 +21,7 @@ import { MdSnackbar } from 'vue-material-3';
 ## Usage
 
 ```vue
-<MdSnackbar v-model="open" action-text="Undo" />
+<MdSnackbar v-model="open" text="Message sent" action-text="Undo" />
 ```
 
 ## Storybook

@@ -59,4 +59,21 @@ describe('MdChipSet', () => {
 
     wrapper.unmount();
   });
+
+  it('uses option semantics and skips disabled chips during keyboard navigation', async () => {
+    const wrapper = mount(MdChipSet, {
+      attachTo: document.body,
+      slots: {
+        default: () => [h(MdFilterChip, { label: 'One' }), h(MdFilterChip, { label: 'Disabled', disabled: true }), h(MdFilterChip, { label: 'Three' })],
+      },
+    });
+
+    const chips = wrapper.findAll('.md-chip');
+    expect(chips[0].attributes('role')).toBe('option');
+    expect(chips[1].attributes('tabindex')).toBe('-1');
+
+    await wrapper.get('.md-chip-set').trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(chips[2].element);
+    wrapper.unmount();
+  });
 });

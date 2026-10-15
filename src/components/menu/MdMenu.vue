@@ -130,6 +130,11 @@ const focusLastItem = () => {
   focusItemByIndex(menuItems.length - 1);
 };
 
+const focusActivator = () => {
+  const focusTarget = activatorEl.value?.querySelector('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+  (focusTarget || activatorEl.value)?.focus?.();
+};
+
 const moveFocus = (offset) => {
   const { focusedIndex, menuItems } = getFocusedItemIndex();
   if (!menuItems.length) {
@@ -174,7 +179,7 @@ const setOpen = (nextOpen, options = {}) => {
   emit('close', { source });
   if (restoreFocus) {
     nextTick(() => {
-      activatorEl.value?.focus?.();
+      focusActivator();
     });
   }
 };

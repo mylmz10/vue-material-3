@@ -22,7 +22,7 @@ import MdMenu from '../menu/MdMenu.vue';
 import MdList from '../list/MdList.vue';
 import MdListItem from '../list/MdListItem.vue';
 
-const props = defineProps({ modelValue: { type: String, default: null }, label: { type: String, default: null }, items: { type: Array, default: null } });
+const props = defineProps({ modelValue: { type: String, default: null }, label: { type: String, default: null }, items: { type: Array, default: () => [] } });
 const emit = defineEmits(['update:modelValue', 'update:search']);
 
 let menuOpened = ref(false);
@@ -55,6 +55,14 @@ const onMenuListItemClick = (index) => {
   isPristine.value = true;
   emit('update:modelValue', filteredItems.value[index]);
 };
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    searchText.value = newValue;
+    isPristine.value = true;
+  }
+);
 
 watch(
   () => menuOpened.value,

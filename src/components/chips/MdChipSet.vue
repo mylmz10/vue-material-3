@@ -3,6 +3,11 @@ import { h } from 'vue';
 
 export default {
   name: 'MdChipSet',
+  provide() {
+    return {
+      mdChipSetContext: this,
+    };
+  },
   props: {
     modelValue: {
       type: [String, Number, Boolean, Object, Array],
@@ -130,6 +135,9 @@ export default {
 
       return Array.from(this.$el.querySelectorAll('[data-md-chip="true"]'));
     },
+    getEnabledChipElements() {
+      return this.getChipElements().filter((chipElement) => chipElement.getAttribute('aria-disabled') !== 'true');
+    },
     resolveCurrentIndex(chipElements) {
       if (!chipElements.length) {
         return 0;
@@ -145,13 +153,13 @@ export default {
       return Math.max(0, Math.min(this.activeIndex, chipElements.length - 1));
     },
     focusChip(index) {
-      const chipElements = this.getChipElements();
+      const chipElements = this.getEnabledChipElements();
       if (!chipElements.length) {
         return;
       }
 
       const boundedIndex = Math.max(0, Math.min(index, chipElements.length - 1));
-      this.activeIndex = boundedIndex;
+      this.activeIndex = this.getChipElements().indexOf(chipElements[boundedIndex]);
       chipElements[boundedIndex]?.focus();
     },
     syncActiveIndex() {
@@ -161,17 +169,18 @@ export default {
         return;
       }
 
-      const firstSelectedIndex = slotItems.findIndex((item, index) => this.isItemSelected(item, index));
+      const firstSelectedIndex = slotItems.findIndex((item, index) => !item?.props?.disabled && this.isItemSelected(item, index));
 
       if (firstSelectedIndex !== -1) {
         this.activeIndex = firstSelectedIndex;
         return;
       }
 
-      this.activeIndex = Math.max(0, Math.min(this.activeIndex, slotItems.length - 1));
+      const firstEnabledIndex = slotItems.findIndex((item) => !item?.props?.disabled);
+      this.activeIndex = firstEnabledIndex === -1 ? 0 : Math.max(firstEnabledIndex, Math.min(this.activeIndex, slotItems.length - 1));
     },
     handleKeydown(event) {
-      const chipElements = this.getChipElements();
+      const chipElements = this.getEnabledChipElements();
       if (!chipElements.length) {
         return;
       }
@@ -236,7 +245,7 @@ export default {
             ...item.props,
             key: item?.key ?? index,
             selected,
-            tabIndex: index === this.activeIndex ? 0 : -1,
+            tabIndex: item?.props?.disabled ? -1 : index === this.activeIndex ? 0 : -1,
             onClick: (event) => {
               originalClick?.(event);
               this.handleChipClick(index, event);
