@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [0.14.3](https://github.com/mylmz10/vue-material-3/compare/v0.14.2...v0.14.3) (2026-10-14)
+
+
+### Bug Fixes
+
+* apply color tokens across components ([c99e0ad](https://github.com/mylmz10/vue-material-3/commit/c99e0ad53b680a9ecd7acba790b35d0e1b055a59))
+* apply color tokens across components ([7e7efe7](https://github.com/mylmz10/vue-material-3/commit/7e7efe7ebb71b8c8d25f322d28d10ebf2f863fec))
+
 ## [0.14.2](https://github.com/mylmz10/vue-material-3/compare/v0.14.1...v0.14.2) (2026-10-14)
 
 
