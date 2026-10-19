@@ -29,10 +29,10 @@ jobs:
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.release.tag_name }}
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies

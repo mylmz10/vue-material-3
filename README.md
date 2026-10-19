@@ -104,7 +104,7 @@ npm run storybook
 
 Recommended local runtime:
 
-- Node.js `20.19.0+`
+- Node.js `22+`
 - npm `10+`
 
 Install dependencies:
