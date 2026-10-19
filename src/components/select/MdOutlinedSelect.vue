@@ -426,7 +426,7 @@ const onBlur = (event) => {
 
 const handleFormReset = () => {
   nextTick(() => {
-    internalValue.value = initialValue.value || '';
+    internalValue.value = initialValue.value ?? '';
     emit('update:modelValue', internalValue.value);
     emit('input', internalValue.value);
     emit('change', internalValue.value);

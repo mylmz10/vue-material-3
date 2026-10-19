@@ -6,7 +6,7 @@
 
     <MdList>
       <template v-if="filteredItems.length">
-        <MdListItem v-for="(item, index) in filteredItems" :selected="modelValue === item" :headline="item" @click="onMenuListItemClick(index)"></MdListItem>
+        <MdListItem v-for="(item, index) in filteredItems" :key="index" :selected="modelValue === item" :headline="item" @click="onMenuListItemClick(index)"></MdListItem>
       </template>
       <template v-else>
         <MdListItem headline="No data available"></MdListItem>
@@ -32,7 +32,7 @@ let isPristine = ref(true);
 
 const filteredItems = computed(() => {
   if (!selecting.value && searchText.value) {
-    return props.items.filter((item) => item.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()));
+    return props.items.filter((item) => typeof item === 'string' && item.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()));
   }
   return props.items;
 });

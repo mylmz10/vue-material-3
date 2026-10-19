@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
-import { mount } from '@vue/test-utils';
+import { enableAutoUnmount, mount } from '@vue/test-utils';
 import MdTooltip from '@/components/tooltip/MdTooltip.vue';
 
 const flushTooltipOpen = async () => {
@@ -20,10 +20,11 @@ const mountTooltip = (props = {}, slots = {}) => {
   });
 };
 
+enableAutoUnmount(afterEach);
+
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  document.body.innerHTML = '';
 });
 
 describe('MdTooltip', () => {

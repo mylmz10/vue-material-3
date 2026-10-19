@@ -48,4 +48,15 @@ describe('autocomplete components', () => {
     await wrapper.setProps({ modelValue: 'Izmir' });
     expect(wrapper.get('input').element.value).toBe('Izmir');
   });
+
+  it('ignores non-string suggestions while filtering', async () => {
+    const wrapper = mount(MdFilledAutoComplete, {
+      props: { items: ['Ankara', 1, null] },
+    });
+
+    await wrapper.get('input').trigger('focus');
+    await wrapper.get('input').setValue('an');
+
+    expect(wrapper.text()).toContain('Ankara');
+  });
 });

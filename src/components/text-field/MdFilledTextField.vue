@@ -102,7 +102,8 @@ const emit = defineEmits(['focus', 'blur', 'input', 'change', 'invalid', 'select
 
 const normalizeValue = (value) => (value === null || value === undefined ? '' : `${value}`);
 
-const inputValue = ref(normalizeValue(props.modelValue || props.value));
+const resolveInitialValue = () => (props.modelValue === 0 ? props.modelValue : props.modelValue || props.value);
+const inputValue = ref(normalizeValue(resolveInitialValue()));
 const textFieldEl = ref(null);
 const initialValue = ref(inputValue.value);
 const isInputFocused = ref(false);
@@ -190,7 +191,7 @@ defineExpose({
 });
 
 onMounted(() => {
-  initialValue.value = normalizeValue(props.modelValue || props.value);
+  initialValue.value = normalizeValue(resolveInitialValue());
   const inputEl = textFieldEl.value?.getInputEl?.();
   formEl = inputEl?.form || null;
   formEl?.addEventListener('reset', onFormReset);

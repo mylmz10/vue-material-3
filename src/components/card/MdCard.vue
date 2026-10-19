@@ -8,6 +8,10 @@
       'md-card--interactive': interactive,
       'md-card--with-footer': actionButtonText || cancelButtonText,
     }"
+    :role="interactive ? 'button' : undefined"
+    :tabindex="interactive ? 0 : undefined"
+    @click="emit('click', $event)"
+    @keydown="handleKeydown"
   >
     <div class="md-card__state-layer"></div>
 
@@ -72,6 +76,17 @@ const props = defineProps({
     default: false,
   },
 });
+
+const emit = defineEmits(['action', 'cancel', 'click']);
+
+const handleKeydown = (event) => {
+  if (!props.interactive || event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) {
+    return;
+  }
+
+  event.preventDefault();
+  event.currentTarget.click();
+};
 </script>
 
 <style lang="scss">
@@ -171,6 +186,11 @@ const props = defineProps({
 
   &--interactive {
     cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid #{theme.value('primary')};
+      outline-offset: 2px;
+    }
   }
 
   &--elevated {

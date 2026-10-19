@@ -18,7 +18,7 @@
 import MdRipple from '../ripple/MdRipple.vue';
 import MdIcon from '../icon/MdIcon.vue';
 
-const props = defineProps({
+defineProps({
   disabled: {
     type: Boolean,
   },

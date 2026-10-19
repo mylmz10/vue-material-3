@@ -85,6 +85,7 @@ const emit = defineEmits(['select-hour', 'select-minute']);
 const dialEl = ref(null);
 let pointerMoveListener = null;
 let pointerUpListener = null;
+let activePointerId = null;
 
 const dialSize = DIAL_SIZE;
 const handleSize = DIAL_HANDLE_SIZE;
@@ -172,15 +173,25 @@ const stopPointerSelection = () => {
     window.removeEventListener('pointerup', pointerUpListener);
     pointerUpListener = null;
   }
+
+  activePointerId = null;
 };
 
 const startPointerSelection = (event) => {
+  stopPointerSelection();
+  activePointerId = event.pointerId;
   updateFromPointer(event);
 
   pointerMoveListener = (moveEvent) => {
+    if (moveEvent.pointerId !== activePointerId) {
+      return;
+    }
     updateFromPointer(moveEvent);
   };
-  pointerUpListener = () => {
+  pointerUpListener = (upEvent) => {
+    if (upEvent.pointerId !== activePointerId) {
+      return;
+    }
     stopPointerSelection();
   };
 

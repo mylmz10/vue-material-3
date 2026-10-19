@@ -27,6 +27,12 @@ import { MdList, MdListItem, MdListDivider } from 'vue-material-3';
 </MdList>
 ```
 
+For a row that performs an action, add `interactive` so it can be reached and activated with the keyboard.
+
+```vue
+<MdListItem interactive headline="Notifications" @click="openNotifications" />
+```
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-list--list" target="_blank" rel="noreferrer">Storybook</a> for list examples.

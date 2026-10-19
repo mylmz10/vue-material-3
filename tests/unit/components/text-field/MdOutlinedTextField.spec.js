@@ -34,6 +34,14 @@ describe('MdOutlinedTextField', () => {
     expect(wrapper.text()).toContain('$');
   });
 
+  it('renders zero as a controlled value', () => {
+    const wrapper = mount(MdOutlinedTextField, {
+      props: { modelValue: 0 },
+    });
+
+    expect(wrapper.get('input').element.value).toBe('0');
+  });
+
   it('hides placeholder until focus when label is present', async () => {
     const wrapper = mount(MdOutlinedTextField, {
       props: {

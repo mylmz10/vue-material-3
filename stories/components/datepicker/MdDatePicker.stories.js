@@ -38,7 +38,8 @@ const createFieldRender = (FieldComponent, args, fallbackValue = SINGLE_DEFAULT,
   setup() {
     const value = ref(normalizeModelValue(args, fallbackValue));
     const boundArgs = computed(() => {
-      const { modelValue, ...rest } = args;
+      const rest = { ...args };
+      delete rest.modelValue;
       return rest;
     });
     const selectedValue = computed(() =>
@@ -71,7 +72,9 @@ const createSurfaceRender = (args, fallbackValue = SINGLE_DEFAULT, minHeight = 5
     const value = ref(normalizeModelValue(args, fallbackValue));
     const open = ref(args.open ?? true);
     const boundArgs = computed(() => {
-      const { modelValue, open: _open, ...rest } = args;
+      const rest = { ...args };
+      delete rest.modelValue;
+      delete rest.open;
       return rest;
     });
 

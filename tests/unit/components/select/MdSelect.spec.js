@@ -102,4 +102,48 @@ describe('select components', () => {
     await wrapper.get('.md-select-option').trigger('click');
     expect(formInput.checkValidity()).toBe(true);
   });
+
+  it('restores a numeric zero value on form reset', async () => {
+    const form = document.createElement('form');
+    document.body.appendChild(form);
+    const wrapper = mount(MdFilledSelect, {
+      attachTo: form,
+      props: { modelValue: 0 },
+      slots: {
+        default: '<MdSelectOption :value="0">None</MdSelectOption><MdSelectOption :value="1">One</MdSelectOption>',
+      },
+      global: { components: { MdSelectOption } },
+    });
+
+    await wrapper.get('.md-filled-select__trigger').trigger('click');
+    await wrapper.findAll('.md-select-option')[1].trigger('click');
+    form.dispatchEvent(new Event('reset'));
+    await nextTick();
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([0]);
+    wrapper.unmount();
+    form.remove();
+  });
+
+  it('restores a numeric zero value for outlined select on form reset', async () => {
+    const form = document.createElement('form');
+    document.body.appendChild(form);
+    const wrapper = mount(MdOutlinedSelect, {
+      attachTo: form,
+      props: { modelValue: 0 },
+      slots: {
+        default: '<MdSelectOption :value="0">None</MdSelectOption><MdSelectOption :value="1">One</MdSelectOption>',
+      },
+      global: { components: { MdSelectOption } },
+    });
+
+    await wrapper.get('.md-outlined-select__trigger').trigger('click');
+    await wrapper.findAll('.md-select-option')[1].trigger('click');
+    form.dispatchEvent(new Event('reset'));
+    await nextTick();
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([0]);
+    wrapper.unmount();
+    form.remove();
+  });
 });

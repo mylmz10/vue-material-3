@@ -31,6 +31,15 @@ describe('visual primitives', () => {
     expect(wrapper.text()).toContain('9');
   });
 
+  it('renders zero as a number badge', () => {
+    const wrapper = mount(MdBadge, {
+      props: { value: 0 },
+    });
+
+    expect(wrapper.classes()).toContain('md-badge--large');
+    expect(wrapper.text()).toContain('0');
+  });
+
   it('renders avatar initials', () => {
     const wrapper = mount(MdAvatar, {
       props: {
@@ -39,6 +48,15 @@ describe('visual primitives', () => {
     });
 
     expect(wrapper.text()).toContain('VM');
+  });
+
+  it('uses initials as image alt text and renders initials only as a fallback', () => {
+    const wrapper = mount(MdAvatar, {
+      props: { image: '/avatar.png', initials: 'VM' },
+    });
+
+    expect(wrapper.get('img').attributes('alt')).toBe('VM');
+    expect(wrapper.findAll('.md-avatar > div')).toHaveLength(0);
   });
 
   it('renders divider with requested tag and orientation', () => {
@@ -61,9 +79,12 @@ describe('visual primitives', () => {
     });
 
     expect(wrapper.get('.md-linear-progress-indicator__indicator').attributes('style')).toContain('35%');
+    expect(wrapper.attributes('role')).toBe('progressbar');
+    expect(wrapper.attributes('aria-valuenow')).toBe('35');
 
     await wrapper.setProps({ indeterminate: true });
     expect(wrapper.classes()).toContain('md-linear-progress-indicator--indeterminate');
+    expect(wrapper.attributes('aria-valuenow')).toBeUndefined();
   });
 
   it('renders circular progress value and indeterminate mode', async () => {

@@ -69,6 +69,7 @@ $theme: tokens.md-comp-text-button-values();
   &.md-button--soft-disabled {
     color: #{theme.value('on-surface')};
 
+    .md-button__label,
     .md-button__trailing-icon {
       opacity: map.get($theme, disabled-label-text-opacity);
     }

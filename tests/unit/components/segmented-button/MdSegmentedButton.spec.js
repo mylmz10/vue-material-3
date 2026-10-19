@@ -35,6 +35,11 @@ describe('segmented button components', () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.findAll('.md-segmented-button')[1].classes()).toContain('md-segmented-button--selected');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1]);
+
+    await wrapper.setProps({ modelValue: 1 });
+    await wrapper.setProps({ modelValue: 0 });
+    expect(wrapper.findAll('.md-segmented-button')[0].classes()).toContain('md-segmented-button--selected');
   });
 
   it('supports multi-select mode', async () => {
@@ -57,5 +62,10 @@ describe('segmented button components', () => {
     const updatedButtons = wrapper.findAll('.md-segmented-button');
     expect(updatedButtons[0].classes()).toContain('md-segmented-button--selected');
     expect(updatedButtons[1].classes()).toContain('md-segmented-button--selected');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[0, 1]]);
+
+    await wrapper.setProps({ modelValue: [1] });
+    expect(wrapper.findAll('.md-segmented-button')[0].classes()).not.toContain('md-segmented-button--selected');
+    expect(wrapper.findAll('.md-segmented-button')[1].classes()).toContain('md-segmented-button--selected');
   });
 });

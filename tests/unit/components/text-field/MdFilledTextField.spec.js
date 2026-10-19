@@ -32,6 +32,14 @@ describe('MdFilledTextField', () => {
     expect(wrapper.text()).toContain('USD');
   });
 
+  it('renders zero as a controlled value', () => {
+    const wrapper = mount(MdFilledTextField, {
+      props: { modelValue: 0 },
+    });
+
+    expect(wrapper.get('input').element.value).toBe('0');
+  });
+
   it('does not render prefix when value is empty', () => {
     const wrapper = mount(MdFilledTextField, {
       props: {

@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { enableAutoUnmount, mount } from '@vue/test-utils';
 import MdDatePicker from '@/components/datepicker/MdDatePicker.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
+
+enableAutoUnmount(afterEach);
 
 describe('MdDatePicker', () => {
   beforeEach(() => {

@@ -76,7 +76,7 @@ function determineRippleSize() {
   maxRadius = hypotenuse + PADDING;
 
   // ensure `_initialSize` is even for unbounded
-  if (unbounded) {
+  if (unbounded.value) {
     _initialSize = _initialSize - (_initialSize % 2);
   }
 

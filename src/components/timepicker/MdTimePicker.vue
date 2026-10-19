@@ -386,7 +386,7 @@ const handleInputKeydown = (segment, event) => {
   }
 };
 
-const closeDialog = (source) => {
+const closeDialog = () => {
   isClosingInternally.value = true;
   dialogOpen.value = false;
   emit('update:open', false);
@@ -398,7 +398,7 @@ const closeDialog = (source) => {
 const cancelSelection = (source) => {
   syncFromModel();
   emit('cancel', { source });
-  closeDialog(source);
+  closeDialog();
 };
 
 const confirmSelection = () => {
@@ -410,7 +410,7 @@ const confirmSelection = () => {
   const modelValue = toModelValue(nextValue);
   emit('update:modelValue', modelValue);
   emit('confirm', modelValue);
-  closeDialog('confirm');
+  closeDialog();
 };
 
 const handleDialogDismiss = (event) => {

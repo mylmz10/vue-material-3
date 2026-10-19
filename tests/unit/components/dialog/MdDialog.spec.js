@@ -45,6 +45,30 @@ describe('MdDialog', () => {
     wrapper.unmount();
   });
 
+  it('stays open when escape closing is disabled', async () => {
+    const wrapper = mount(MdDialog, {
+      props: { modelValue: true, closeOnEscape: false },
+    });
+
+    await wrapper.get('.md-modal').trigger('keydown', { key: 'Escape' });
+
+    expect(wrapper.find('.md-modal').exists()).toBe(true);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it('stays open when backdrop closing is disabled', async () => {
+    const wrapper = mount(MdDialog, {
+      props: { modelValue: true, closeOnBackdropClick: false },
+    });
+
+    await wrapper.get('.md-modal').trigger('click');
+
+    expect(wrapper.find('.md-modal').exists()).toBe(true);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    wrapper.unmount();
+  });
+
   it('traps focus within the dialog when tabbing', async () => {
     const wrapper = mount(MdDialog, {
       attachTo: document.body,
@@ -87,5 +111,21 @@ describe('MdDialog', () => {
 
     document.body.style.overflow = '';
     wrapper.unmount();
+  });
+
+  it('keeps body scrolling locked until every open dialog closes', async () => {
+    document.body.style.overflow = 'scroll';
+    const firstDialog = mount(MdDialog, { props: { modelValue: true } });
+    const secondDialog = mount(MdDialog, { props: { modelValue: true } });
+
+    await firstDialog.setProps({ modelValue: false });
+    expect(document.body.style.overflow).toBe('hidden');
+
+    await secondDialog.setProps({ modelValue: false });
+    expect(document.body.style.overflow).toBe('scroll');
+
+    firstDialog.unmount();
+    secondDialog.unmount();
+    document.body.style.overflow = '';
   });
 });

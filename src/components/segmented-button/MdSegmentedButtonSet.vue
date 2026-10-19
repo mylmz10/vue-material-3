@@ -2,6 +2,7 @@
   <span class="md-segmented-button-set">
     <MdSegmentedButton
       v-for="(segmentedButton, index) in items"
+      :key="segmentedButton.value ?? segmentedButton.label ?? index"
       :label="segmentedButton.label"
       :disabled="segmentedButton.disabled"
       :selected="isSelected(index)"
@@ -36,17 +37,18 @@ const handleClick = ($event, index) => {
     return;
   }
   if (props.multiselect) {
+    let nextSelection;
     if (selectedIndex.value.includes(index)) {
-      selectedIndex.value = selectedIndex.value.filter((v) => v !== index);
+      nextSelection = selectedIndex.value.filter((value) => value !== index);
     } else {
-      selectedIndex.value.push(index);
+      nextSelection = [...selectedIndex.value, index];
     }
+    selectedIndex.value = nextSelection;
+    emit('update:modelValue', nextSelection);
   } else {
-    if (selectedIndex.value === index) {
-      selectedIndex.value = null;
-    } else {
-      selectedIndex.value = index;
-    }
+    const nextSelection = selectedIndex.value === index ? null : index;
+    selectedIndex.value = nextSelection;
+    emit('update:modelValue', nextSelection);
   }
 };
 
@@ -58,13 +60,14 @@ const isSelected = (index) => {
 };
 
 watch(
-  () => props.multiselect,
-  (newValue) => {
-    if (newValue) {
-      selectedIndex.value = props.modelValue !== undefined ? props.modelValue : [];
-    } else {
-      selectedIndex.value = props.modelValue !== undefined ? props.modelValue : null;
+  () => [props.multiselect, props.modelValue],
+  ([multiselect, modelValue]) => {
+    if (multiselect) {
+      selectedIndex.value = Array.isArray(modelValue) ? [...modelValue] : [];
+      return;
     }
+
+    selectedIndex.value = typeof modelValue === 'number' ? modelValue : null;
   },
   { immediate: true }
 );

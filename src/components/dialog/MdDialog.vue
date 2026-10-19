@@ -26,12 +26,14 @@
   </Transition>
 </template>
 
+<script>
+let bodyScrollLockCount = 0;
+let bodyOverflowBeforeLock = '';
+</script>
+
 <script setup>
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
-
-let bodyScrollLockCount = 0;
-let bodyOverflowBeforeLock = '';
 
 const _open = ref(false);
 const dialogEl = ref(null);

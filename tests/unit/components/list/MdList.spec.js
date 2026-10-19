@@ -35,6 +35,19 @@ describe('list components', () => {
     expect(wrapper.emitted('click')).toHaveLength(1);
   });
 
+  it('supports keyboard activation for interactive list items', async () => {
+    const wrapper = mount(MdListItem, {
+      props: { interactive: true, headline: 'Notifications' },
+    });
+
+    expect(wrapper.attributes('role')).toBe('button');
+    expect(wrapper.attributes('tabindex')).toBe('0');
+    await wrapper.trigger('keydown', { key: 'Enter' });
+    await wrapper.trigger('keydown', { key: ' ' });
+
+    expect(wrapper.emitted('click')).toHaveLength(2);
+  });
+
   it('renders list divider as li', () => {
     const wrapper = mount(MdListDivider);
 

@@ -10,7 +10,8 @@ const createFieldRender = (FieldComponent, args, fallbackValue = '07:00') => ({
   setup() {
     const value = ref(args.modelValue ?? fallbackValue);
     const boundArgs = computed(() => {
-      const { modelValue, ...rest } = args;
+      const rest = { ...args };
+      delete rest.modelValue;
       return rest;
     });
 
@@ -37,7 +38,9 @@ const createSurfaceRender = (args, fallbackValue = '07:00', minHeight = 640) => 
     const value = ref(args.modelValue ?? fallbackValue);
     const open = ref(args.open ?? true);
     const boundArgs = computed(() => {
-      const { modelValue, open: _open, ...rest } = args;
+      const rest = { ...args };
+      delete rest.modelValue;
+      delete rest.open;
       return rest;
     });
 
