@@ -182,8 +182,8 @@ const initializeSingle = () => {
 
 const initializeRange = () => {
   const { min, max } = normalizedBounds.value;
-  let nextStart = normalizeSliderValue(props.valueStart ?? min, min);
-  let nextEnd = normalizeSliderValue(props.valueEnd ?? max, max);
+  let nextStart = normalizeSliderValue(props.modelValue?.valueStart ?? props.valueStart ?? min, min);
+  let nextEnd = normalizeSliderValue(props.modelValue?.valueEnd ?? props.valueEnd ?? max, max);
 
   if (nextStart > nextEnd) {
     [nextStart, nextEnd] = [nextEnd, nextStart];
@@ -227,7 +227,7 @@ watch(
 );
 
 watch(
-  () => [props.valueStart, props.valueEnd],
+  () => [props.modelValue?.valueStart ?? props.valueStart, props.modelValue?.valueEnd ?? props.valueEnd],
   ([nextStart, nextEnd]) => {
     if (!props.range) {
       return;
