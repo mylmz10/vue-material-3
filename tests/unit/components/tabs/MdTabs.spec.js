@@ -122,6 +122,14 @@ describe('MdTabs', () => {
     expect(wrapper.attributes('aria-selected')).toBe('true');
   });
 
+  it('sizes the primary tab indicator from its content', () => {
+    const wrapper = mount(MdPrimaryTab, {
+      props: { label: 'Amazing views' },
+    });
+
+    expect(wrapper.find('.md-primary-tab__content > .md-primary-tab__indicator').exists()).toBe(true);
+  });
+
   it('supports secondary tabs inside tabs context', async () => {
     const wrapper = mount(MdTabs, {
       props: {

@@ -27,8 +27,8 @@
       <span class="md-primary-tab__label">
         <slot>{{ label }}</slot>
       </span>
+      <span class="md-primary-tab__indicator"></span>
     </span>
-    <span class="md-primary-tab__indicator"></span>
   </button>
 </template>
 
@@ -175,6 +175,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
     gap: 4px;
     justify-content: center;
     min-height: 100%;
+    position: relative;
   }
 
   &__icon {
@@ -197,15 +198,13 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
     border-radius: map.get($theme, active-indicator-shape);
     bottom: 0;
     height: map.get($theme, active-indicator-height);
-    left: 50%;
-    max-width: 64px;
     opacity: 0;
     position: absolute;
-    width: calc(100% - 24px);
+    left: 0;
+    right: 0;
     transform: scaleX(0);
     transform-origin: center;
     transition: transform 0.2s ease, opacity 0.2s ease;
-    translate: -50% 0;
   }
 
   &--selected {

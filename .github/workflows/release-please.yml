@@ -115,18 +115,41 @@ jobs:
           awk '/^## \[/{section++} section == 1 {print} section == 2 {exit}' CHANGELOG.md > /tmp/release-notes.md
           gh release create "${TAG_NAME}" --target "${GITHUB_SHA}" --title "${TAG_NAME}" --notes-file /tmp/release-notes.md
 
-      - name: Checkout Repo
+      - name: Checkout release commit
         uses: actions/checkout@v4
         if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
         with:
           fetch-depth: 0
-          ref: master
+          ref: ${{ steps.release-meta.outputs.sha || steps.manual-release.outputs.sha }}
 
       - name: Setup Node.js 24.x
         uses: actions/setup-node@v4
         with:
           node-version: 24
         if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
+
+      - name: Verify release source and version
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
+        env:
+          RELEASE_SHA: ${{ steps.release-meta.outputs.sha || steps.manual-release.outputs.sha }}
+          RELEASE_TAG: ${{ steps.release-meta.outputs.tag_name || steps.manual-release.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RELEASE_SHA}" ] || [ -z "${RELEASE_TAG}" ]; then
+            echo "::error::Release SHA and tag are required."
+            exit 1
+          fi
+
+          if [ "$(git rev-parse HEAD)" != "${RELEASE_SHA}" ] || [ "$(git rev-parse --verify "refs/tags/${RELEASE_TAG}^{commit}")" != "${RELEASE_SHA}" ]; then
+            echo "::error::Checked-out source and release tag must match the release SHA."
+            exit 1
+          fi
+
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "${RELEASE_TAG}" != "v${VERSION}" ]; then
+            echo "::error::Package version ${VERSION} does not match release tag ${RELEASE_TAG}."
+            exit 1
+          fi
 
       - name: Ensure npm 11.5.1+
         run: |
@@ -138,6 +161,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
         if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
+
+      - name: Validate release
+        if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.created == 'true' }}
+        run: |
+          npm test
+          npm run lint:check
 
       - name: Publish package on NPM 📦
         id: publish
