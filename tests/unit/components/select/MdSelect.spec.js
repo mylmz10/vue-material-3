@@ -1,11 +1,66 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import { h, nextTick, toRaw } from 'vue';
 import MdFilledSelect from '@/components/select/MdFilledSelect.vue';
 import MdOutlinedSelect from '@/components/select/MdOutlinedSelect.vue';
 import MdSelectOption from '@/components/select/MdSelectOption.vue';
 
 describe('select components', () => {
+  describe.each([
+    ['filled', MdFilledSelect],
+    ['outlined', MdOutlinedSelect],
+  ])('%s object values', (_, component) => {
+    it('selects distinct objects independently and reflects external model changes', async () => {
+      const first = { id: 1 };
+      const second = { id: 2 };
+      const wrapper = mount(component, {
+        props: { modelValue: first },
+        slots: { default: () => [h(MdSelectOption, { value: first, displayText: 'First' }), h(MdSelectOption, { value: second, displayText: 'Second' })] },
+      });
+      await nextTick();
+
+      expect(wrapper.findAll('[role="option"]').map((option) => option.attributes('aria-selected'))).toEqual(['true', 'false']);
+      expect(wrapper.get('[role="combobox"]').text()).toBe('First');
+
+      await wrapper.setProps({ modelValue: second });
+      expect(wrapper.findAll('[role="option"]').map((option) => option.attributes('aria-selected'))).toEqual(['false', 'true']);
+      expect(wrapper.get('[role="combobox"]').text()).toBe('Second');
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+      await wrapper.get('[role="combobox"]').trigger('click');
+      await wrapper.findAll('[role="option"]')[0].trigger('click');
+      expect(toRaw(wrapper.emitted('update:modelValue').at(-1)[0])).toBe(first);
+      expect(wrapper.get('[role="combobox"]').text()).toBe('First');
+      wrapper.unmount();
+    });
+
+    it('does not equate different object identities or their serialized text', async () => {
+      const wrapper = mount(component, {
+        props: { modelValue: { id: 1 } },
+        slots: { default: () => [h(MdSelectOption, { value: { id: 1 }, displayText: 'Another object' }), h(MdSelectOption, { value: '[object Object]', displayText: 'Literal text' })] },
+      });
+      await nextTick();
+
+      expect(wrapper.findAll('[role="option"]').map((option) => option.attributes('aria-selected'))).toEqual(['false', 'false']);
+      wrapper.unmount();
+    });
+
+    it.each([
+      [0, '0'],
+      [false, 'false'],
+      [null, ''],
+    ])('preserves primitive comparison for %j and %j', async (modelValue, value) => {
+      const wrapper = mount(component, {
+        props: { modelValue },
+        slots: { default: () => h(MdSelectOption, { value, displayText: 'Matching value' }) },
+      });
+      await nextTick();
+
+      expect(wrapper.get('[role="option"]').attributes('aria-selected')).toBe('true');
+      wrapper.unmount();
+    });
+  });
+
   it('emits selection events from select option', async () => {
     const wrapper = mount(MdSelectOption, {
       props: {

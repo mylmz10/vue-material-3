@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRaw, watch } from 'vue';
 import MdFilledField from '../field/MdFilledField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdList from '../list/MdList.vue';
@@ -121,6 +121,11 @@ const isPopulated = computed(() => {
 });
 
 const isValueSelected = (value) => {
+  const current = internalValue.value;
+  if ((current !== null && typeof current === 'object') || (value !== null && typeof value === 'object')) {
+    return toRaw(current) === toRaw(value);
+  }
+
   return normalizeValue(internalValue.value) === normalizeValue(value);
 };
 
@@ -437,7 +442,7 @@ const handleFormReset = () => {
 watch(
   () => props.modelValue,
   (newValue) => {
-    if (newValue === undefined || normalizeValue(newValue) === normalizeValue(internalValue.value)) {
+    if (newValue === undefined || isValueSelected(newValue)) {
       return;
     }
 
