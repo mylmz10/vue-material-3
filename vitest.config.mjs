@@ -14,6 +14,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    setupFiles: ['tests/setup/dialog.js'],
     include: ['tests/**/*.spec.{js,ts}'],
     coverage: {
       provider: 'v8',

@@ -35,6 +35,12 @@ import { MdDialog } from 'vue-material-3';
 </MdDialog>
 ```
 
+## Accessibility
+
+Dialogs use native `showModal()`/`close()` so the browser excludes background content while they are open. The header slot supplies the accessible name; use `aria-label` or `aria-labelledby` to provide a more specific name. `initialFocus` targets must be visible and inside the dialog. Tab navigation skips hidden, inert and disabled controls; nested dialogs keep focus within the active dialog. Closing restores the launcher focus unless `restoreFocus` is false. Closing surfaces remain inert during their exit animation.
+
+Browsers must support the [native dialog modal API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal). `trapFocus` controls the custom Tab wrapping; native modal isolation remains active when it is false.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-dialog--detailed-dialog" target="_blank" rel="noreferrer">Storybook</a> for dialog examples.
