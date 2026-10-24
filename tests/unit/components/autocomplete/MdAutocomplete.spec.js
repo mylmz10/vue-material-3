@@ -5,6 +5,29 @@ import MdFilledAutoComplete from '@/components/autocomplete/MdFilledAutoComplete
 import MdOutlinedAutoComplete from '@/components/autocomplete/MdOutlinedAutoComplete.vue';
 
 describe('autocomplete components', () => {
+  describe.each([
+    ['filled', MdFilledAutoComplete],
+    ['outlined', MdOutlinedAutoComplete],
+  ])('%s filtered selection', (_, component) => {
+    it.each(['Apple', 'Banana', 'Papaya'])('emits the clicked suggestion %s after filtering', async (selected) => {
+      const wrapper = mount(component, {
+        props: { items: ['Cherry', 'Apple', 'Banana', 'Papaya'] },
+      });
+
+      await wrapper.get('input').trigger('focus');
+      await wrapper.get('input').setValue('a');
+      const suggestions = wrapper.findAll('.md-list-item');
+      expect(suggestions.map((item) => item.text())).toEqual(['Apple', 'Banana', 'Papaya']);
+
+      await suggestions.find((item) => item.text() === selected).trigger('click');
+
+      expect(wrapper.emitted('update:modelValue')).toEqual([[selected]]);
+      expect(wrapper.get('input').element.value).toBe(selected);
+      expect(wrapper.get('.md-menu').classes()).not.toContain('md-menu--open');
+      wrapper.unmount();
+    });
+  });
+
   it('filters filled autocomplete items and emits search updates', async () => {
     const wrapper = mount(MdFilledAutoComplete, {
       props: {

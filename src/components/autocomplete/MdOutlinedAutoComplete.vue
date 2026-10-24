@@ -50,10 +50,11 @@ const onTextFieldInput = () => {
   emit('update:search', searchText.value);
 };
 const onMenuListItemClick = (index) => {
-  searchText.value = filteredItems.value[index];
+  const selectedItem = filteredItems.value[index];
+  searchText.value = selectedItem;
   menuOpened.value = false;
   isPristine.value = true;
-  emit('update:modelValue', filteredItems.value[index]);
+  emit('update:modelValue', selectedItem);
 };
 
 watch(
