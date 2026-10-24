@@ -26,6 +26,10 @@ import { MdFilledTextField, MdOutlinedTextField } from 'vue-material-3';
 <MdOutlinedTextField v-model="email" label="Email" />
 ```
 
+## Accessibility
+
+The visible label names the native input, and supporting/error text is linked as its description. Input IDs are generated when omitted. Consumer `id`, ARIA and other control attributes are forwarded to the input; `class` and `style` stay on the wrapper. An external `aria-describedby` is combined with the field description. The same forwarding applies to autocomplete and date/time picker fields.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-textfields--filled-text-field" target="_blank" rel="noreferrer">Storybook</a> for text field variants.

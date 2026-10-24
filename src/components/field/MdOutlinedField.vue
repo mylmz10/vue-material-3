@@ -13,6 +13,8 @@ defineProps({
   disabled: { type: Boolean },
   error: { type: Boolean },
   label: { type: String },
+  inputId: { type: String },
+  supportingTextId: { type: String },
   populated: { type: Boolean },
   required: { type: Boolean },
   focused: { type: Boolean },

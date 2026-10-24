@@ -1,7 +1,7 @@
 <template>
-  <MdMenu class="md-autocomplete" v-model="menuOpened">
+  <MdMenu class="md-autocomplete" :class="$attrs.class" :style="$attrs.style" v-model="menuOpened">
     <template v-slot:activator>
-      <MdFilledTextField v-model="searchText" :label="props.label" @focus="onTextFieldFocus" @input="onTextFieldInput"></MdFilledTextField>
+      <MdFilledTextField v-bind="getControlAttrs($attrs)" v-model="searchText" :label="props.label" @focus="onTextFieldFocus" @input="onTextFieldInput"></MdFilledTextField>
     </template>
 
     <MdList>
@@ -21,6 +21,10 @@ import MdFilledTextField from '../text-field/MdFilledTextField.vue';
 import MdMenu from '../menu/MdMenu.vue';
 import MdList from '../list/MdList.vue';
 import MdListItem from '../list/MdListItem.vue';
+
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({ modelValue: { type: String, default: null }, label: { type: String, default: null }, items: { type: Array, default: () => [] } });
 const emit = defineEmits(['update:modelValue', 'update:search']);

@@ -1,5 +1,5 @@
 <template>
-  <span class="md-text-field">
+  <span class="md-text-field" :class="$attrs.class" :style="$attrs.style">
     <span class="md-text-field__input-wrapper">
       <span v-if="hasPrefix" ref="prefixEl" class="md-text-field__affix md-text-field__affix--prefix">
         <slot name="prefix">{{ prefix }}</slot>
@@ -7,6 +7,7 @@
 
       <input
         ref="inputEl"
+        v-bind="getControlAttrs($attrs)"
         class="md-text-field__input"
         :autocomplete="autocomplete || undefined"
         :autofocus="autofocus"
@@ -46,6 +47,9 @@
 
 <script setup>
 import { computed, ref, useSlots } from 'vue';
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 
 defineEmits(['change', 'input', 'select', 'focus', 'blur', 'keyup', 'keydown', 'invalid']);
 

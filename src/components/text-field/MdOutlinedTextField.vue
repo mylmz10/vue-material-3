@@ -1,12 +1,24 @@
 <template>
-  <span class="md-outlined-text-field" @click="onClick">
-    <MdOutlinedField :disabled="disabled" :label="label" :populated="!!inputValue" :error="error" :required="required" :style="{ '--md-field-label-offset': `${labelOffsetWithBase}px` }">
+  <span class="md-outlined-text-field" :class="$attrs.class" :style="$attrs.style" @click="onClick">
+    <MdOutlinedField
+      :input-id="$attrs.id || inputId"
+      :supporting-text-id="supportingTextId"
+      :disabled="disabled"
+      :label="label"
+      :populated="!!inputValue"
+      :error="error"
+      :required="required"
+      :style="{ '--md-field-label-offset': `${labelOffsetWithBase}px` }"
+    >
       <template v-if="slots.start" #start>
         <slot name="start" />
       </template>
 
       <MdTextFieldBase
         ref="textFieldEl"
+        v-bind="getControlAttrs($attrs)"
+        :id="$attrs.id || inputId"
+        :aria-describedby="[$attrs['aria-describedby'], hasSupportingText ? supportingTextId : null].filter(Boolean).join(' ') || undefined"
         :autocomplete="autocomplete"
         :autofocus="autofocus"
         :disabled="disabled"
@@ -27,7 +39,7 @@
         :suffix="suffix"
         :type="type"
         :value="inputValue"
-        :aria-invalid="ariaInvalid"
+        :aria-invalid="ariaInvalid || $attrs['aria-invalid']"
         @input="onTextFieldInput"
         @change="onTextFieldChange"
         @focus="onTextFieldFocus"
@@ -60,11 +72,16 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue';
 import MdTextFieldBase from './MdTextFieldBase.vue';
 import MdOutlinedField from '../field/MdOutlinedField.vue';
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 
 const slots = useSlots();
+const inputId = `md-text-field-${useId()}`;
+const supportingTextId = `${inputId}-supporting`;
 
 const props = defineProps({
   autocomplete: { type: String, default: '' },
@@ -118,6 +135,7 @@ const resolvedSupportingText = computed(() => {
 
   return props.supportingText;
 });
+const hasSupportingText = computed(() => !!(resolvedSupportingText.value || props.supportingTextEnd || slots['supporting-text'] || slots['supporting-text-end']));
 const ariaInvalid = computed(() => ((props.error || props.invalid) ? 'true' : ''));
 const showPrefix = computed(() => hasInputValue.value || isInputFocused.value || props.focused);
 const resolvedPlaceholder = computed(() => {
