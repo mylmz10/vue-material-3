@@ -1,11 +1,13 @@
 <template>
   <Transition>
     <dialog
-      v-if="_open"
+      v-if="_open || keepMounted"
       ref="dialogEl"
       class="md-modal"
       :class="[dialogClass, { 'md-modal--open': _open }]"
       v-bind="$attrs"
+      :inert="!_open || undefined"
+      :aria-hidden="!_open ? 'true' : $attrs['aria-hidden']"
       aria-modal="true"
       :aria-labelledby="$attrs['aria-labelledby'] || (!$attrs['aria-label'] && slots.header ? headerId : undefined)"
       @close="onNativeClose"
@@ -48,6 +50,7 @@ const containerEl = ref(null);
 const previousFocusedElement = ref(null);
 
 const props = defineProps({
+  keepMounted: { type: Boolean, default: false },
   modelValue: {
     type: Boolean,
     default: false,
@@ -194,6 +197,11 @@ const openDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) =
 const closeNativeDialog = () => {
   const dialog = dialogEl.value;
   if (!dialog) return;
+  // Retained descendants must not leave a modal open behind a closed surface.
+  if (props.keepMounted)
+    Array.from(dialog.querySelectorAll('dialog[open]'))
+      .reverse()
+      .forEach((child) => child.close());
   // Keep the fading surface out of focus navigation and the accessibility tree.
   dialog.setAttribute('inert', '');
   dialog.setAttribute('aria-hidden', 'true');

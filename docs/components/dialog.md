@@ -41,6 +41,8 @@ Dialogs use native `showModal()`/`close()` so the browser excludes background co
 
 Browsers must support the [native dialog modal API](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal). `trapFocus` controls the custom Tab wrapping; native modal isolation remains active when it is false.
 
+Set `keepMounted` to retain slot components and their state while closed. Closed retained dialogs stay hidden and inert.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-dialog--detailed-dialog" target="_blank" rel="noreferrer">Storybook</a> for dialog examples.

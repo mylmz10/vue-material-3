@@ -42,6 +42,19 @@ import { MdNavigationBar, MdNavigationDrawer, MdNavigationTab } from 'vue-materi
 <MdNavigationBar v-model="activeIndex" :items="items" />
 ```
 
+## Modal drawer
+
+```vue
+<MdNavigationDrawer :opened="drawerOpen" modal aria-label="Main navigation" @change="drawerOpen = $event">
+  <nav aria-label="Destinations">
+    <a href="/inbox">Inbox</a>
+    <a href="/sent">Sent</a>
+  </nav>
+</MdNavigationDrawer>
+```
+
+Modal drawers use the shared native dialog behavior: focus enters the drawer, Tab stays inside, Escape or the scrim closes it, and focus returns to the launcher. The default accessible name is “Navigation”; provide `aria-label` or `aria-labelledby` when a more specific name is needed. Use links or buttons for keyboard-operable destinations. Closing retains slot components and their state. Changing the `modal` variant replaces the root and remounts slot content. Standard drawers remain nonmodal.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-navigationbar--navigation-bar" target="_blank" rel="noreferrer">Storybook</a> for navigation examples.
