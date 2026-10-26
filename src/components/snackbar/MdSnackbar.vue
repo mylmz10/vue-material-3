@@ -1,7 +1,8 @@
 <template>
+  <div class="md-snackbar__announcement" role="status" aria-live="polite" aria-atomic="true">{{ announcement }}</div>
   <Transition>
-    <div v-if="modelValue" class="md-snackbar" :class="{ 'md-snackbar--multiline': multiLine, 'md-snackbar--longer-action': longerAction }">
-      <div class="md-snackbar__supporting-text">
+    <div v-if="modelValue" v-bind="$attrs" class="md-snackbar" :class="{ 'md-snackbar--multiline': multiLine, 'md-snackbar--longer-action': longerAction }">
+      <div ref="messageEl" class="md-snackbar__supporting-text">
         <slot>{{ text }}</slot>
       </div>
       <button v-if="actionText" type="button" class="md-snackbar__action-text" @click="onActionClick">
@@ -17,8 +18,10 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, watch } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   timeout: {
@@ -46,6 +49,26 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue', 'action']);
+
+const messageEl = ref(null);
+const announcement = ref('');
+let messageObserver;
+const updateAnnouncement = () => {
+  announcement.value = props.modelValue ? messageEl.value?.textContent?.trim() || '' : '';
+};
+watch(
+  [messageEl, () => props.modelValue],
+  ([element]) => {
+    messageObserver?.disconnect();
+    if (element) {
+      messageObserver = new MutationObserver(updateAnnouncement);
+      messageObserver.observe(element, { childList: true, characterData: true, subtree: true });
+    }
+    if (!props.modelValue) announcement.value = '';
+    else nextTick(updateAnnouncement);
+  },
+  { flush: 'post' }
+);
 
 const close = () => {
   emit('update:modelValue', false);
@@ -75,13 +98,10 @@ const scheduleClose = () => {
   }, props.timeout);
 };
 
-watch(
-  () => [props.modelValue, props.timeout],
-  scheduleClose,
-  { immediate: true }
-);
+watch(() => [props.modelValue, props.timeout], scheduleClose, { immediate: true });
 
 onBeforeUnmount(() => {
+  messageObserver?.disconnect();
   clearCloseTimer();
 });
 </script>
@@ -94,6 +114,17 @@ onBeforeUnmount(() => {
 @use '../elevation/elevation';
 
 $theme: tokens.md-comp-snackbar-values();
+
+.md-snackbar__announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 .md-snackbar {
   position: fixed;

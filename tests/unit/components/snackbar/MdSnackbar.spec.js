@@ -1,10 +1,53 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { h, ref } from 'vue';
+import { flushPromises, mount } from '@vue/test-utils';
 import MdSnackbar from '@/components/snackbar/MdSnackbar.vue';
 
 describe('MdSnackbar', () => {
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it('keeps a persistent polite message-only live region without moving focus', async () => {
+    const launcher = document.createElement('button');
+    document.body.append(launcher);
+    launcher.focus();
+    const wrapper = mount(MdSnackbar, { attachTo: document.body, props: { modelValue: false, text: 'Saved', timeout: 0, actionText: 'Undo' } });
+    const region = wrapper.get('[role="status"]').element;
+    expect(region.textContent).toBe('');
+    expect(region.getAttribute('aria-live')).toBe('polite');
+    expect(region.getAttribute('aria-atomic')).toBe('true');
+    await wrapper.setProps({ modelValue: true });
+    await flushPromises();
+    expect(wrapper.get('[role="status"]').element).toBe(region);
+    expect(region.textContent).toBe('Saved');
+    expect(region.querySelector('button')).toBeNull();
+    expect(document.activeElement).toBe(launcher);
+    await wrapper.setProps({ actionText: 'Retry' });
+    expect(region.textContent).toBe('Saved');
+    await wrapper.setProps({ text: 'Updated' });
+    await flushPromises();
+    expect(region.textContent).toBe('Updated');
+    await wrapper.setProps({ modelValue: false });
+    await flushPromises();
+    expect(region.textContent).toBe('');
+    wrapper.unmount();
+    launcher.remove();
+  });
+
+  it('announces initially open slot content without mounting it twice', async () => {
+    const message = ref('Custom message');
+    const setup = vi.fn(() => () => h('span', { id: 'slot-message' }, message.value));
+    const Message = { setup };
+    const wrapper = mount(MdSnackbar, { attachTo: document.body, props: { modelValue: true, timeout: 0 }, slots: { default: () => h(Message) } });
+    await flushPromises();
+    expect(setup).toHaveBeenCalledOnce();
+    expect(document.querySelectorAll('#slot-message')).toHaveLength(1);
+    expect(wrapper.get('[role="status"]').text()).toBe('Custom message');
+    message.value = 'Changed slot message';
+    await flushPromises();
+    expect(wrapper.get('[role="status"]').text()).toBe('Changed slot message');
+    wrapper.unmount();
   });
 
   it('emits action when action button is clicked', async () => {
