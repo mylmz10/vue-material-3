@@ -99,7 +99,7 @@ const props = defineProps({
   maxlength: { type: Number, default: undefined },
   min: { type: String, default: '' },
   minlength: { type: Number, default: undefined },
-  modelValue: { type: [String, Number], default: '' },
+  modelValue: { type: [String, Number], default: undefined },
   name: { type: String, default: '' },
   pattern: { type: String, default: '' },
   placeholder: { type: String, default: '' },
@@ -119,7 +119,7 @@ const emit = defineEmits(['focus', 'blur', 'input', 'change', 'invalid', 'select
 
 const normalizeValue = (value) => (value === null || value === undefined ? '' : `${value}`);
 
-const resolveInitialValue = () => (props.modelValue === 0 ? props.modelValue : props.modelValue || props.value);
+const resolveInitialValue = () => (props.modelValue !== undefined ? props.modelValue : props.value);
 const inputValue = ref(normalizeValue(resolveInitialValue()));
 const textFieldEl = ref(null);
 const initialValue = ref(inputValue.value);
@@ -151,15 +151,15 @@ const labelOffsetWithBase = computed(() => labelOffset.value + 8);
 
 watch(
   () => props.modelValue,
-  (value) => {
-    inputValue.value = normalizeValue(value);
+  () => {
+    inputValue.value = normalizeValue(resolveInitialValue());
   }
 );
 
 watch(
   () => props.value,
   (value) => {
-    if (props.modelValue !== undefined && props.modelValue !== null && props.modelValue !== '') {
+    if (props.modelValue !== undefined) {
       return;
     }
 

@@ -26,6 +26,10 @@ import { MdFilledTextField, MdOutlinedTextField } from 'vue-material-3';
 <MdOutlinedTextField v-model="email" label="Email" />
 ```
 
+## Value precedence
+
+A supplied `v-model` takes precedence over the legacy `value` prop, including `''`, `0`, and `null` (displayed as empty). When the model is absent (`undefined`), `value` initializes the input and remains reactive. Form reset restores the initial resolved value unless the reset event is canceled.
+
 ## Accessibility
 
 The visible label names the native input, and supporting/error text is linked as its description. Input IDs are generated when omitted. Consumer `id`, ARIA and other control attributes are forwarded to the input; `class` and `style` stay on the wrapper. An external `aria-describedby` is combined with the field description. The same forwarding applies to autocomplete and date/time picker fields.
