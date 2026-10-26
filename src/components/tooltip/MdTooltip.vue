@@ -3,7 +3,6 @@
     <span
       ref="triggerEl"
       class="md-tooltip__trigger"
-      :aria-describedby="tooltipId"
       @mouseenter="handleTriggerMouseEnter"
       @mouseleave="handleTriggerMouseLeave"
       @focusin="handleTriggerFocusIn"
@@ -63,7 +62,7 @@ let tooltipInstanceIndex = 0;
 </script>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots, watch } from 'vue';
 
 const CLOSE_DELAY_MS = 1500;
 const LONG_PRESS_DELAY_MS = 500;
@@ -139,6 +138,28 @@ const ignoreNextClick = ref(false);
 
 const instanceId = `md-tooltip-${++tooltipInstanceIndex}`;
 const tooltipId = computed(() => props.id || `${instanceId}-surface`);
+
+const describedTriggers = new Map();
+const clearTriggerDescriptions = () => {
+  for (const [element, id] of describedTriggers) {
+    const ids = (element.getAttribute('aria-describedby') || '').split(/\s+/).filter((token) => token && token !== id);
+    if (ids.length) element.setAttribute('aria-describedby', ids.join(' '));
+    else element.removeAttribute('aria-describedby');
+  }
+  describedTriggers.clear();
+};
+const syncTriggerDescriptions = () => {
+  clearTriggerDescriptions();
+  if (!isOpen.value) return;
+  const targets = triggerEl.value?.querySelectorAll('button, a[href], input, textarea, select, [tabindex], [contenteditable="true"]') || [];
+  for (const element of targets) {
+    const ids = new Set((element.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean));
+    if (ids.has(tooltipId.value)) continue;
+    ids.add(tooltipId.value);
+    element.setAttribute('aria-describedby', [...ids].join(' '));
+    describedTriggers.set(element, tooltipId.value);
+  }
+};
 
 let closeTimer = null;
 let longPressTimer = null;
@@ -486,6 +507,7 @@ const handleTriggerMouseLeave = () => {
 };
 
 const handleTriggerFocusIn = () => {
+  syncTriggerDescriptions();
   hoveredTrigger.value = true;
   clearCloseTimer();
   if (!isPersistentRich.value) {
@@ -589,6 +611,7 @@ const handleActionClick = () => {
 };
 
 onMounted(() => {
+  syncTriggerDescriptions();
   getTooltipRegistry().set(instanceId, closeTooltip);
   if (isOpen.value) closeOtherTooltips();
 });
@@ -628,7 +651,10 @@ watch(
   { immediate: true }
 );
 
+onUpdated(syncTriggerDescriptions);
+
 onBeforeUnmount(() => {
+  clearTriggerDescriptions();
   clearCloseTimer();
   clearLongPressTimer();
   removeGlobalListeners();

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { h, nextTick } from 'vue';
+import { computeAccessibleDescription } from 'dom-accessibility-api';
+import { h, nextTick, ref } from 'vue';
 import { enableAutoUnmount, mount } from '@vue/test-utils';
 import MdTooltip from '@/components/tooltip/MdTooltip.vue';
 
@@ -28,6 +29,50 @@ afterEach(() => {
 });
 
 describe('MdTooltip', () => {
+  it('describes the actual trigger and preserves consumer description changes', async () => {
+    const wrapper = mountTooltip({ id: 'tip-description', text: 'Helpful detail' }, {
+      default: '<span id="existing-description">Existing detail</span><button aria-describedby="existing-description">Trigger</button>',
+    });
+    const button = wrapper.get('button');
+    expect(button.attributes('aria-describedby')).toBe('existing-description');
+    button.element.focus();
+    await flushTooltipOpen();
+    expect(button.attributes('aria-describedby')).toBe('existing-description tip-description');
+    expect(computeAccessibleDescription(button.element)).toBe('Existing detail Helpful detail');
+    expect(wrapper.get('.md-tooltip__trigger').attributes('aria-describedby')).toBeUndefined();
+    button.element.setAttribute('aria-describedby', 'existing-description extra tip-description');
+    await wrapper.setProps({ id: 'replacement-description' });
+    expect(button.attributes('aria-describedby')).toBe('existing-description extra replacement-description');
+    await wrapper.setProps({ modelValue: false });
+    expect(button.attributes('aria-describedby')).toBe('existing-description extra');
+    expect(document.getElementById('replacement-description')).toBeNull();
+  });
+
+  it('relinks replaced slot controls and cleans up on unmount', async () => {
+    const key = ref('first');
+    const wrapper = mountTooltip({ modelValue: true, id: 'dynamic-tip', text: 'Detail' }, {
+      default: () => h('button', { key: key.value, 'aria-describedby': 'existing' }, key.value),
+    });
+    await flushTooltipOpen();
+    const first = wrapper.get('button').element;
+    key.value = 'second';
+    await flushTooltipOpen();
+    expect(first.getAttribute('aria-describedby')).toBe('existing');
+    const second = wrapper.get('button').element;
+    expect(second.getAttribute('aria-describedby')).toBe('existing dynamic-tip');
+    wrapper.unmount();
+    expect(second.getAttribute('aria-describedby')).toBe('existing');
+  });
+
+  it('preserves a tooltip ID token that was already supplied by the consumer', async () => {
+    const wrapper = mountTooltip({ id: 'consumer-tip', modelValue: true, text: 'Detail' }, {
+      default: '<button aria-describedby="help consumer-tip">Trigger</button>',
+    });
+    await flushTooltipOpen();
+    await wrapper.setProps({ modelValue: false });
+    expect(wrapper.get('button').attributes('aria-describedby')).toBe('help consumer-tip');
+  });
+
   it('opens on hover and closes 1.5 seconds after leaving the target', async () => {
     vi.useFakeTimers();
     const wrapper = mountTooltip({ text: 'Add to list' });
@@ -69,11 +114,13 @@ describe('MdTooltip', () => {
     second.unmount();
   });
 
-  it('assigns distinct default IDs to independent instances', () => {
-    const first = mountTooltip({ text: 'First tooltip' });
-    const second = mountTooltip({ text: 'Second tooltip' });
-    const firstId = first.get('.md-tooltip__trigger').attributes('aria-describedby');
-    const secondId = second.get('.md-tooltip__trigger').attributes('aria-describedby');
+  it('assigns distinct default IDs to independent instances', async () => {
+    const first = mountTooltip({ text: 'First tooltip', modelValue: true });
+    await flushTooltipOpen();
+    const firstId = first.get('button').attributes('aria-describedby');
+    const second = mountTooltip({ text: 'Second tooltip', modelValue: true });
+    await flushTooltipOpen();
+    const secondId = second.get('button').attributes('aria-describedby');
     expect(firstId).toBeTruthy();
     expect(secondId).not.toBe(firstId);
   });
@@ -162,7 +209,7 @@ describe('MdTooltip', () => {
 
     await flushTooltipOpen();
 
-    expect(wrapper.get('.md-tooltip__trigger').attributes('aria-describedby')).toBe('custom-tooltip');
+    expect(wrapper.get('button').attributes('aria-describedby')).toBe('custom-tooltip');
     expect(document.body.querySelector('#custom-tooltip')?.textContent).toContain('Controlled tooltip');
 
     await wrapper.setProps({ modelValue: false });
