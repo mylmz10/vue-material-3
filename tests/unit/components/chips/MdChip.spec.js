@@ -49,6 +49,15 @@ describe('MdChip', () => {
     expect(wrapper.emitted('remove')).toEqual([['alpha']]);
   });
 
+  it('does not render a nested remove button for linked chips', () => {
+    const wrapper = mount(MdChip, {
+      props: { variant: 'input', href: '/example', removable: true, label: 'Input' },
+    });
+
+    expect(wrapper.element.tagName).toBe('A');
+    expect(wrapper.find('.md-chip__remove').exists()).toBe(false);
+  });
+
   it('ignores elevated style for input variant', () => {
     const wrapper = mount(MdChip, {
       props: {

@@ -1,17 +1,22 @@
 <template>
   <Transition>
     <dialog
-      v-if="_open"
+      v-if="_open || keepMounted"
       ref="dialogEl"
       class="md-modal"
       :class="[dialogClass, { 'md-modal--open': _open }]"
-      open
+      v-bind="$attrs"
+      :inert="!_open || undefined"
+      :aria-hidden="!_open ? 'true' : $attrs['aria-hidden']"
+      aria-modal="true"
+      :aria-labelledby="$attrs['aria-labelledby'] || (!$attrs['aria-label'] && slots.header ? headerId : undefined)"
+      @close="onNativeClose"
       @cancel.prevent="onCancel"
       @click="handleBackdropClick"
       @keydown="onDialogKeydown"
     >
       <div ref="containerEl" class="md-modal__container" :class="containerClass" tabindex="-1">
-        <div class="md-modal__header" :class="headerClass">
+        <div :id="headerId" class="md-modal__header" :class="headerClass">
           <slot name="header" />
         </div>
         <div class="md-modal__content" :class="contentClass">
@@ -26,18 +31,26 @@
   </Transition>
 </template>
 
+<script>
+let bodyScrollLockCount = 0;
+let bodyOverflowBeforeLock = '';
+</script>
+
 <script setup>
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue';
 
-let bodyScrollLockCount = 0;
+defineOptions({ inheritAttrs: false });
 
+const slots = useSlots();
+const headerId = `md-dialog-${useId()}-header`;
 const _open = ref(false);
 const dialogEl = ref(null);
 const containerEl = ref(null);
 const previousFocusedElement = ref(null);
 
 const props = defineProps({
+  keepMounted: { type: Boolean, default: false },
   modelValue: {
     type: Boolean,
     default: false,
@@ -95,6 +108,7 @@ const lockBodyScroll = () => {
 
   bodyScrollLockCount += 1;
   if (bodyScrollLockCount === 1) {
+    bodyOverflowBeforeLock = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
   }
 };
@@ -106,16 +120,26 @@ const unlockBodyScroll = () => {
 
   bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
   if (bodyScrollLockCount === 0) {
-    document.body.style.overflow = '';
+    document.body.style.overflow = bodyOverflowBeforeLock;
+    bodyOverflowBeforeLock = '';
   }
 };
 
-const getFocusableElements = () => {
-  if (!containerEl.value) {
-    return [];
+const isVisibleTarget = (element) => {
+  if (!containerEl.value?.contains(element) || element.closest('dialog') !== dialogEl.value || element.matches(':disabled, input[type="hidden"]') || element.closest('[hidden], [inert]')) return false;
+  for (let current = element; current; current = current.parentElement) {
+    const style = getComputedStyle(current);
+    if (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse') return false;
+    if (current === dialogEl.value) break;
   }
+  return true;
+};
 
-  return Array.from(containerEl.value.querySelectorAll(focusableSelector)).filter((element) => !element.hasAttribute('disabled'));
+const getFocusableElements = () => {
+  if (!containerEl.value) return [];
+  return Array.from(containerEl.value.querySelectorAll(focusableSelector)).filter(
+    (element) => (element.tabIndex >= 0 || (element.matches('[contenteditable="true"]') && !element.hasAttribute('tabindex'))) && isVisibleTarget(element)
+  );
 };
 
 const resolveInitialFocusTarget = () => {
@@ -125,14 +149,14 @@ const resolveInitialFocusTarget = () => {
 
   if (typeof props.initialFocus === 'string' && props.initialFocus) {
     const element = containerEl.value.querySelector(props.initialFocus);
-    if (element) {
+    if (element && isVisibleTarget(element)) {
       return element;
     }
   }
 
   if (typeof props.initialFocus === 'function') {
     const element = props.initialFocus(containerEl.value);
-    if (element) {
+    if (element && isVisibleTarget(element)) {
       return element;
     }
   }
@@ -165,9 +189,33 @@ const openDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) =
   }
 
   nextTick(() => {
+    if (!_open.value || !dialogEl.value) return;
+    dialogEl.value.showModal();
     focusInitialElement();
     emit('opened', { source });
   });
+};
+
+const closeNativeDialog = () => {
+  const dialog = dialogEl.value;
+  if (!dialog) return;
+  // Retained descendants must not leave a modal open behind a closed surface.
+  if (props.keepMounted)
+    Array.from(dialog.querySelectorAll('dialog[open]'))
+      .reverse()
+      .forEach((child) => child.close());
+  // Keep the fading surface out of focus navigation and the accessibility tree.
+  dialog.setAttribute('inert', '');
+  dialog.setAttribute('aria-hidden', 'true');
+  const launcher = previousFocusedElement.value;
+  // Native close also restores focus; suppress that when the consumer opts out.
+  const suppressRestore = !props.restoreFocus && launcher && !launcher.hasAttribute('inert');
+  if (suppressRestore) launcher.setAttribute('inert', '');
+  try {
+    dialog.close();
+  } finally {
+    if (suppressRestore) launcher.removeAttribute('inert');
+  }
 };
 
 const closeDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) => {
@@ -177,6 +225,7 @@ const closeDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) 
 
   emit('close', { source });
   _open.value = false;
+  closeNativeDialog();
   unlockBodyScroll();
 
   if (emitModelUpdate) {
@@ -185,7 +234,7 @@ const closeDialog = ({ source = 'programmatic', emitModelUpdate = false } = {}) 
 
   nextTick(() => {
     if (props.restoreFocus) {
-      previousFocusedElement.value?.focus?.();
+      if (previousFocusedElement.value?.isConnected) previousFocusedElement.value.focus?.();
     }
     emit('closed', { source });
   });
@@ -204,8 +253,16 @@ const requestClose = (source) => {
   closeDialog({ source, emitModelUpdate: true });
 };
 
-const onCancel = () => {
+const onCancel = (event) => {
+  if (event.target !== dialogEl.value) return;
+  event.stopPropagation();
   requestClose('escape');
+};
+
+const onNativeClose = (event) => {
+  if (event.target !== dialogEl.value || event.target.open) return;
+  if (!props.restoreFocus && document.activeElement === previousFocusedElement.value) previousFocusedElement.value.blur();
+  closeDialog({ source: 'native', emitModelUpdate: true });
 };
 
 const handleBackdropClick = (event) => {
@@ -242,8 +299,10 @@ const trapFocus = (event) => {
 };
 
 const onDialogKeydown = (event) => {
+  if (event.target.closest('dialog') !== dialogEl.value || event.defaultPrevented) return;
   if (event.key === 'Escape') {
     event.preventDefault();
+    event.stopPropagation();
     requestClose('escape');
     return;
   }
@@ -267,6 +326,8 @@ watch(
 
 onBeforeUnmount(() => {
   if (_open.value) {
+    _open.value = false;
+    closeNativeDialog();
     unlockBodyScroll();
   }
 });
@@ -323,6 +384,10 @@ $sys-color: theme.values();
   --surface-tint-layer-color: #{map.get($sys-color, surface-tint)};
 
   $this: &;
+
+  &::backdrop {
+    background: transparent;
+  }
 
   &:before {
     content: '';

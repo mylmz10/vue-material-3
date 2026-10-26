@@ -63,4 +63,5 @@ describe('button variants', () => {
     expect(wrapper.classes()).toContain('md-text-button');
     expect(wrapper.text()).toContain('Learn more');
   });
+
 });

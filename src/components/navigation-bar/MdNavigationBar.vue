@@ -1,7 +1,7 @@
 <template>
   <div class="md-navigation-bar">
     <MdElevationOverlay />
-    <MdNavigationTab v-for="(item, index) in items" :selected="modelValue === index" :label="item.label" :active-icon="item.activeIcon" @click="onItemClick($event, item, index)" />
+    <MdNavigationTab v-for="(item, index) in items" :key="index" :selected="modelValue === index" :label="item.label" :active-icon="item.activeIcon" @click="onItemClick($event, item, index)" />
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
 
 const emit = defineEmits(['update:modelValue']);
 
-const props = defineProps({
+defineProps({
   items: {
     type: Array,
     default: () => [],

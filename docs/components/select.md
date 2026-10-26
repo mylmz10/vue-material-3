@@ -38,6 +38,10 @@ import { MdFilledSelect, MdOutlinedSelect, MdSelectOption } from 'vue-material-3
 </MdOutlinedSelect>
 ```
 
+## Object values
+
+Object-valued options are matched by reference identity, including reactive wrappers of the same object. Keep the model and option values tied to the same objects; a newly created object with identical properties is a different value. Primitive values retain their existing string-normalized comparison. Object equality is separate from native form serialization, which still converts the value to a string; use a primitive ID for form submissions that need a stable identifier.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-select--filled-select" target="_blank" rel="noreferrer">Storybook</a> for select variants.

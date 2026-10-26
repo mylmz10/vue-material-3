@@ -1,8 +1,9 @@
 <template>
-  <div ref="rootEl" class="md-date-picker-field" :class="`md-date-picker-field--${pickerVariant}`" @keydown="handleRootKeydown">
+  <div ref="rootEl" class="md-date-picker-field" :style="$attrs.style" :class="[`md-date-picker-field--${pickerVariant}`, $attrs.class]" @keydown="handleRootKeydown">
     <div class="md-date-picker-field__control" @click="handleWrapperClick">
       <component
         :is="fieldComponent"
+        v-bind="getControlAttrs($attrs)"
         v-model="inputValue"
         :label="resolvedLabel"
         :supporting-text="resolvedSupportingText"
@@ -77,6 +78,10 @@ import {
   parseDisplayValue,
   parseRangeDisplayValue,
 } from './datePickerUtils';
+
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   disabled: {

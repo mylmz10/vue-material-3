@@ -71,12 +71,14 @@ const handleInput = () => {
 };
 
 const handleTrailingClick = () => {
-  if (inputValue.value) {
+  const action = resolvedTrailingIcon.value;
+
+  if (action === 'close') {
     inputValue.value = '';
     emit('update:modelValue', '');
   }
 
-  emit('trailingClick', resolvedTrailingIcon.value);
+  emit('trailingClick', action);
 };
 </script>
 
@@ -84,10 +86,8 @@ const handleTrailingClick = () => {
 @use 'sass:map';
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
-@use '../elevation/elevation';
 
 $theme: tokens.md-comp-search-bar-values();
-$sys-color: theme.values();
 
 .search-wrapper {
   width: 100%;
@@ -109,7 +109,6 @@ $sys-color: theme.values();
   padding-inline: 4px;
   background: var(--md-search-container-color);
   border-radius: map.get($theme, container-shape);
-  box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($sys-color, shadow));
   overflow: hidden;
 }
 

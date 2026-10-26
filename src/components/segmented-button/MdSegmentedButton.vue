@@ -1,5 +1,6 @@
 <template>
   <button
+    type="button"
     class="md-segmented-button"
     :class="{ 'md-segmented-button--selected': selected, 'md-segmented-button--disabled': disabled }"
     v-bind:disabled="disabled"
@@ -17,7 +18,7 @@
 import MdRipple from '../ripple/MdRipple.vue';
 import MdIcon from '../icon/MdIcon.vue';
 
-const props = defineProps({
+defineProps({
   disabled: {
     type: Boolean,
   },

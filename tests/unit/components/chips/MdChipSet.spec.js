@@ -1,10 +1,43 @@
-import { h } from 'vue';
+import { h, ref, nextTick } from 'vue';
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdChipSet from '@/components/chips/MdChipSet.vue';
 import MdFilterChip from '@/components/chips/MdFilterChip.vue';
 
 describe('MdChipSet', () => {
+  it('keeps one enabled tab stop as children are disabled, removed and re-enabled', async () => {
+    const disabled = ref(false);
+    const removed = ref(false);
+    const allDisabled = ref(false);
+    const wrapper = mount(MdChipSet, {
+      props: { modelValue: 'b' },
+      slots: {
+        default: () => [
+          h(MdFilterChip, { key: 'a', value: 'a', label: 'A', disabled: allDisabled.value }),
+          ...(!removed.value ? [h(MdFilterChip, { key: 'b', value: 'b', label: 'B', disabled: disabled.value || allDisabled.value })] : []),
+          h(MdFilterChip, { key: 'c', value: 'c', label: 'C', disabled: allDisabled.value }),
+        ],
+      },
+    });
+    await nextTick();
+    await nextTick();
+    const stops = () => wrapper.findAll('.md-chip[tabindex="0"]');
+    expect(stops().map((chip) => chip.text())).toEqual(['B']);
+    disabled.value = true;
+    await nextTick();
+    expect(stops().map((chip) => chip.text())).toEqual(['A']);
+    removed.value = true;
+    await nextTick();
+    expect(stops()).toHaveLength(1);
+    allDisabled.value = true;
+    await nextTick();
+    expect(stops()).toHaveLength(0);
+    allDisabled.value = false;
+    await nextTick();
+    expect(stops()).toHaveLength(1);
+    wrapper.unmount();
+  });
+
   it('emits scalar model update in single selection mode', async () => {
     const wrapper = mount(MdChipSet, {
       props: {
@@ -57,6 +90,23 @@ describe('MdChipSet', () => {
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1]);
 
+    wrapper.unmount();
+  });
+
+  it('uses option semantics and skips disabled chips during keyboard navigation', async () => {
+    const wrapper = mount(MdChipSet, {
+      attachTo: document.body,
+      slots: {
+        default: () => [h(MdFilterChip, { label: 'One' }), h(MdFilterChip, { label: 'Disabled', disabled: true }), h(MdFilterChip, { label: 'Three' })],
+      },
+    });
+
+    const chips = wrapper.findAll('.md-chip');
+    expect(chips[0].attributes('role')).toBe('option');
+    expect(chips[1].attributes('tabindex')).toBe('-1');
+
+    await wrapper.get('.md-chip-set').trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(chips[2].element);
     wrapper.unmount();
   });
 });

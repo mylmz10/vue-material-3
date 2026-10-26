@@ -87,4 +87,28 @@ describe('MdMenu', () => {
 
     wrapper.unmount();
   });
+
+  it('returns focus to the activator after escape', async () => {
+    const wrapper = mount(MdMenu, {
+      attachTo: document.body,
+      props: {
+        modelValue: true,
+      },
+      slots: {
+        activator: '<button type="button" id="menu-trigger">Open menu</button>',
+        default: '<MdMenuItem label="Profile" value="profile" />',
+      },
+      global: {
+        components: {
+          MdMenuItem,
+        },
+      },
+    });
+
+    await wrapper.get('.md-menu__content').trigger('keydown', { key: 'Escape' });
+    await wrapper.vm.$nextTick();
+
+    expect(document.activeElement).toBe(wrapper.get('#menu-trigger').element);
+    wrapper.unmount();
+  });
 });

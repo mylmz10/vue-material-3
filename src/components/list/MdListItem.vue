@@ -2,14 +2,18 @@
   <li
     class="md-list-item"
     :class="{
+      'md-list-item--interactive': interactive,
       'md-list-item--selected': selected,
       'md-list-item--multiline': !!supportingTextMultiline,
       'md-list-item--two-line': supportingTextMultiline === 2,
       'md-list-item--three-line': supportingTextMultiline === 3,
     }"
+    :role="interactive ? 'button' : undefined"
+    :tabindex="interactive ? 0 : undefined"
     @mouseover="mouseover = true"
     @mouseleave="mouseover = false"
     @click="$emit('click', $event)"
+    @keydown="onKeydown"
   >
     <div class="md-list-item__state-layer"></div>
     <MdRipple v-if="mouseover" style="z-index: 0"></MdRipple>
@@ -35,11 +39,11 @@
 </template>
 
 <script setup>
-import { useSlots, computed, ref } from 'vue';
+import { useSlots, computed, ref, toRefs } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-const { headline, supportingText, supportingTextMultiline, trailingText, icon, selected } = defineProps({
+const props = defineProps({
   headline: {
     type: String,
   },
@@ -58,22 +62,36 @@ const { headline, supportingText, supportingTextMultiline, trailingText, icon, s
   selected: {
     type: Boolean,
   },
+  interactive: {
+    type: Boolean,
+    default: false,
+  },
 });
+const { headline, supportingText, supportingTextMultiline, trailingText, icon, selected, interactive } = toRefs(props);
 
 const slots = useSlots();
 const mouseover = ref(false);
 const emit = defineEmits(['click']);
 
+const onKeydown = (event) => {
+  if (!interactive.value || event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) {
+    return;
+  }
+
+  event.preventDefault();
+  emit('click', event);
+};
+
 const renderStartSlot = computed(() => {
-  return slots.start || icon;
+  return slots.start || icon.value;
 });
 
 const renderEndSlot = computed(() => {
-  return slots.end || trailingText;
+  return slots.end || trailingText.value;
 });
 
 const renderSupportingText = computed(() => {
-  return slots['supporting-text'] || supportingText;
+  return slots['supporting-text'] || supportingText.value;
 });
 </script>
 

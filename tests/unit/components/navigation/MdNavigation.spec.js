@@ -52,4 +52,16 @@ describe('navigation components', () => {
 
     wrapper.unmount();
   });
+
+  it('reflects controlled opened prop changes', async () => {
+    const wrapper = mount(MdNavigationDrawer, {
+      props: { opened: true },
+    });
+
+    expect(wrapper.classes()).toContain('md-navigation-drawer--opened');
+    await wrapper.setProps({ opened: false });
+    expect(wrapper.classes()).not.toContain('md-navigation-drawer--opened');
+    await wrapper.setProps({ opened: true });
+    expect(wrapper.classes()).toContain('md-navigation-drawer--opened');
+  });
 });

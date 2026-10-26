@@ -1,8 +1,9 @@
 <template>
-  <div class="md-time-picker-field">
+  <div class="md-time-picker-field" :style="$attrs.style" :class="$attrs.class">
     <div class="md-time-picker-field__control" @click="openPicker">
       <component
         :is="fieldComponent"
+        v-bind="getControlAttrs($attrs)"
         :modelValue="displayValue"
         :label="resolvedLabel"
         :supporting-text="supportingText"
@@ -46,6 +47,10 @@ import MdIcon from '../icon/MdIcon.vue';
 import MdOutlinedTextField from '../text-field/MdOutlinedTextField.vue';
 import MdTimePicker from './MdTimePicker.vue';
 import { formatDisplayValue } from './timePickerUtils';
+
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   cancelText: {

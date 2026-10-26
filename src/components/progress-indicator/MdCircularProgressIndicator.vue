@@ -9,23 +9,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-
-const props = defineProps({
+defineProps({
   value: { type: [String, Number], default: 0 },
   indeterminate: { type: Boolean },
-});
-
-const indicatorStyle = computed(() => {
-  return {
-    width: props.indeterminate ? '' : `${props.value}%`,
-  };
-});
-
-const indeterminateIndicatorStyle = computed(() => {
-  return {
-    width: `${props.value}%`,
-  };
 });
 </script>
 

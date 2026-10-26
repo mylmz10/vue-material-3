@@ -3,6 +3,11 @@ import { h } from 'vue';
 
 export default {
   name: 'MdChipSet',
+  provide() {
+    return {
+      mdChipSetContext: this,
+    };
+  },
   props: {
     modelValue: {
       type: [String, Number, Boolean, Object, Array],
@@ -130,13 +135,16 @@ export default {
 
       return Array.from(this.$el.querySelectorAll('[data-md-chip="true"]'));
     },
+    getEnabledChipElements() {
+      return this.getChipElements().filter((chipElement) => chipElement.getAttribute('aria-disabled') !== 'true');
+    },
     resolveCurrentIndex(chipElements) {
       if (!chipElements.length) {
         return 0;
       }
 
       const focusedIndex =
-        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement) : -1;
+        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement?.closest('[data-md-chip="true"]')) : -1;
 
       if (focusedIndex !== -1) {
         return focusedIndex;
@@ -145,14 +153,23 @@ export default {
       return Math.max(0, Math.min(this.activeIndex, chipElements.length - 1));
     },
     focusChip(index) {
-      const chipElements = this.getChipElements();
+      const chipElements = this.getEnabledChipElements();
       if (!chipElements.length) {
         return;
       }
 
       const boundedIndex = Math.max(0, Math.min(index, chipElements.length - 1));
-      this.activeIndex = boundedIndex;
+      this.activeIndex = this.getChipElements().indexOf(chipElements[boundedIndex]);
       chipElements[boundedIndex]?.focus();
+    },
+    focusAfterRemoval(chipElement, removedIndex) {
+      this.$nextTick(() => {
+        // Respect a declined removal or focus explicitly moved by the consumer.
+        if (chipElement.isConnected || !this.$el?.isConnected || (document.activeElement !== document.body && document.activeElement !== document.documentElement)) return;
+        const chips = this.getEnabledChipElements();
+        if (chips.length) this.focusChip(Math.min(Math.max(removedIndex, 0), chips.length - 1));
+        else this.$el.focus();
+      });
     },
     syncActiveIndex() {
       const slotItems = this.getSlotItems();
@@ -161,17 +178,21 @@ export default {
         return;
       }
 
-      const firstSelectedIndex = slotItems.findIndex((item, index) => this.isItemSelected(item, index));
+      const firstSelectedIndex = slotItems.findIndex((item, index) => !item?.props?.disabled && this.isItemSelected(item, index));
 
       if (firstSelectedIndex !== -1) {
         this.activeIndex = firstSelectedIndex;
         return;
       }
 
-      this.activeIndex = Math.max(0, Math.min(this.activeIndex, slotItems.length - 1));
+      const firstEnabledIndex = slotItems.findIndex((item) => !item?.props?.disabled);
+      this.activeIndex = this.getActiveIndex(slotItems, firstEnabledIndex);
+    },
+    getActiveIndex(slotItems, fallback = slotItems.findIndex((item) => !item?.props?.disabled)) {
+      return slotItems[this.activeIndex] && !slotItems[this.activeIndex]?.props?.disabled ? this.activeIndex : fallback;
     },
     handleKeydown(event) {
-      const chipElements = this.getChipElements();
+      const chipElements = this.getEnabledChipElements();
       if (!chipElements.length) {
         return;
       }
@@ -215,12 +236,14 @@ export default {
   },
   render() {
     const slotItems = this.getSlotItems();
+    const activeIndex = this.getActiveIndex(slotItems);
 
     return h(
       'div',
       {
         class: 'md-chip-set',
         role: 'listbox',
+        tabindex: -1,
         'aria-multiselectable': this.isMulti ? 'true' : undefined,
         onKeydown: this.handleKeydown,
       },
@@ -236,7 +259,7 @@ export default {
             ...item.props,
             key: item?.key ?? index,
             selected,
-            tabIndex: index === this.activeIndex ? 0 : -1,
+            tabIndex: item?.props?.disabled ? -1 : index === activeIndex ? 0 : -1,
             onClick: (event) => {
               originalClick?.(event);
               this.handleChipClick(index, event);

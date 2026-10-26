@@ -1,5 +1,5 @@
 <template>
-  <div class="md-badge" :class="{ 'md-badge--large': !!value, 'md-badge--absolute': !!absolute }">
+  <div class="md-badge" :class="{ 'md-badge--large': value === 0 || !!value, 'md-badge--absolute': !!absolute }">
     <div class="md-badge__value">{{ value }}</div>
   </div>
 </template>

@@ -16,8 +16,21 @@ describe('MdSnackbar', () => {
       },
     });
 
-    await wrapper.get('.md-snackbar__action-text span').trigger('click');
+    const actionButton = wrapper.get('.md-snackbar__action-text');
+    expect(actionButton.attributes('type')).toBe('button');
+    await actionButton.trigger('click');
     expect(wrapper.emitted('action')).toHaveLength(1);
+  });
+
+  it('renders custom supporting text', () => {
+    const wrapper = mount(MdSnackbar, {
+      props: {
+        modelValue: true,
+        text: 'Message sent',
+      },
+    });
+
+    expect(wrapper.get('.md-snackbar__supporting-text').text()).toBe('Message sent');
   });
 
   it('emits close when dismiss affordance is clicked', async () => {
@@ -28,7 +41,9 @@ describe('MdSnackbar', () => {
       },
     });
 
-    await wrapper.get('.md-snackbar__actions').trigger('click');
+    const closeButton = wrapper.get('.md-snackbar__actions');
+    expect(closeButton.attributes('type')).toBe('button');
+    await closeButton.trigger('click');
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([false]);
   });
 
@@ -42,6 +57,25 @@ describe('MdSnackbar', () => {
       },
     });
 
+    vi.advanceTimersByTime(25);
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([false]);
+  });
+
+  it('starts its timeout when it is opened after mounting', async () => {
+    vi.useFakeTimers();
+
+    const wrapper = mount(MdSnackbar, {
+      props: {
+        modelValue: false,
+        timeout: 25,
+      },
+    });
+
+    vi.advanceTimersByTime(25);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+    await wrapper.setProps({ modelValue: true });
     vi.advanceTimersByTime(25);
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([false]);

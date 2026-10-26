@@ -2,9 +2,23 @@
   <MdMenu class="md-outlined-select-menu" v-model="menuOpened">
     <template #activator>
       <span class="md-outlined-select" :class="{ 'md-outlined-select--open': menuOpened, 'md-outlined-select--disabled': disabled }">
-        <input v-if="name" class="md-outlined-select__hidden-input" type="hidden" :name="name" :value="formValue" />
+        <input
+          v-if="name || required"
+          class="md-outlined-select__hidden-input"
+          type="text"
+          :name="name || undefined"
+          :value="formValue"
+          :required="required"
+          :disabled="disabled"
+          tabindex="-1"
+          aria-hidden="true"
+          @invalid.prevent="onInvalid"
+          @focus="triggerEl?.focus()"
+          @beforeinput.prevent
+          @input="restoreFormValue"
+        />
 
-        <MdOutlinedField :disabled="disabled" :error="error" :label="label" :populated="isPopulated">
+        <MdOutlinedField :disabled="disabled" :error="error || validationInvalid" :label="label" :populated="isPopulated">
           <button
             ref="triggerEl"
             class="md-outlined-select__trigger"
@@ -13,6 +27,8 @@
             :disabled="disabled"
             :aria-expanded="`${menuOpened}`"
             aria-haspopup="listbox"
+            :aria-required="required"
+            :aria-invalid="error || validationInvalid"
             :aria-controls="listboxId"
             :aria-activedescendant="activeOptionId || undefined"
             @click="toggleMenu"
@@ -45,7 +61,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRaw, watch } from 'vue';
 import MdOutlinedField from '../field/MdOutlinedField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdList from '../list/MdList.vue';
@@ -102,6 +118,14 @@ const normalizeValue = (value) => {
   return `${value}`;
 };
 
+const validationInvalid = ref(false);
+const onInvalid = () => {
+  validationInvalid.value = true;
+  triggerEl.value?.focus();
+};
+const restoreFormValue = (event) => {
+  event.target.value = formValue.value;
+};
 const triggerEl = ref(null);
 const listEl = ref(null);
 const menuOpened = ref(false);
@@ -115,12 +139,20 @@ const lastOpenDirection = ref(0);
 const listboxId = `md-outlined-select-listbox-${Math.random().toString(36).slice(2, 10)}`;
 
 const formValue = computed(() => normalizeValue(internalValue.value));
+watch([formValue, () => props.required, () => props.disabled], () => {
+  validationInvalid.value = false;
+});
 
 const isPopulated = computed(() => {
   return !!displayLabel.value || !!normalizeValue(internalValue.value);
 });
 
 const isValueSelected = (value) => {
+  const current = internalValue.value;
+  if ((current !== null && typeof current === 'object') || (value !== null && typeof value === 'object')) {
+    return toRaw(current) === toRaw(value);
+  }
+
   return normalizeValue(internalValue.value) === normalizeValue(value);
 };
 
@@ -425,8 +457,9 @@ const onBlur = (event) => {
 };
 
 const handleFormReset = () => {
+  validationInvalid.value = false;
   nextTick(() => {
-    internalValue.value = initialValue.value || '';
+    internalValue.value = initialValue.value ?? '';
     emit('update:modelValue', internalValue.value);
     emit('input', internalValue.value);
     emit('change', internalValue.value);
@@ -437,7 +470,7 @@ const handleFormReset = () => {
 watch(
   () => props.modelValue,
   (newValue) => {
-    if (newValue === undefined || normalizeValue(newValue) === normalizeValue(internalValue.value)) {
+    if (newValue === undefined || isValueSelected(newValue)) {
       return;
     }
 
@@ -515,7 +548,11 @@ $theme: tokens.md-comp-outlined-select-values();
   }
 
   &__hidden-input {
-    display: none;
+    block-size: 1px;
+    inline-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
   }
 
   &__trigger {

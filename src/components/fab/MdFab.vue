@@ -1,5 +1,5 @@
 <template>
-  <button class="md-fab" :class="{ 'md-fab--small': size === 'small', 'md-fab--large': size === 'large' }" :disabled="disabled">
+  <button type="button" class="md-fab" :class="{ 'md-fab--small': size === 'small', 'md-fab--large': size === 'large' }" :disabled="disabled">
     <MdRipple></MdRipple>
     <i class="material-icons md-fab__icon">{{ icon }}</i>
     <MdElevationOverlay></MdElevationOverlay>

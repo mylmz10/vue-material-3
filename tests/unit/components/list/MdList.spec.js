@@ -35,6 +35,38 @@ describe('list components', () => {
     expect(wrapper.emitted('click')).toHaveLength(1);
   });
 
+  it('supports keyboard activation for interactive list items', async () => {
+    const wrapper = mount(MdListItem, {
+      props: { interactive: true, headline: 'Notifications' },
+    });
+
+    expect(wrapper.attributes('role')).toBe('button');
+    expect(wrapper.attributes('tabindex')).toBe('0');
+    await wrapper.trigger('keydown', { key: 'Enter' });
+    await wrapper.trigger('keydown', { key: ' ' });
+
+    expect(wrapper.emitted('click')).toHaveLength(2);
+  });
+
+  it.each([false, true])('preserves nested input keys with interactive=%s', (interactive) => {
+    const wrapper = mount(MdListItem, { props: { interactive }, slots: { end: '<input />' } });
+    for (const key of [' ', 'Enter']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      wrapper.get('input').element.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(wrapper.emitted('click')).toBeUndefined();
+    wrapper.unmount();
+  });
+
+  it('only renders populated optional regions and tracks prop changes', async () => {
+    const wrapper = mount(MdListItem);
+    for (const region of ['start', 'end', 'supporting-text']) expect(wrapper.find(`.md-list-item__${region}`).exists()).toBe(false);
+    await wrapper.setProps({ icon: 'home', trailingText: 'More', supportingText: 'Details' });
+    for (const region of ['start', 'end', 'supporting-text']) expect(wrapper.find(`.md-list-item__${region}`).exists()).toBe(true);
+    wrapper.unmount();
+  });
+
   it('renders list divider as li', () => {
     const wrapper = mount(MdListDivider);
 

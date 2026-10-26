@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { enableAutoUnmount, mount } from '@vue/test-utils';
 import MdTimePicker from '@/components/timepicker/MdTimePicker.vue';
+import MdTimePickerDial from '@/components/timepicker/MdTimePickerDial.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
+
+enableAutoUnmount(afterEach);
 
 describe('MdTimePicker', () => {
   it('commits the selected dial time on confirm', async () => {
@@ -125,5 +128,30 @@ describe('MdTimePicker', () => {
     await findButtonByText(wrapper, 'OK').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['20:15']);
+  });
+
+  it('cleans up an earlier pointer selection before starting another one', async () => {
+    const removeListener = vi.spyOn(window, 'removeEventListener');
+    const wrapper = mount(MdTimePickerDial, {
+      props: { hour24: 7, minute: 0 },
+    });
+
+    await wrapper.trigger('pointerdown', { pointerId: 1, clientX: 1, clientY: 1 });
+    await wrapper.trigger('pointerdown', { pointerId: 2, clientX: 2, clientY: 2 });
+
+    expect(removeListener).toHaveBeenCalledWith('pointermove', expect.any(Function));
+    expect(removeListener).toHaveBeenCalledWith('pointerup', expect.any(Function));
+
+    const selectionCount = wrapper.emitted('select-hour')?.length;
+    const oldPointerMove = new Event('pointermove');
+    Object.defineProperties(oldPointerMove, {
+      clientX: { value: 3 },
+      clientY: { value: 3 },
+      pointerId: { value: 1 },
+    });
+    window.dispatchEvent(oldPointerMove);
+    expect(wrapper.emitted('select-hour')).toHaveLength(selectionCount);
+
+    removeListener.mockRestore();
   });
 });

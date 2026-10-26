@@ -24,7 +24,7 @@
         <slot name="start"></slot>
       </span>
       <span class="md-field__middle">
-        <span class="md-field__label" aria-hidden="false">{{ label }}</span>
+        <component :is="inputId ? 'label' : 'span'" class="md-field__label" :for="inputId" aria-hidden="false">{{ label }}</component>
 
         <span class="md-field__content">
           <slot></slot>
@@ -37,7 +37,7 @@
       <span class="md-field__active-indicator"></span>
     </span>
 
-    <span class="md-field__supporting-text">
+    <span :id="supportingTextId" class="md-field__supporting-text">
       <span class="md-field__supporting-text-start">
         <slot name="supporting-text"></slot>
       </span>
@@ -55,6 +55,8 @@ defineProps({
   disabled: { type: Boolean },
   error: { type: Boolean },
   label: { type: String },
+  inputId: { type: String },
+  supportingTextId: { type: String },
   populated: { type: Boolean },
   required: { type: Boolean },
   focused: { type: Boolean },

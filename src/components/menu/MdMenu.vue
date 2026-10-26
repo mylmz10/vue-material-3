@@ -3,7 +3,7 @@
     <div v-if="hasActivator" ref="activatorEl" class="md-menu__activator">
       <slot name="activator" :onClick="onActivatorClick" :onKeydown="onActivatorKeydown" :open="open" :close="close" :toggle="toggle" :ariaExpanded="`${isOpen}`" :ariaHaspopup="'menu'" />
     </div>
-    <div v-show="isOpen" ref="contentEl" class="md-menu__content" role="menu" tabindex="-1" @keydown="onMenuKeydown">
+    <div v-show="isOpen" ref="contentEl" class="md-menu__content" :role="contentRole" tabindex="-1" @keydown="onMenuKeydown">
       <div class="md-menu__surface"></div>
       <slot />
     </div>
@@ -14,6 +14,7 @@
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, useSlots, watch } from 'vue';
 
 const props = defineProps({
+  contentRole: { type: String, default: 'menu' },
   modelValue: {
     type: Boolean,
     default: undefined,
@@ -130,6 +131,11 @@ const focusLastItem = () => {
   focusItemByIndex(menuItems.length - 1);
 };
 
+const focusActivator = () => {
+  const focusTarget = activatorEl.value?.querySelector('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+  (focusTarget || activatorEl.value)?.focus?.();
+};
+
 const moveFocus = (offset) => {
   const { focusedIndex, menuItems } = getFocusedItemIndex();
   if (!menuItems.length) {
@@ -174,7 +180,7 @@ const setOpen = (nextOpen, options = {}) => {
   emit('close', { source });
   if (restoreFocus) {
     nextTick(() => {
-      activatorEl.value?.focus?.();
+      focusActivator();
     });
   }
 };

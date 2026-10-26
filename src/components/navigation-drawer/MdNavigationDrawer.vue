@@ -1,43 +1,49 @@
 <template>
-  <div class="md-navigation-drawer" :class="{ 'md-navigation-drawer--opened': _opened, 'md-navigation-drawer--modal': modal }">
+  <component
+    :is="modal ? MdDialog : 'div'"
+    class="md-navigation-drawer"
+    :class="{ 'md-navigation-drawer--opened': _opened, 'md-navigation-drawer--modal': modal }"
+    v-bind="$attrs"
+    :model-value="modal ? _opened : undefined"
+    :keep-mounted="modal || undefined"
+    :aria-label="modal ? $attrs['aria-label'] || 'Navigation' : $attrs['aria-label']"
+    :container-class="modal ? 'md-navigation-drawer__modal-container' : undefined"
+    :content-class="modal ? 'md-navigation-drawer__modal-content' : undefined"
+    :header-class="modal ? 'md-navigation-drawer__empty' : undefined"
+    :footer-class="modal ? 'md-navigation-drawer__empty' : undefined"
+    @update:modelValue="onModalUpdate"
+  >
     <div v-if="modal" class="md-navigation-drawer__overlay" @click="close"></div>
     <div class="md-navigation-drawer__slot-content">
       <slot />
     </div>
-  </div>
+  </component>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
+import MdDialog from '../dialog/MdDialog.vue';
 
-const _opened = ref(false);
+defineOptions({ inheritAttrs: false });
 
 const emit = defineEmits(['change']);
-
-const props = defineProps({
-  opened: {
-    type: Boolean,
-  },
-  modal: {
-    type: Boolean,
-  },
-});
+const props = defineProps({ opened: { type: Boolean }, modal: { type: Boolean } });
+const _opened = ref(props.opened);
 
 const close = () => {
+  if (!_opened.value) return;
   _opened.value = false;
-  emit('change', _opened.value);
+  emit('change', false);
 };
-
-onMounted(() => {
-  _opened.value = props.opened;
-});
+const onModalUpdate = (opened) => {
+  if (!opened) close();
+};
 
 watch(
   () => props.opened,
-  (newValue) => {
-    _opened.value = newValue;
-  },
-  { immediate: true }
+  (opened) => {
+    _opened.value = opened;
+  }
 );
 </script>
 
@@ -143,11 +149,53 @@ $sys-color: theme.values();
   }
 
   &--modal {
-    position: absolute;
+    position: fixed;
     inset: 0;
+    inline-size: 100vw;
+    block-size: 100vh;
+    max-inline-size: 100vw;
+    max-block-size: 100vh;
+    overflow: hidden;
     z-index: 1000;
 
+    &:not([open]) {
+      display: none;
+    }
+
+    &::before {
+      background: transparent;
+    }
+
+    .md-navigation-drawer__modal-container {
+      inset-block: 0;
+      inset-inline-start: 0;
+      min-block-size: 0;
+      max-block-size: 100%;
+      inline-size: min(100%, #{map.get($theme, container-width)});
+      min-inline-size: 0;
+      max-inline-size: 100%;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .md-navigation-drawer__modal-content {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      padding: 0;
+      margin: 0;
+    }
+
+    .md-navigation-drawer__empty,
+    .md-navigation-drawer__modal-container > .md-elevation-overlay {
+      display: none;
+    }
+
     .md-navigation-drawer__slot-content {
+      width: 100%;
+      min-inline-size: 0;
+      overflow-y: auto;
       background-color: var(--md-navigation-drawer-modal-container-color);
       box-shadow: elevation.resolve-box-shadow(map.get($theme, modal-container-elevation), map.get($sys-color, shadow));
     }

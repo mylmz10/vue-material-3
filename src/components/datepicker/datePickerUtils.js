@@ -131,6 +131,14 @@ export const isRangeAllowed = (value, constraints = {}) => {
     return isDateAllowed(normalizedRange.start, constraints);
   }
 
+  if (!isDateAllowed(normalizedRange.start, constraints) || !isDateAllowed(normalizedRange.end, constraints)) {
+    return false;
+  }
+
+  if (typeof constraints.isDateDisabled !== 'function') {
+    return true;
+  }
+
   let cursor = normalizedRange.start;
   while (cursor.isBefore(normalizedRange.end, 'day') || cursor.isSame(normalizedRange.end, 'day')) {
     if (!isDateAllowed(cursor, constraints)) {

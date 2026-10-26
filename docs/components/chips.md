@@ -37,6 +37,12 @@ import { MdAssistChip, MdChipSet, MdFilterChip, MdInputChip, MdSuggestionChip } 
 </MdChipSet>
 ```
 
+## Keyboard removal
+
+Focused removable chips accept Delete or Backspace. The forward horizontal arrow moves from the chip to its remove button, and the reverse arrow returns to the chip (Right/Left in LTR; Left/Right in RTL). Enter or Space on the remove button emits `remove`; disabled and soft-disabled chips cannot remove.
+
+Inside `MdChipSet`, removing a focused chip moves focus to the next enabled chip, then the previous one if needed. If no enabled chips remain, focus stays on the set. The parent still owns removing the chip from its data; focus is retained if removal is declined. For standalone chips, the parent should move focus to the appropriate input or control after removal. See the [M3 chip accessibility guidance](https://m3.material.io/components/chips/accessibility).
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-chips--assist-chip" target="_blank" rel="noreferrer">Storybook</a> for chip variants.

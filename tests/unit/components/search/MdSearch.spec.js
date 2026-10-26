@@ -34,4 +34,17 @@ describe('MdSearch', () => {
     expect(wrapper.emitted('trailingClick')).toHaveLength(1);
     expect(wrapper.get('.avatar-slot').text()).toBe('VM');
   });
+
+  it('reports close when the trailing action clears a search', async () => {
+    const wrapper = mount(MdSearch, {
+      props: {
+        modelValue: 'tabs',
+      },
+    });
+
+    await wrapper.get('.search-action--trailing').trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['']);
+    expect(wrapper.emitted('trailingClick')?.at(-1)).toEqual(['close']);
+  });
 });

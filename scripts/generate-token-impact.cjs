@@ -32,7 +32,7 @@ function findThemeScopes(src) {
     const end = i + 1 < matches.length ? matches[i + 1].index : src.length;
     const segment = src.slice(start, end);
 
-    const mapGetRegex = new RegExp(`map\\.get\\(\\$${varName},\\s*['\"]?([a-z0-9-]+)['\"]?\\)`, 'g');
+    const mapGetRegex = new RegExp(`map\\.get\\(\\$${varName},\\s*['"]?([a-z0-9-]+)['"]?\\)`, 'g');
     const keys = [...segment.matchAll(mapGetRegex)].map((k) => k[1]);
 
     scopes.push({
@@ -86,7 +86,9 @@ const by = rows.reduce((acc, row) => {
 let upstreamSha = 'unknown';
 try {
   upstreamSha = execSync('git -C /tmp/material-web-v0_192 rev-parse HEAD', {encoding: 'utf8'}).trim();
-} catch {}
+} catch {
+  // The optional local upstream checkout is not required to generate the report.
+}
 
 let out = '';
 out += '# Token Upgrade Impact Matrix (v0_192)\n\n';

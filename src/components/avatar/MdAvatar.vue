@@ -1,12 +1,12 @@
 <template>
   <div class="md-avatar">
-    <img v-if="image" :src="image" alt="initials" />
-    <div v-if="initials">{{ initials }}</div>
+    <img v-if="image" :src="image" :alt="initials || ''" />
+    <div v-else-if="initials">{{ initials }}</div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   image: {
     type: String,
   },

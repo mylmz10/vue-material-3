@@ -1,8 +1,15 @@
 <template>
-  <div class="md-linear-progress-indicator" :class="{ 'md-linear-progress-indicator--indeterminate': indeterminate }">
+  <div
+    class="md-linear-progress-indicator"
+    :class="{ 'md-linear-progress-indicator--indeterminate': indeterminate }"
+    role="progressbar"
+    :aria-label="ariaLabel"
+    :aria-valuemin="indeterminate ? undefined : 0"
+    :aria-valuemax="indeterminate ? undefined : 100"
+    :aria-valuenow="indeterminate ? undefined : value"
+  >
     <div class="md-linear-progress-indicator__track"></div>
     <div class="md-linear-progress-indicator__indicator" :style="indicatorStyle"></div>
-    <div class="md-linear-progress-indicator__indeterminate-indicator" :style="indeterminateIndicatorStyle"></div>
   </div>
 </template>
 
@@ -10,6 +17,7 @@
 import { computed } from 'vue';
 
 const props = defineProps({
+  ariaLabel: { type: String, default: 'Progress' },
   value: { type: [String, Number], default: 0 },
   indeterminate: { type: Boolean },
 });
@@ -20,11 +28,6 @@ const indicatorStyle = computed(() => {
   };
 });
 
-const indeterminateIndicatorStyle = computed(() => {
-  return {
-    width: `${props.value}%`,
-  };
-});
 </script>
 
 <style lang="scss">

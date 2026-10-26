@@ -39,4 +39,18 @@ describe('MdCard', () => {
     expect(wrapper.emitted('cancel')).toHaveLength(1);
     expect(wrapper.emitted('action')).toHaveLength(1);
   });
+
+  it('activates interactive cards with the keyboard', async () => {
+    const wrapper = mount(MdCard, {
+      props: { interactive: true },
+    });
+
+    expect(wrapper.attributes('role')).toBe('button');
+    expect(wrapper.attributes('tabindex')).toBe('0');
+
+    await wrapper.trigger('keydown', { key: 'Enter' });
+    await wrapper.trigger('keydown', { key: ' ' });
+
+    expect(wrapper.emitted('click')).toHaveLength(2);
+  });
 });
