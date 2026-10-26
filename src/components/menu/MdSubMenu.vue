@@ -7,6 +7,9 @@
       :icon="icon"
       :disabled="disabled"
       :submenu="true"
+      aria-haspopup="menu"
+      :aria-expanded="`${isOpen}`"
+      :aria-controls="subMenuId"
       :keep-open="true"
       trailing-icon="chevron_right"
       @click="onTriggerClick"
@@ -20,6 +23,7 @@
       class="md-sub-menu__menu"
       :model-value="isOpen"
       :nested="true"
+      :content-id="subMenuId"
       :close-on-select="closeOnSelect"
       :focus-first-item-on-open="false"
       :restore-focus-on-close="false"
@@ -32,7 +36,7 @@
 </template>
 
 <script setup>
-import { inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
+import { inject, nextTick, onBeforeUnmount, onMounted, provide, ref, useId, watch } from 'vue';
 import MdMenu from './MdMenu.vue';
 import MdMenuItem from './MdMenuItem.vue';
 
@@ -66,7 +70,7 @@ const isOpen = ref(!!props.modelValue);
 const mdMenuContextKey = 'mdMenuContext';
 const mdSubMenuContextKey = 'mdSubMenuContext';
 const parentMenuContext = inject(mdMenuContextKey, null);
-const subMenuId = `md-sub-menu-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
+const subMenuId = `md-sub-menu-${useId()}`;
 
 watch(
   () => props.modelValue,

@@ -3,7 +3,7 @@
     <div v-if="hasActivator" ref="activatorEl" class="md-menu__activator">
       <slot name="activator" :onClick="onActivatorClick" :onKeydown="onActivatorKeydown" :open="open" :close="close" :toggle="toggle" :ariaExpanded="`${isOpen}`" :ariaHaspopup="'menu'" />
     </div>
-    <div v-show="isOpen" ref="contentEl" class="md-menu__content" :role="contentRole" tabindex="-1" @keydown="onMenuKeydown">
+    <div v-show="isOpen" :id="contentId" ref="contentEl" class="md-menu__content" :role="contentRole" tabindex="-1" @keydown="onMenuKeydown">
       <div class="md-menu__surface"></div>
       <slot />
     </div>
@@ -14,6 +14,7 @@
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, useSlots, watch } from 'vue';
 
 const props = defineProps({
+  contentId: { type: String, default: undefined },
   contentRole: { type: String, default: 'menu' },
   modelValue: {
     type: Boolean,
@@ -227,6 +228,7 @@ const onActivatorKeydown = (event) => {
 };
 
 const onMenuKeydown = (event) => {
+  if (event.defaultPrevented) return;
   if (event.key === 'ArrowDown') {
     event.preventDefault();
     moveFocus(1);

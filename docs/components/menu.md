@@ -39,6 +39,10 @@ import { MdMenu, MdMenuItem, MdSubMenu } from 'vue-material-3';
 </MdMenu>
 ```
 
+## Accessibility
+
+Submenu triggers identify their popup as a menu and expose its expanded state. `aria-controls` references the actual nested menu content through a stable ID. Standalone menus can set `content-id` when an external control needs the same relationship.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-menu--menu" target="_blank" rel="noreferrer">Storybook</a> for menu examples.
