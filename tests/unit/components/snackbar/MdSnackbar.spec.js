@@ -90,6 +90,33 @@ describe('MdSnackbar', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([false]);
   });
 
+  it('keeps an actionable message available until explicit dismissal', async () => {
+    vi.useFakeTimers();
+    const wrapper = mount(MdSnackbar, { props: { modelValue: true, actionText: 'Undo', timeout: 25 } });
+    vi.advanceTimersByTime(10000);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    await wrapper.get('.md-snackbar__action-text').trigger('click');
+    expect(wrapper.emitted('action')).toHaveLength(1);
+    await wrapper.get('.md-snackbar__actions').trigger('click');
+    expect(wrapper.emitted('update:modelValue')).toEqual([[false]]);
+    wrapper.unmount();
+  });
+
+  it('cancels a pending timeout when an action is added and restarts after removal', async () => {
+    vi.useFakeTimers();
+    const wrapper = mount(MdSnackbar, { props: { modelValue: true, timeout: 25 } });
+    vi.advanceTimersByTime(20);
+    await wrapper.setProps({ actionText: 'Retry' });
+    vi.advanceTimersByTime(1000);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    await wrapper.setProps({ actionText: '' });
+    vi.advanceTimersByTime(24);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    vi.advanceTimersByTime(1);
+    expect(wrapper.emitted('update:modelValue')).toEqual([[false]]);
+    wrapper.unmount();
+  });
+
   it('auto closes after timeout', async () => {
     vi.useFakeTimers();
 

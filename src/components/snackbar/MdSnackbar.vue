@@ -88,7 +88,7 @@ const clearCloseTimer = () => {
 
 const scheduleClose = () => {
   clearCloseTimer();
-  if (!props.modelValue || props.timeout <= 0) {
+  if (!props.modelValue || props.actionText || props.timeout <= 0) {
     return;
   }
 
@@ -98,7 +98,7 @@ const scheduleClose = () => {
   }, props.timeout);
 };
 
-watch(() => [props.modelValue, props.timeout], scheduleClose, { immediate: true });
+watch(() => [props.modelValue, props.timeout, props.actionText], scheduleClose, { immediate: true });
 
 onBeforeUnmount(() => {
   messageObserver?.disconnect();
