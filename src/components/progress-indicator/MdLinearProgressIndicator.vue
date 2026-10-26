@@ -10,6 +10,7 @@
   >
     <div class="md-linear-progress-indicator__track"></div>
     <div class="md-linear-progress-indicator__indicator" :style="indicatorStyle"></div>
+    <div v-if="!indeterminate" class="md-linear-progress-indicator__stop" aria-hidden="true"></div>
   </div>
 </template>
 
@@ -27,7 +28,6 @@ const indicatorStyle = computed(() => {
     width: props.indeterminate ? '' : `${props.value}%`,
   };
 });
-
 </script>
 
 <style lang="scss">
@@ -60,6 +60,17 @@ $theme: tokens.md-comp-linear-progress-indicator-values();
     background-color: #{theme.value('primary')};
     height: map.get($theme, active-indicator-height);
     transition: width cubic-bezier(0.4, 0, 0.2, 1) 2s;
+  }
+
+  &__stop {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #{theme.value('primary')};
+    transform: translateY(-50%);
   }
 
   &--indeterminate {

@@ -22,6 +22,10 @@ import { MdLinearProgressIndicator, MdCircularProgressIndicator } from 'vue-mate
 <MdCircularProgressIndicator indeterminate />
 ```
 
+## Determinate endpoint
+
+Determinate linear indicators include a 4px, primary-colored stop marker to identify the end of low-contrast tracks. It merges into the active bar at completion and follows the inline direction in RTL layouts. Indeterminate and circular indicators do not use a stop marker.
+
 ## Storybook
 
 Use <a href="/vue-material-3/storybook/?path=/story/components-progress-indicators--linear-progress-indicator" target="_blank" rel="noreferrer">Storybook</a> for controls.
