@@ -2,9 +2,23 @@
   <MdMenu class="md-filled-select-menu" v-model="menuOpened">
     <template #activator>
       <span class="md-filled-select" :class="{ 'md-filled-select--open': menuOpened, 'md-filled-select--disabled': disabled }">
-        <input v-if="name || required" class="md-filled-select__hidden-input" type="text" :name="name || undefined" :value="formValue" :required="required" :disabled="disabled" tabindex="-1" aria-hidden="true" />
+        <input
+          v-if="name || required"
+          class="md-filled-select__hidden-input"
+          type="text"
+          :name="name || undefined"
+          :value="formValue"
+          :required="required"
+          :disabled="disabled"
+          tabindex="-1"
+          aria-hidden="true"
+          @invalid.prevent="onInvalid"
+          @focus="triggerEl?.focus()"
+          @beforeinput.prevent
+          @input="restoreFormValue"
+        />
 
-        <MdFilledField :disabled="disabled" :error="error" :label="label" :populated="isPopulated">
+        <MdFilledField :disabled="disabled" :error="error || validationInvalid" :label="label" :populated="isPopulated">
           <button
             ref="triggerEl"
             class="md-filled-select__trigger"
@@ -13,6 +27,8 @@
             :disabled="disabled"
             :aria-expanded="`${menuOpened}`"
             aria-haspopup="listbox"
+            :aria-required="required"
+            :aria-invalid="error || validationInvalid"
             :aria-controls="listboxId"
             :aria-activedescendant="activeOptionId || undefined"
             @click="toggleMenu"
@@ -102,6 +118,14 @@ const normalizeValue = (value) => {
   return `${value}`;
 };
 
+const validationInvalid = ref(false);
+const onInvalid = () => {
+  validationInvalid.value = true;
+  triggerEl.value?.focus();
+};
+const restoreFormValue = (event) => {
+  event.target.value = formValue.value;
+};
 const triggerEl = ref(null);
 const listEl = ref(null);
 const menuOpened = ref(false);
@@ -115,6 +139,9 @@ const lastOpenDirection = ref(0);
 const listboxId = `md-filled-select-listbox-${Math.random().toString(36).slice(2, 10)}`;
 
 const formValue = computed(() => normalizeValue(internalValue.value));
+watch([formValue, () => props.required, () => props.disabled], () => {
+  validationInvalid.value = false;
+});
 
 const isPopulated = computed(() => {
   return !!displayLabel.value || !!normalizeValue(internalValue.value);
@@ -430,6 +457,7 @@ const onBlur = (event) => {
 };
 
 const handleFormReset = () => {
+  validationInvalid.value = false;
   nextTick(() => {
     internalValue.value = initialValue.value ?? '';
     emit('update:modelValue', internalValue.value);

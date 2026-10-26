@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { nextTick } from 'vue';
+import { h, nextTick } from 'vue';
 import { enableAutoUnmount, mount } from '@vue/test-utils';
 import MdTooltip from '@/components/tooltip/MdTooltip.vue';
 
@@ -48,9 +48,9 @@ describe('MdTooltip', () => {
     wrapper.unmount();
   });
 
-  it('opens the second tooltip when moving between triggers', async () => {
-    const first = mountTooltip({ text: 'First tooltip' });
-    const second = mountTooltip({ text: 'Second tooltip' });
+  it.each([false, true])('closes the previous tooltip during handoff (custom IDs: %s)', async (customIds) => {
+    const first = mountTooltip({ text: 'First tooltip', id: customIds ? 'first-tooltip' : '' });
+    const second = mountTooltip({ text: 'Second tooltip', id: customIds ? 'second-tooltip' : '' });
 
     await first.get('.md-tooltip__trigger').trigger('mouseenter');
     await flushTooltipOpen();
@@ -61,22 +61,66 @@ describe('MdTooltip', () => {
     await flushTooltipOpen();
 
     const openSurfaces = Array.from(document.body.querySelectorAll('.md-tooltip__surface--plain'));
-    expect(openSurfaces.some((surface) => surface.textContent?.includes('Second tooltip'))).toBe(true);
+    expect(openSurfaces).toHaveLength(1);
+    expect(openSurfaces[0].textContent).toContain('Second tooltip');
+    expect(first.emitted('close')?.at(-1)).toEqual([{ source: 'handoff' }]);
 
     first.unmount();
     second.unmount();
   });
 
+  it('assigns distinct default IDs to independent instances', () => {
+    const first = mountTooltip({ text: 'First tooltip' });
+    const second = mountTooltip({ text: 'Second tooltip' });
+    const firstId = first.get('.md-tooltip__trigger').attributes('aria-describedby');
+    const secondId = second.get('.md-tooltip__trigger').attributes('aria-describedby');
+    expect(firstId).toBeTruthy();
+    expect(secondId).not.toBe(firstId);
+  });
+
+  it('keeps another instance registered after an earlier instance unmounts', async () => {
+    const first = mountTooltip({ text: 'First tooltip' });
+    const second = mountTooltip({ text: 'Second tooltip' });
+    const third = mountTooltip({ text: 'Third tooltip' });
+    await second.get('.md-tooltip__trigger').trigger('mouseenter');
+    await flushTooltipOpen();
+    first.unmount();
+    await third.get('.md-tooltip__trigger').trigger('mouseenter');
+    await flushTooltipOpen();
+    const surfaces = Array.from(document.body.querySelectorAll('.md-tooltip__surface'));
+    expect(surfaces).toHaveLength(1);
+    expect(surfaces[0].textContent).toContain('Third tooltip');
+    expect(second.emitted('close')?.at(-1)).toEqual([{ source: 'handoff' }]);
+  });
+
+  it('applies handoff to externally controlled opens', async () => {
+    const first = mountTooltip({ text: 'First tooltip', modelValue: true });
+    const second = mountTooltip({ text: 'Second tooltip', modelValue: false });
+    await flushTooltipOpen();
+    await second.setProps({ modelValue: true });
+    await flushTooltipOpen();
+    expect(document.body.querySelectorAll('.md-tooltip__surface')).toHaveLength(1);
+    expect(first.emitted('update:modelValue')?.at(-1)).toEqual([false]);
+    expect(first.emitted('close')?.at(-1)).toEqual([{ source: 'handoff' }]);
+    expect(second.emitted('update:modelValue')).toBeUndefined();
+  });
+
+  it('keeps only the last initially open tooltip when mounting siblings', async () => {
+    mount({ render: () => h('div', [h(MdTooltip, { text: 'First tooltip', modelValue: true }), h(MdTooltip, { text: 'Second tooltip', modelValue: true })]) }, { attachTo: document.body });
+    await flushTooltipOpen();
+    const surfaces = Array.from(document.body.querySelectorAll('.md-tooltip__surface'));
+    expect(surfaces).toHaveLength(1);
+    expect(surfaces[0].textContent).toContain('Second tooltip');
+  });
+
   it('only opens persistent rich tooltips on click', async () => {
-    const wrapper = mountTooltip(
-      {
-        variant: 'rich',
-        persistent: true,
-        headline: 'Paint Tool',
-        supportingText: 'Add annotations and highlights with the paint tool.',
-        actionLabel: 'Learn more',
-      }
-    );
+    const wrapper = mountTooltip({
+      variant: 'rich',
+      persistent: true,
+      headline: 'Paint Tool',
+      supportingText: 'Add annotations and highlights with the paint tool.',
+      actionLabel: 'Learn more',
+    });
 
     await wrapper.get('.md-tooltip__trigger').trigger('mouseenter');
     await flushTooltipOpen();

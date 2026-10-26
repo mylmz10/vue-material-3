@@ -213,13 +213,14 @@ describe('MdDatePickerField', () => {
     })).toBe(true);
   });
 
-  it('rejects oversized ranges that need per-day disabled-date checks', () => {
+  it('validates long ranges without an arbitrary duration limit', () => {
     const isDateDisabled = vi.fn(() => false);
 
     expect(isRangeAllowed({
       start: '2000-01-01',
-      end: '2011-01-01',
-    }, { isDateDisabled })).toBe(false);
-    expect(isDateDisabled).toHaveBeenCalledTimes(2);
+      end: '2020-01-01',
+    }, { isDateDisabled })).toBe(true);
+    expect(isDateDisabled.mock.calls.length).toBeGreaterThan(7300);
+    expect(isRangeAllowed({ start: '2000-01-01', end: '2020-01-01' }, { isDateDisabled: (date) => date === '2015-06-01' })).toBe(false);
   });
 });

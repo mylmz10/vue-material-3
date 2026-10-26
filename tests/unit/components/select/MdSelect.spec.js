@@ -10,6 +10,39 @@ describe('select components', () => {
     ['filled', MdFilledSelect],
     ['outlined', MdOutlinedSelect],
   ])('%s object values', (_, component) => {
+    it('routes required validation to the visible trigger and prevents proxy edits', async () => {
+      const form = document.createElement('form');
+      document.body.append(form);
+      const wrapper = mount(component, { attachTo: form, props: { name: 'city', required: true }, slots: { default: () => h(MdSelectOption, { value: 'istanbul', displayText: 'Istanbul' }) } });
+      const proxy = wrapper.get('input').element;
+      const trigger = wrapper.get('[role="combobox"]');
+      const invalid = new Event('invalid', { cancelable: true });
+      proxy.dispatchEvent(invalid);
+      await nextTick();
+      expect(invalid.defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(trigger.element);
+      expect(trigger.attributes('aria-invalid')).toBe('true');
+      expect(trigger.attributes('aria-required')).toBe('true');
+      proxy.focus();
+      expect(document.activeElement).toBe(trigger.element);
+      proxy.value = 'ghost';
+      proxy.dispatchEvent(new Event('input', { bubbles: true }));
+      expect(proxy.value).toBe('');
+      expect(form.checkValidity()).toBe(false);
+      expect(new FormData(form).get('city')).toBe('');
+      await wrapper.setProps({ modelValue: 'istanbul' });
+      expect(form.checkValidity()).toBe(true);
+      expect(trigger.attributes('aria-invalid')).toBe('false');
+      expect(new FormData(form).get('city')).toBe('istanbul');
+      form.reset();
+      await nextTick();
+      await nextTick();
+      expect(proxy.value).toBe('');
+      expect(trigger.attributes('aria-invalid')).toBe('false');
+      wrapper.unmount();
+      form.remove();
+    });
+
     it('selects distinct objects independently and reflects external model changes', async () => {
       const first = { id: 1 };
       const second = { id: 2 };

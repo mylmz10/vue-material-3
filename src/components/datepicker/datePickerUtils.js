@@ -14,7 +14,6 @@ dayjs.extend(weekday);
 
 export const MODEL_FORMAT = 'YYYY-MM-DD';
 export const DEFAULT_DISPLAY_FORMAT = 'MM/DD/YYYY';
-const MAX_RANGE_DISABLED_DATE_CHECKS = 3660;
 
 const SUPPORTED_DAYJS_LOCALES = new Set(['en', 'tr']);
 
@@ -138,10 +137,6 @@ export const isRangeAllowed = (value, constraints = {}) => {
 
   if (typeof constraints.isDateDisabled !== 'function') {
     return true;
-  }
-
-  if (normalizedRange.end.diff(normalizedRange.start, 'day') > MAX_RANGE_DISABLED_DATE_CHECKS) {
-    return false;
   }
 
   let cursor = normalizedRange.start;

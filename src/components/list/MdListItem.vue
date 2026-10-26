@@ -74,7 +74,7 @@ const mouseover = ref(false);
 const emit = defineEmits(['click']);
 
 const onKeydown = (event) => {
-  if (!interactive || (event.key !== 'Enter' && event.key !== ' ')) {
+  if (!interactive.value || event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) {
     return;
   }
 
@@ -83,15 +83,15 @@ const onKeydown = (event) => {
 };
 
 const renderStartSlot = computed(() => {
-  return slots.start || icon;
+  return slots.start || icon.value;
 });
 
 const renderEndSlot = computed(() => {
-  return slots.end || trailingText;
+  return slots.end || trailingText.value;
 });
 
 const renderSupportingText = computed(() => {
-  return slots['supporting-text'] || supportingText;
+  return slots['supporting-text'] || supportingText.value;
 });
 </script>
 

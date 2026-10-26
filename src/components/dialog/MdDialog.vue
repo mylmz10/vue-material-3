@@ -137,7 +137,9 @@ const isVisibleTarget = (element) => {
 
 const getFocusableElements = () => {
   if (!containerEl.value) return [];
-  return Array.from(containerEl.value.querySelectorAll(focusableSelector)).filter((element) => element.tabIndex >= 0 && isVisibleTarget(element));
+  return Array.from(containerEl.value.querySelectorAll(focusableSelector)).filter(
+    (element) => (element.tabIndex >= 0 || (element.matches('[contenteditable="true"]') && !element.hasAttribute('tabindex'))) && isVisibleTarget(element)
+  );
 };
 
 const resolveInitialFocusTarget = () => {

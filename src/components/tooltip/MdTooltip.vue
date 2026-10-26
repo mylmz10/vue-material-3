@@ -58,6 +58,10 @@
   </span>
 </template>
 
+<script>
+let tooltipInstanceIndex = 0;
+</script>
+
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
 
@@ -65,8 +69,6 @@ const CLOSE_DELAY_MS = 1500;
 const LONG_PRESS_DELAY_MS = 500;
 const VIEWPORT_MARGIN = 8;
 const RICH_GAP = 4;
-
-let tooltipInstanceIndex = 0;
 
 const slots = useSlots();
 
@@ -588,6 +590,7 @@ const handleActionClick = () => {
 
 onMounted(() => {
   getTooltipRegistry().set(instanceId, closeTooltip);
+  if (isOpen.value) closeOtherTooltips();
 });
 
 watch(
@@ -612,6 +615,7 @@ watch(
     isOpen.value = !!nextValue;
 
     if (nextValue) {
+      closeOtherTooltips();
       addGlobalListeners();
       await nextTick();
       updatePosition();

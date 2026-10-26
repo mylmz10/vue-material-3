@@ -55,6 +55,19 @@ describe('MdDialog', () => {
     expect(document.activeElement).toBe(wrapper.get('#visible-last').element);
   });
 
+  it('includes native contenteditable targets while respecting explicit negative tabindex', async () => {
+    const wrapper = render({
+      props: { modelValue: true },
+      slots: { default: '<div contenteditable="true" tabindex="-1">Excluded</div><div contenteditable="true" id="editor">Editor</div><button id="last">Last</button>' },
+    });
+    await nextTick();
+    expect(document.activeElement).toBe(wrapper.get('#editor').element);
+    await wrapper.get('#last').trigger('keydown', { key: 'Tab' });
+    expect(document.activeElement).toBe(wrapper.get('#editor').element);
+    await wrapper.get('#editor').trigger('keydown', { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(wrapper.get('#last').element);
+  });
+
   it('synchronizes native close, releases scrolling, and restores launcher focus', async () => {
     const launcher = document.createElement('button');
     document.body.appendChild(launcher);

@@ -186,7 +186,10 @@ export default {
       }
 
       const firstEnabledIndex = slotItems.findIndex((item) => !item?.props?.disabled);
-      this.activeIndex = firstEnabledIndex === -1 ? 0 : Math.max(firstEnabledIndex, Math.min(this.activeIndex, slotItems.length - 1));
+      this.activeIndex = this.getActiveIndex(slotItems, firstEnabledIndex);
+    },
+    getActiveIndex(slotItems, fallback = slotItems.findIndex((item) => !item?.props?.disabled)) {
+      return slotItems[this.activeIndex] && !slotItems[this.activeIndex]?.props?.disabled ? this.activeIndex : fallback;
     },
     handleKeydown(event) {
       const chipElements = this.getEnabledChipElements();
@@ -233,6 +236,7 @@ export default {
   },
   render() {
     const slotItems = this.getSlotItems();
+    const activeIndex = this.getActiveIndex(slotItems);
 
     return h(
       'div',
@@ -255,7 +259,7 @@ export default {
             ...item.props,
             key: item?.key ?? index,
             selected,
-            tabIndex: item?.props?.disabled ? -1 : index === this.activeIndex ? 0 : -1,
+            tabIndex: item?.props?.disabled ? -1 : index === activeIndex ? 0 : -1,
             onClick: (event) => {
               originalClick?.(event);
               this.handleChipClick(index, event);
