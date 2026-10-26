@@ -1,52 +1,54 @@
 <template>
   <div class="md-date-picker-date-table" role="grid" :aria-label="ariaLabel">
     <div class="md-date-picker-date-table__header" role="row">
-      <div v-for="weekDay in weekDays" :key="weekDay" class="md-date-picker-date-table__weekday-item" role="columnheader">
+      <div v-for="(weekDay, index) in weekDays" :key="index" class="md-date-picker-date-table__weekday-item" role="columnheader">
         {{ weekDay }}
       </div>
     </div>
 
-    <div class="md-date-picker-date-table__days" @mouseleave="$emit('hover-date', null)">
-      <div
-        v-for="day in days"
-        :key="day.iso"
-        class="md-date-picker-date-table__day-cell"
-        :class="{
-          'md-date-picker-date-table__day-cell--range-start': day.isRangeStart,
-          'md-date-picker-date-table__day-cell--range-end': day.isRangeEnd,
-          'md-date-picker-date-table__day-cell--range-fill': day.isInRange || day.isPreviewInRange,
-          'md-date-picker-date-table__day-cell--range-fill-start': day.isRangeStart && !day.isRangeEnd,
-          'md-date-picker-date-table__day-cell--range-fill-end': day.isRangeEnd && !day.isRangeStart,
-          'md-date-picker-date-table__day-cell--range-single': day.isRangeStart && day.isRangeEnd,
-          'md-date-picker-date-table__day-cell--range-preview-end': day.isPreviewRangeEnd,
-        }"
-        role="gridcell"
-        :aria-selected="day.isSelected ? 'true' : 'false'"
-      >
-        <button
-          type="button"
-          :data-iso="day.iso"
-          class="md-date-picker-date-table__date-item"
+    <div class="md-date-picker-date-table__days" role="rowgroup" @mouseleave="$emit('hover-date', null)">
+      <div v-for="week in weeks" :key="week[0].iso" class="md-date-picker-date-table__week" role="row">
+        <div
+          v-for="day in week"
+          :key="day.iso"
+          class="md-date-picker-date-table__day-cell"
           :class="{
-            'md-date-picker-date-table__date-item--current-month': day.isCurrentMonth,
-            'md-date-picker-date-table__date-item--out-of-month': !day.isCurrentMonth,
-            'md-date-picker-date-table__date-item--today': day.isToday,
-            'md-date-picker-date-table__date-item--selected': day.isSelected,
-            'md-date-picker-date-table__date-item--focused': day.isFocused,
-            'md-date-picker-date-table__date-item--in-range': day.isInRange || day.isPreviewInRange,
-            'md-date-picker-date-table__date-item--preview-end': day.isPreviewRangeEnd,
+            'md-date-picker-date-table__day-cell--range-start': day.isRangeStart,
+            'md-date-picker-date-table__day-cell--range-end': day.isRangeEnd,
+            'md-date-picker-date-table__day-cell--range-fill': day.isInRange || day.isPreviewInRange,
+            'md-date-picker-date-table__day-cell--range-fill-start': day.isRangeStart && !day.isRangeEnd,
+            'md-date-picker-date-table__day-cell--range-fill-end': day.isRangeEnd && !day.isRangeStart,
+            'md-date-picker-date-table__day-cell--range-single': day.isRangeStart && day.isRangeEnd,
+            'md-date-picker-date-table__day-cell--range-preview-end': day.isPreviewRangeEnd,
           }"
-          :disabled="day.isDisabled"
-          :tabindex="day.isFocused && !day.isDisabled ? 0 : -1"
-          :aria-current="day.isToday ? 'date' : undefined"
-          :aria-label="getAriaLabel(day)"
-          @click="$emit('select', day.iso)"
-          @focus="$emit('focus-date', day.iso)"
-          @mouseenter="$emit('hover-date', day.isDisabled ? null : day.iso)"
+          role="gridcell"
+          :aria-selected="day.isSelected ? 'true' : 'false'"
         >
-          <div class="md-date-picker-date-table__state-layer"></div>
-          <span>{{ day.label }}</span>
-        </button>
+          <button
+            type="button"
+            :data-iso="day.iso"
+            class="md-date-picker-date-table__date-item"
+            :class="{
+              'md-date-picker-date-table__date-item--current-month': day.isCurrentMonth,
+              'md-date-picker-date-table__date-item--out-of-month': !day.isCurrentMonth,
+              'md-date-picker-date-table__date-item--today': day.isToday,
+              'md-date-picker-date-table__date-item--selected': day.isSelected,
+              'md-date-picker-date-table__date-item--focused': day.isFocused,
+              'md-date-picker-date-table__date-item--in-range': day.isInRange || day.isPreviewInRange,
+              'md-date-picker-date-table__date-item--preview-end': day.isPreviewRangeEnd,
+            }"
+            :disabled="day.isDisabled"
+            :tabindex="day.isFocused && !day.isDisabled ? 0 : -1"
+            :aria-current="day.isToday ? 'date' : undefined"
+            :aria-label="getAriaLabel(day)"
+            @click="$emit('select', day.iso)"
+            @focus="$emit('focus-date', day.iso)"
+            @mouseenter="$emit('hover-date', day.isDisabled ? null : day.iso)"
+          >
+            <div class="md-date-picker-date-table__state-layer"></div>
+            <span>{{ day.label }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -73,6 +75,7 @@ const props = defineProps({
 
 defineEmits(['focus-date', 'hover-date', 'select']);
 
+const weeks = computed(() => Array.from({ length: Math.ceil(props.days.length / 7) }, (_, index) => props.days.slice(index * 7, index * 7 + 7)));
 const weekDays = computed(() => getWeekdayLabels(props.locale));
 
 const getAriaLabel = (day) => {
@@ -132,7 +135,7 @@ $theme: tokens.md-comp-date-picker-docked-values();
   width: 100%;
 
   &__header,
-  &__days {
+  &__week {
     display: grid;
     grid-template-columns: repeat(7, var(--date-grid-column-width, var(--date-container-width, #{map.get($theme, date-container-width)})));
     justify-content: center;
@@ -245,7 +248,8 @@ $theme: tokens.md-comp-date-picker-docked-values();
     }
 
     &--today {
-      border: var(--date-today-container-outline-width, #{map.get($theme, date-today-container-outline-width)}) solid var(--date-today-container-outline-color, #{map.get($theme, date-today-container-outline-color)});
+      border: var(--date-today-container-outline-width, #{map.get($theme, date-today-container-outline-width)}) solid
+        var(--date-today-container-outline-color, #{map.get($theme, date-today-container-outline-color)});
       color: var(--date-today-label-text-color, #{map.get($theme, date-today-label-text-color)});
     }
 
@@ -264,7 +268,8 @@ $theme: tokens.md-comp-date-picker-docked-values();
     }
 
     &--preview-end {
-      border: var(--date-today-container-outline-width, #{map.get($theme, date-today-container-outline-width)}) solid var(--date-today-container-outline-color, #{map.get($theme, date-today-container-outline-color)});
+      border: var(--date-today-container-outline-width, #{map.get($theme, date-today-container-outline-width)}) solid
+        var(--date-today-container-outline-color, #{map.get($theme, date-today-container-outline-color)});
       color: var(--date-today-label-text-color, #{map.get($theme, date-today-label-text-color)});
     }
   }
