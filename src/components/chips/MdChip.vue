@@ -137,7 +137,7 @@ const resolvedTabIndex = computed(() => {
     return props.tabIndex;
   }
 
-  if (isDisabledLike.value && !props.alwaysFocusable) {
+  if (props.disabled && !props.alwaysFocusable) {
     return -1;
   }
 

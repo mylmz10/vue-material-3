@@ -37,11 +37,15 @@ import { MdAssistChip, MdChipSet, MdFilterChip, MdInputChip, MdSuggestionChip } 
 </MdChipSet>
 ```
 
+## Disabled focus behavior
+
+`soft-disabled` chips remain focusable and discoverable through chip-set arrow navigation, while clicks, selection and removal remain blocked. Hard-disabled chips are skipped unless `always-focusable` is set; that override permits focus but does not enable actions.
+
 ## Keyboard removal
 
 Focused removable chips accept Delete or Backspace. The forward horizontal arrow moves from the chip to its remove button, and the reverse arrow returns to the chip (Right/Left in LTR; Left/Right in RTL). Enter or Space on the remove button emits `remove`; disabled and soft-disabled chips cannot remove.
 
-Inside `MdChipSet`, removing a focused chip moves focus to the next enabled chip, then the previous one if needed. If no enabled chips remain, focus stays on the set. The parent still owns removing the chip from its data; focus is retained if removal is declined. For standalone chips, the parent should move focus to the appropriate input or control after removal. See the [M3 chip accessibility guidance](https://m3.material.io/components/chips/accessibility).
+Inside `MdChipSet`, removing a focused chip moves focus to the next focusable chip, then the previous one if needed. If no focusable chips remain, focus stays on the set. The parent still owns removing the chip from its data; focus is retained if removal is declined. For standalone chips, the parent should move focus to the appropriate input or control after removal. See the [M3 chip accessibility guidance](https://m3.material.io/components/chips/accessibility).
 
 ## Storybook
 

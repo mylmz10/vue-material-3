@@ -5,6 +5,56 @@ import MdChipSet from '@/components/chips/MdChipSet.vue';
 import MdFilterChip from '@/components/chips/MdFilterChip.vue';
 
 describe('MdChipSet', () => {
+  it('navigates soft-disabled and always-focusable chips without activating them', async () => {
+    const wrapper = mount(MdChipSet, {
+      attachTo: document.body,
+      props: { modelValue: 'a' },
+      slots: {
+        default: () => [
+          h(MdFilterChip, { label: 'A', value: 'a' }),
+          h(MdFilterChip, { label: 'Soft', value: 'b', softDisabled: true, removable: true }),
+          h(MdFilterChip, { label: 'Hard', value: 'c', disabled: true }),
+          h(MdFilterChip, { label: 'Discoverable', value: 'd', disabled: true, alwaysFocusable: true }),
+          h(MdFilterChip, { label: 'Last', value: 'e' }),
+        ],
+      },
+    });
+    await nextTick();
+    await nextTick();
+    const chips = wrapper.findAll('.md-chip');
+    chips[0].element.focus();
+    await chips[0].trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(chips[1].element);
+    expect(chips[1].attributes('tabindex')).toBe('0');
+    for (const key of ['Enter', ' ', 'Delete', 'Backspace']) await chips[1].trigger('keydown', { key });
+    await chips[1].trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(chips[3].element);
+    expect(chips[3].attributes('tabindex')).toBe('0');
+    await chips[3].trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    expect(chips[2].attributes('tabindex')).toBe('-1');
+    await chips[3].trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(chips[4].element);
+    wrapper.unmount();
+  });
+
+  it('honors boolean attributes and kebab-case always-focusable in template slots', async () => {
+    const wrapper = mount(MdChipSet, {
+      attachTo: document.body,
+      slots: { default: '<MdFilterChip label="Soft" soft-disabled /><MdFilterChip label="Hard" disabled /><MdFilterChip label="Discoverable" disabled always-focusable />' },
+      global: { components: { MdFilterChip } },
+    });
+    await nextTick();
+    await nextTick();
+    const chips = wrapper.findAll('.md-chip');
+    expect(chips.map((chip) => chip.attributes('tabindex'))).toEqual(['0', '-1', '-1']);
+    chips[0].element.focus();
+    await chips[0].trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(chips[2].element);
+    expect(chips[2].attributes('tabindex')).toBe('0');
+    wrapper.unmount();
+  });
+
   it('keeps one enabled tab stop as children are disabled, removed and re-enabled', async () => {
     const disabled = ref(false);
     const removed = ref(false);

@@ -136,7 +136,7 @@ export default {
       return Array.from(this.$el.querySelectorAll('[data-md-chip="true"]'));
     },
     getEnabledChipElements() {
-      return this.getChipElements().filter((chipElement) => chipElement.getAttribute('aria-disabled') !== 'true');
+      return this.getChipElements().filter((chipElement) => !chipElement.matches('.md-chip--disabled:not(.md-chip--always-focusable)'));
     },
     resolveCurrentIndex(chipElements) {
       if (!chipElements.length) {
@@ -171,6 +171,11 @@ export default {
         else this.$el.focus();
       });
     },
+    isItemFocusable(item) {
+      const disabled = item?.props?.disabled;
+      const alwaysFocusable = item?.props?.alwaysFocusable ?? item?.props?.['always-focusable'];
+      return !(disabled === '' || disabled) || alwaysFocusable === '' || !!alwaysFocusable;
+    },
     syncActiveIndex() {
       const slotItems = this.getSlotItems();
       if (!slotItems.length) {
@@ -178,18 +183,18 @@ export default {
         return;
       }
 
-      const firstSelectedIndex = slotItems.findIndex((item, index) => !item?.props?.disabled && this.isItemSelected(item, index));
+      const firstSelectedIndex = slotItems.findIndex((item, index) => this.isItemFocusable(item) && this.isItemSelected(item, index));
 
       if (firstSelectedIndex !== -1) {
         this.activeIndex = firstSelectedIndex;
         return;
       }
 
-      const firstEnabledIndex = slotItems.findIndex((item) => !item?.props?.disabled);
+      const firstEnabledIndex = slotItems.findIndex((item) => this.isItemFocusable(item));
       this.activeIndex = this.getActiveIndex(slotItems, firstEnabledIndex);
     },
-    getActiveIndex(slotItems, fallback = slotItems.findIndex((item) => !item?.props?.disabled)) {
-      return slotItems[this.activeIndex] && !slotItems[this.activeIndex]?.props?.disabled ? this.activeIndex : fallback;
+    getActiveIndex(slotItems, fallback = slotItems.findIndex((item) => this.isItemFocusable(item))) {
+      return slotItems[this.activeIndex] && this.isItemFocusable(slotItems[this.activeIndex]) ? this.activeIndex : fallback;
     },
     handleKeydown(event) {
       const chipElements = this.getEnabledChipElements();
@@ -259,7 +264,7 @@ export default {
             ...item.props,
             key: item?.key ?? index,
             selected,
-            tabIndex: item?.props?.disabled ? -1 : index === activeIndex ? 0 : -1,
+            tabIndex: this.isItemFocusable(item) && index === activeIndex ? 0 : -1,
             onClick: (event) => {
               originalClick?.(event);
               this.handleChipClick(index, event);

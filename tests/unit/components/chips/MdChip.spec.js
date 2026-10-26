@@ -3,6 +3,26 @@ import { mount } from '@vue/test-utils';
 import MdChip from '@/components/chips/MdChip.vue';
 
 describe('MdChip', () => {
+  it.each([
+    [{ softDisabled: true }, '0'],
+    [{ disabled: true }, '-1'],
+    [{ disabled: true, alwaysFocusable: true }, '0'],
+  ])('separates disabled focus eligibility from activation for %j', async (props, tabindex) => {
+    const wrapper = mount(MdChip, { attachTo: document.body, props: { ...props, label: 'Unavailable', variant: 'filter', removable: true } });
+    expect(wrapper.attributes('tabindex')).toBe(tabindex);
+    expect(wrapper.attributes('aria-disabled')).toBe('true');
+    if (tabindex === '0') {
+      wrapper.element.focus();
+      expect(document.activeElement).toBe(wrapper.element);
+    }
+    await wrapper.trigger('click');
+    for (const key of ['Enter', ' ', 'Delete', 'Backspace']) await wrapper.trigger('keydown', { key });
+    expect(wrapper.emitted('click')).toBeUndefined();
+    expect(wrapper.emitted('update:selected')).toBeUndefined();
+    expect(wrapper.emitted('remove')).toBeUndefined();
+    wrapper.unmount();
+  });
+
   it('toggles selected state for filter variant', async () => {
     const wrapper = mount(MdChip, {
       props: {
