@@ -180,9 +180,12 @@ const onTextFieldBlur = (ev) => {
   emit('blur', ev);
 };
 
-const onFormReset = () => {
-  inputValue.value = initialValue.value;
-  emit('update:modelValue', inputValue.value);
+const onFormReset = (event) => {
+  nextTick(() => {
+    if (event.defaultPrevented) return;
+    inputValue.value = initialValue.value;
+    emit('update:modelValue', inputValue.value);
+  });
 };
 
 const updateLabelOffset = () => {
