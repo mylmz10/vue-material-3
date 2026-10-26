@@ -25,7 +25,7 @@
       :style="getLabelStyle(option)"
       :data-dial-value="option.value"
       :aria-pressed="String(isSelected(option.value))"
-      @click.stop="selectValue(option.value)"
+      @click.stop="selectValue(option.value, $event)"
     >
       {{ option.label }}
     </button>
@@ -80,11 +80,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['select-hour', 'select-minute']);
+const emit = defineEmits(['select-hour', 'select-minute', 'selection-complete']);
 
 const dialEl = ref(null);
 let pointerMoveListener = null;
 let pointerUpListener = null;
+let pointerCancelListener = null;
 let activePointerId = null;
 
 const dialSize = DIAL_SIZE;
@@ -148,8 +149,11 @@ const emitSelection = (value) => {
   emit('select-minute', value);
 };
 
-const selectValue = (value) => {
+const selectValue = (value, event) => {
+  // Pointer gestures already select and complete before the synthesized click.
+  if (event.detail > 0) return;
   emitSelection(value);
+  emit('selection-complete', props.mode);
 };
 
 const updateFromPointer = (event) => {
@@ -174,6 +178,10 @@ const stopPointerSelection = () => {
     pointerUpListener = null;
   }
 
+  if (pointerCancelListener) {
+    window.removeEventListener('pointercancel', pointerCancelListener);
+    pointerCancelListener = null;
+  }
   activePointerId = null;
 };
 
@@ -192,11 +200,18 @@ const startPointerSelection = (event) => {
     if (upEvent.pointerId !== activePointerId) {
       return;
     }
+    updateFromPointer(upEvent);
+    const completedMode = props.mode;
     stopPointerSelection();
+    emit('selection-complete', completedMode);
+  };
+  pointerCancelListener = (cancelEvent) => {
+    if (cancelEvent.pointerId === activePointerId) stopPointerSelection();
   };
 
   window.addEventListener('pointermove', pointerMoveListener);
   window.addEventListener('pointerup', pointerUpListener);
+  window.addEventListener('pointercancel', pointerCancelListener);
 };
 
 onBeforeUnmount(() => {

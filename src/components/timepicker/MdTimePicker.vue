@@ -119,6 +119,7 @@
             :hour-cycle="resolvedHourCycle"
             @select-hour="selectHour"
             @select-minute="selectMinute"
+            @selection-complete="completeDialSelection"
           />
         </div>
       </transition>
@@ -296,7 +297,10 @@ const toggleEntryMode = () => {
 
 const selectHour = (hour12) => {
   draftTime.value = withHour(draftTime.value, hour12, meridiem.value, resolvedHourCycle.value);
-  activeSegment.value = 'minute';
+};
+
+const completeDialSelection = (mode) => {
+  if (mode === 'hour') activeSegment.value = 'minute';
 };
 
 const selectMinute = (minute) => {

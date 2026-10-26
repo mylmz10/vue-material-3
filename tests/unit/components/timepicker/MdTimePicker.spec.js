@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
 import { enableAutoUnmount, mount } from '@vue/test-utils';
 import MdTimePicker from '@/components/timepicker/MdTimePicker.vue';
 import MdTimePickerDial from '@/components/timepicker/MdTimePickerDial.vue';
@@ -128,6 +129,49 @@ describe('MdTimePicker', () => {
     await findButtonByText(wrapper, 'OK').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['20:15']);
+  });
+
+  it.each([12, 24])('keeps dragging hours until pointerup in the %s-hour cycle', async (hourCycle) => {
+    const wrapper = mount(MdTimePicker, { attachTo: document.body, props: { open: true, modelValue: '07:15', hourCycle } });
+    const dial = wrapper.get('.md-time-picker-dial');
+    vi.spyOn(dial.element, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 256, height: 256 });
+    const pointer = (type, x, y, pointerId = 1) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.assign(event, { clientX: x, clientY: y, pointerId });
+      (type === 'pointerdown' ? dial.element : window).dispatchEvent(event);
+    };
+    pointer('pointerdown', 240, 128);
+    await nextTick();
+    expect(dial.attributes('aria-label')).toBe('Select hour');
+    pointer('pointermove', 128, 240);
+    await nextTick();
+    expect(wrapper.get('[data-segment="hour"]').text()).toBe('06');
+    expect(wrapper.get('[data-segment="minute"]').text()).toBe('15');
+    pointer('pointerup', 128, 240);
+    await nextTick();
+    expect(dial.attributes('aria-label')).toBe('Select minute');
+    wrapper.get('[data-dial-value="30"]').element.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    await nextTick();
+    expect(wrapper.get('[data-segment="minute"]').text()).toBe('15');
+    await findButtonByText(wrapper, 'OK').trigger('click');
+    expect(wrapper.emitted('confirm')?.at(-1)).toEqual(['06:15']);
+  });
+
+  it('cleans up canceled gestures without advancing or accepting later moves', async () => {
+    const wrapper = mount(MdTimePicker, { attachTo: document.body, props: { open: true, modelValue: '07:15' } });
+    const dial = wrapper.get('.md-time-picker-dial');
+    await dial.trigger('pointerdown', { pointerId: 1, clientX: 240, clientY: 128 });
+    const cancel = new Event('pointercancel');
+    Object.assign(cancel, { pointerId: 1 });
+    window.dispatchEvent(cancel);
+    await nextTick();
+    const hour = wrapper.get('[data-segment="hour"]').text();
+    const move = new Event('pointermove');
+    Object.assign(move, { pointerId: 1, clientX: 128, clientY: 240 });
+    window.dispatchEvent(move);
+    await nextTick();
+    expect(dial.attributes('aria-label')).toBe('Select hour');
+    expect(wrapper.get('[data-segment="hour"]').text()).toBe(hour);
   });
 
   it('cleans up an earlier pointer selection before starting another one', async () => {
