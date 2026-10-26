@@ -128,6 +128,7 @@ const getAriaLabel = (day) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-date-picker-docked-values();
 
@@ -226,8 +227,9 @@ $theme: tokens.md-comp-date-picker-docked-values();
     width: var(--date-state-layer-width, #{map.get($theme, date-state-layer-width)});
 
     &:focus-visible {
-      outline: 2px solid currentColor;
+      outline: 3px solid #{theme.value('secondary')};
       outline-offset: 2px;
+      z-index: 2;
     }
 
     &:hover:not(:disabled) .md-date-picker-date-table__state-layer {
@@ -261,6 +263,19 @@ $theme: tokens.md-comp-date-picker-docked-values();
 
     &--selected .md-date-picker-date-table__state-layer {
       background-color: var(--date-selected-hover-state-layer-color, #{map.get($theme, date-selected-hover-state-layer-color)});
+    }
+
+    &:focus-visible:not(:disabled) .md-date-picker-date-table__state-layer {
+      background-color: var(--date-unselected-focus-state-layer-color, #{theme.value('on-surface-variant')});
+      opacity: var(--date-focus-state-layer-opacity, #{map.get($theme, date-focus-state-layer-opacity)});
+    }
+
+    &--today:focus-visible:not(:disabled) .md-date-picker-date-table__state-layer {
+      background-color: var(--date-today-focus-state-layer-color, #{theme.value('primary')});
+    }
+
+    &--selected:focus-visible:not(:disabled) .md-date-picker-date-table__state-layer {
+      background-color: var(--date-selected-focus-state-layer-color, #{theme.value('on-primary')});
     }
 
     &--in-range {
