@@ -72,7 +72,7 @@ const mdSelectContextKey = 'mdSelectContext';
 const props = defineProps({
   modelValue: {
     type: [String, Number, Boolean, Object],
-    default: '',
+    default: undefined,
   },
   value: {
     type: [String, Number, Boolean, Object],
@@ -129,9 +129,9 @@ const restoreFormValue = (event) => {
 const triggerEl = ref(null);
 const listEl = ref(null);
 const menuOpened = ref(false);
-const internalValue = ref(props.modelValue ?? props.value ?? '');
+const internalValue = ref(props.modelValue !== undefined ? props.modelValue : props.value ?? '');
 const displayLabel = ref('');
-const initialValue = ref(props.modelValue ?? props.value ?? '');
+const initialValue = ref(props.modelValue !== undefined ? props.modelValue : props.value ?? '');
 const registeredOptions = ref(new Map());
 const initializedFromOption = ref(false);
 const activeOptionId = ref('');
@@ -308,7 +308,7 @@ const onOptionSelectedStateChange = (option, selected) => {
 const registerOption = (option) => {
   registeredOptions.value.set(option.id, option);
 
-  if (!initializedFromOption.value && !normalizeValue(internalValue.value) && option.selected && !option.disabled) {
+  if (props.modelValue === undefined && !initializedFromOption.value && !normalizeValue(internalValue.value) && option.selected && !option.disabled) {
     initializedFromOption.value = true;
     internalValue.value = option.value;
     emit('update:modelValue', option.value);

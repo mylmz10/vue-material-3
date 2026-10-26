@@ -38,6 +38,10 @@ import { MdFilledSelect, MdOutlinedSelect, MdSelectOption } from 'vue-material-3
 </MdOutlinedSelect>
 ```
 
+## Value initialization
+
+`v-model` takes precedence over `value`, including an explicitly empty string. When no model is supplied, `value` sets the initial selection and the form-reset baseline. Later changes to `value` do not update the selection; use `v-model` for reactive updates.
+
 ## Object values
 
 Object-valued options are matched by reference identity, including reactive wrappers of the same object. Keep the model and option values tied to the same objects; a newly created object with identical properties is a different value. Primitive values retain their existing string-normalized comparison. Object equality is separate from native form serialization, which still converts the value to a string; use a primitive ID for form submissions that need a stable identifier.

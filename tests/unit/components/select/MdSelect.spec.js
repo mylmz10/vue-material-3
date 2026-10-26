@@ -10,6 +10,34 @@ describe('select components', () => {
     ['filled', MdFilledSelect],
     ['outlined', MdOutlinedSelect],
   ])('%s object values', (_, component) => {
+    it.each(['a', 0, false, { id: 1 }])('initializes from legacy value %s only when the model is absent', async (value) => {
+      const wrapper = mount(component, {
+        props: { value },
+        slots: { default: () => h(MdSelectOption, { value, displayText: 'Initial option' }) },
+      });
+      await nextTick();
+      expect(wrapper.get('[role="combobox"]').text()).toBe('Initial option');
+      expect(wrapper.get('[role="option"]').attributes('aria-selected')).toBe('true');
+      await wrapper.setProps({ value: 'later' });
+      expect(wrapper.get('[role="combobox"]').text()).toBe('Initial option');
+      wrapper.unmount();
+    });
+
+    it('keeps an explicit empty model ahead of value and selected-option fallbacks', async () => {
+      const wrapper = mount(component, {
+        props: { modelValue: '', value: 'a' },
+        slots: { default: () => h(MdSelectOption, { value: 'a', selected: true, displayText: 'Fallback' }) },
+      });
+      await nextTick();
+      expect(wrapper.get('[role="combobox"]').text()).toBe('');
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+      await wrapper.setProps({ value: 'later' });
+      expect(wrapper.get('[role="combobox"]').text()).toBe('');
+      await wrapper.setProps({ modelValue: 'a' });
+      expect(wrapper.get('[role="combobox"]').text()).toBe('Fallback');
+      wrapper.unmount();
+    });
+
     it('routes required validation to the visible trigger and prevents proxy edits', async () => {
       const form = document.createElement('form');
       document.body.append(form);
