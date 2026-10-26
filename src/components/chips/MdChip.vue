@@ -1,5 +1,6 @@
 <template>
   <component
+    ref="chipEl"
     :is="isLink ? 'a' : 'div'"
     class="md-chip"
     :class="chipClasses"
@@ -38,9 +39,11 @@
 
     <button
       v-if="showRemoveButton"
+      ref="removeEl"
       class="md-chip__remove"
       type="button"
       :tabindex="-1"
+      :disabled="isDisabledLike"
       :aria-label="removeAriaLabel"
       @click.stop="handleRemove"
       @keydown.enter.stop.prevent="handleRemove"
@@ -62,6 +65,8 @@ import MdIcon from '../icon/MdIcon.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
 const slots = useSlots();
+const chipEl = ref(null);
+const removeEl = ref(null);
 const chipSetContext = inject('mdChipSetContext', null);
 
 const props = defineProps({
@@ -181,10 +186,36 @@ const handleRemove = () => {
     return;
   }
 
+  const element = chipEl.value;
+  const hadFocus = element?.contains(document.activeElement);
+  const removedIndex = chipSetContext?.getEnabledChipElements().indexOf(element);
   emit('remove', props.value);
+  if (hadFocus) chipSetContext?.focusAfterRemoval(element, removedIndex);
 };
 
 const handleKeydown = (event) => {
+  if (event.defaultPrevented || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || (event.target !== chipEl.value && event.target !== removeEl.value)) return;
+
+  if (showRemoveButton.value && !isDisabledLike.value) {
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      event.preventDefault();
+      event.stopPropagation();
+      handleRemove();
+      return;
+    }
+
+    const rtl = getComputedStyle(chipEl.value).direction === 'rtl';
+    const toRemove = event.target === chipEl.value && event.key === (rtl ? 'ArrowLeft' : 'ArrowRight');
+    const toPrimary = event.target === removeEl.value && event.key === (rtl ? 'ArrowRight' : 'ArrowLeft');
+    if (toRemove || toPrimary) {
+      event.preventDefault();
+      event.stopPropagation();
+      (toRemove ? removeEl.value : chipEl.value).focus();
+      return;
+    }
+  }
+
+  if (event.target !== chipEl.value) return;
   if (event.key !== 'Enter' && event.key !== ' ') {
     return;
   }

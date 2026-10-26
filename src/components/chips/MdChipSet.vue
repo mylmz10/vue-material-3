@@ -144,7 +144,7 @@ export default {
       }
 
       const focusedIndex =
-        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement) : -1;
+        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement?.closest('[data-md-chip="true"]')) : -1;
 
       if (focusedIndex !== -1) {
         return focusedIndex;
@@ -161,6 +161,15 @@ export default {
       const boundedIndex = Math.max(0, Math.min(index, chipElements.length - 1));
       this.activeIndex = this.getChipElements().indexOf(chipElements[boundedIndex]);
       chipElements[boundedIndex]?.focus();
+    },
+    focusAfterRemoval(chipElement, removedIndex) {
+      this.$nextTick(() => {
+        // Respect a declined removal or focus explicitly moved by the consumer.
+        if (chipElement.isConnected || !this.$el?.isConnected || (document.activeElement !== document.body && document.activeElement !== document.documentElement)) return;
+        const chips = this.getEnabledChipElements();
+        if (chips.length) this.focusChip(Math.min(Math.max(removedIndex, 0), chips.length - 1));
+        else this.$el.focus();
+      });
     },
     syncActiveIndex() {
       const slotItems = this.getSlotItems();
@@ -230,6 +239,7 @@ export default {
       {
         class: 'md-chip-set',
         role: 'listbox',
+        tabindex: -1,
         'aria-multiselectable': this.isMulti ? 'true' : undefined,
         onKeydown: this.handleKeydown,
       },
