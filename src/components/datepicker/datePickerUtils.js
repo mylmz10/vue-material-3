@@ -261,10 +261,9 @@ export const getCombinedMonthYearLabel = (year, month, locale = 'en-US') => {
 export const getWeekdayLabels = (locale = 'en-US') => {
   const localeKey = resolveDayjsLocale(locale);
   const baseDate = dayjs().locale(localeKey);
-  const firstDayOfWeek = baseDate.localeData().firstDayOfWeek();
 
   return Array.from({ length: 7 }, (_, index) => {
-    const labelDate = baseDate.weekday(firstDayOfWeek + index);
+    const labelDate = baseDate.weekday(index);
     return new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(labelDate.toDate());
   });
 };
@@ -378,15 +377,13 @@ export const buildMonthGrid = ({
   const localeKey = resolveDayjsLocale(locale);
   const monthStart = dayjs().locale(localeKey).year(year).month(month).date(1).startOf('day');
   const monthEnd = monthStart.endOf('month').startOf('day');
-  const firstDayOfWeek = monthStart.localeData().firstDayOfWeek();
-  const lastDayOfWeek = (firstDayOfWeek + 6) % 7;
 
-  let gridStart = monthStart.weekday(firstDayOfWeek);
+  let gridStart = monthStart.weekday(0);
   if (gridStart.isAfter(monthStart, 'day')) {
     gridStart = gridStart.subtract(1, 'week');
   }
 
-  let gridEnd = monthEnd.weekday(lastDayOfWeek);
+  let gridEnd = monthEnd.weekday(6);
   if (gridEnd.isBefore(monthEnd, 'day')) {
     gridEnd = gridEnd.add(1, 'week');
   }

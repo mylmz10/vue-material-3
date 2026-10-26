@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { enableAutoUnmount, mount } from '@vue/test-utils';
+import { buildMonthGrid, getWeekdayLabels } from '@/components/datepicker/datePickerUtils';
 import MdDatePicker from '@/components/datepicker/MdDatePicker.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
@@ -14,6 +15,22 @@ describe('MdDatePicker', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it.each([
+    ['tr-TR', ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'], '2026-06-01', '2026-07-05', '2026-06-01', '2026-06-07'],
+    ['en-US', ['S', 'M', 'T', 'W', 'T', 'F', 'S'], '2026-05-31', '2026-07-04', '2026-06-07', '2026-06-13'],
+  ])('aligns headings, month cells and Home/End for %s', async (locale, labels, first, last, home, end) => {
+    expect(getWeekdayLabels(locale)).toEqual(labels);
+    const days = buildMonthGrid({ year: 2026, month: 5, locale });
+    expect(days[0].iso).toBe(first);
+    expect(days.at(-1).iso).toBe(last);
+    expect(days.findIndex((day) => day.iso === '2026-06-01')).toBe(locale === 'tr-TR' ? 0 : 1);
+    const wrapper = mount(MdDatePicker, { attachTo: document.body, props: { modelValue: locale === 'tr-TR' ? '2026-06-03' : '2026-06-10', locale, variant: 'docked', open: true } });
+    await wrapper.get(`[data-iso="${locale === 'tr-TR' ? '2026-06-03' : '2026-06-10'}"]`).trigger('keydown', { key: 'Home' });
+    expect(wrapper.get(`[data-iso="${home}"]`).attributes('tabindex')).toBe('0');
+    await wrapper.get(`[data-iso="${home}"]`).trigger('keydown', { key: 'End' });
+    expect(wrapper.get(`[data-iso="${end}"]`).attributes('tabindex')).toBe('0');
   });
 
   it('commits the selected date on confirm in modal mode', async () => {

@@ -703,9 +703,7 @@ const handleCalendarKeydown = async (event) => {
   if (event.key === 'Home' || event.key === 'End') {
     event.preventDefault();
     const focusedDate = parseModelValue(focusedIso.value) || dayjs().year(displayedYear.value).month(displayedMonth.value).date(1);
-    const firstDayOfWeek = dayjs().locale(localeKey.value).localeData().firstDayOfWeek();
-    const targetWeekday = event.key === 'Home' ? firstDayOfWeek : (firstDayOfWeek + 6) % 7;
-    let candidate = focusedDate.weekday(targetWeekday);
+    let candidate = focusedDate.locale(localeKey.value).weekday(event.key === 'Home' ? 0 : 6);
     if (event.key === 'Home' && candidate.isAfter(focusedDate, 'day')) {
       candidate = candidate.subtract(1, 'week');
     }
