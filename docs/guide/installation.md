@@ -6,7 +6,13 @@ Install `vue-material-3` from npm:
 npm install vue-material-3
 ```
 
-The package targets Vue 3 applications.
+The package targets Vue 3 applications. Load the compiled stylesheet once in your application entry (for example, `src/main.js`):
+
+```js
+import 'vue-material-3/style.css';
+```
+
+Importing components from the JavaScript entry does not load this separate CSS file.
 
 ## Peer Runtime
 

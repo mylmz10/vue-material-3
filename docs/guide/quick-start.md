@@ -1,6 +1,6 @@
 # Quick Start
 
-Import the component you need from `vue-material-3`:
+Import the component you need and the library stylesheet. The stylesheet can instead be imported once in your application entry:
 
 ```vue
 <template>
@@ -8,6 +8,7 @@ Import the component you need from `vue-material-3`:
 </template>
 
 <script setup>
+import 'vue-material-3/style.css';
 import { MdElevatedButton } from 'vue-material-3';
 </script>
 ```

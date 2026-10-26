@@ -4,13 +4,13 @@ Vue Material 3 follows the Material Design 3 token model. Component styles are b
 
 ## Typography
 
-The project includes Material 3 type scale styles. Import the package entry in your app to include the library styles exposed by the package:
+The project includes Material 3 type scale styles. Import the compiled stylesheet once in your application entry to load component styles, typography and theme variables:
 
 ```js
-import 'vue-material-3';
+import 'vue-material-3/style.css';
 ```
 
-When working inside this repository, Storybook and the package entry import the typography styles used by the component examples.
+The published JavaScript and CSS are separate assets; importing a component does not load the stylesheet. Source examples in this repository use Storybook’s global styles, so they do not demonstrate this required package import.
 
 ## Tokens
 

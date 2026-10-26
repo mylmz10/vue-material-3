@@ -44,6 +44,7 @@ npm install vue-material-3
 </template>
 
 <script setup>
+import 'vue-material-3/style.css';
 import { MdElevatedButton } from 'vue-material-3';
 </script>
 ```
