@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## [0.14.4](https://github.com/mylmz10/vue-material-3/compare/v0.14.3...v0.14.4) (2026-10-26)
+
+
+### Bug Fixes
+
+* align component tokens and PR validation ([a4b94e2](https://github.com/mylmz10/vue-material-3/commit/a4b94e27b2b6e8d5e32a23f3b67973ffe2d7ba76))
+* align component tokens and PR validation ([6764652](https://github.com/mylmz10/vue-material-3/commit/6764652b26bbc7ade61377ff1f912ab9faf0a989))
+* **autocomplete:** preserve filtered selection ([7232fee](https://github.com/mylmz10/vue-material-3/commit/7232fee2dbbd3637d0fb655ba784d0669772221c))
+* **autocomplete:** support keyboard selection and combobox semantics ([2e7f0bb](https://github.com/mylmz10/vue-material-3/commit/2e7f0bb2fd1cc02d7c28b7c272ada2579a13c932))
+* **chips:** enable keyboard removal and recover focus ([9a492bb](https://github.com/mylmz10/vue-material-3/commit/9a492bb5c08bc38cea90da3e9617021e85c77a16))
+* **dialog:** establish native modality and accessible naming ([d7a8c67](https://github.com/mylmz10/vue-material-3/commit/d7a8c6746948503af3d287989a21f7a5c611eeaa))
+* improve component interactions and theming ([8ed6baf](https://github.com/mylmz10/vue-material-3/commit/8ed6bafdc29d242187fc7fac55c9d56434fc8765))
+* **navigation-drawer:** add modal focus and dismissal behavior ([2566dfd](https://github.com/mylmz10/vue-material-3/commit/2566dfdfb29ba474cf204a105dc16caa79a972c9))
+* pin release source and adjust search and tab styles ([a2f66b2](https://github.com/mylmz10/vue-material-3/commit/a2f66b27ac562b28d22d18ae3edcbcf1d7d2ef4c))
+* resolve branch review regressions and tooltip coordination ([8a8dfec](https://github.com/mylmz10/vue-material-3/commit/8a8dfecbee9ef024723ddc26597d75b983b6c5d0))
+* **select:** compare object values by identity ([4999fd2](https://github.com/mylmz10/vue-material-3/commit/4999fd22f42896826db1f122e4c1da8011f57552))
+* **slider:** synchronize range model endpoints ([a9a9061](https://github.com/mylmz10/vue-material-3/commit/a9a90610421613fb0cf300df898438f9b4e8fcb2))
+* **text-field:** associate input labels and descriptions ([d334b1b](https://github.com/mylmz10/vue-material-3/commit/d334b1bddd78cf8d58ff6fd3a5cf767ca47084bc))
+
 ## [0.14.3](https://github.com/mylmz10/vue-material-3/compare/v0.14.2...v0.14.3) (2026-10-14)
 
 
