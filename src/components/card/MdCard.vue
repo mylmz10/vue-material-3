@@ -10,7 +10,7 @@
     }"
     :role="interactive ? 'button' : undefined"
     :tabindex="interactive ? 0 : undefined"
-    @click="emit('click', $event)"
+    @click="handleClick"
     @keydown="handleKeydown"
   >
     <div class="md-card__state-layer"></div>
@@ -78,6 +78,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['action', 'cancel', 'click']);
+
+const handleClick = (event) => {
+  const control = event.target.closest('a[href],button,input,select,textarea,summary,[tabindex],[contenteditable="true"],[contenteditable=""],[role="button"],[role="link"]');
+  if (props.interactive && (event.defaultPrevented || (control && control !== event.currentTarget))) return;
+  emit('click', event);
+};
 
 const handleKeydown = (event) => {
   if (!props.interactive || event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) {

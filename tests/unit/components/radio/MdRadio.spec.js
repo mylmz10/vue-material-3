@@ -74,6 +74,7 @@ describe('MdRadio', () => {
 
     form.reset();
     await nextTick();
+    await nextTick();
 
     expect(wrapper.vm.selected).toBe('istanbul');
     expect(first.element.checked).toBe(true);

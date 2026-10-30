@@ -82,15 +82,15 @@ import { MdElevatedButton } from 'vue-material-3';
 - `TimePicker` (`TimePicker`, `FilledTimePickerField`, `OutlinedTimePickerField`)
 - `Tooltip`
 
-## Planned Components
+## Additional Components
 
-These components are planned and not published in the current API yet:
+The working source also includes these standard M3 components (available in the next release):
 
-- [ ] BottomSheet
-- [ ] Carousel
-- [ ] NavigationRail
-- [ ] SideSheet
-- [ ] TopAppBar
+- [x] BottomSheet
+- [x] Carousel
+- [x] NavigationRail
+- [x] SideSheet
+- [x] TopAppBar
 
 ## Storybook
 
@@ -129,3 +129,5 @@ npm run build-storybook
 ## License
 
 MIT
+
+See [browser and package checks](docs/testing/browser.md) and the [Material baseline](docs/guide/material-baseline.md). Vue 3.5 or newer within Vue 3 is required.

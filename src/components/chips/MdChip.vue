@@ -101,7 +101,7 @@ watch(
   () => props.selected,
   (nextValue) => {
     selectedState.value = nextValue;
-  },
+  }
 );
 
 const hasLeadingSlot = computed(() => !!slots['leading-icon']);
@@ -109,7 +109,7 @@ const hasTrailingSlot = computed(() => !!slots['trailing-icon']);
 const hasAvatarSlot = computed(() => !!slots.avatar);
 
 const isLink = computed(() => !!props.href);
-const isInChipSet = computed(() => !!chipSetContext);
+const isInSelectionSet = computed(() => !!chipSetContext?.isSelectionSet);
 const isDisabledLike = computed(() => props.disabled || props.softDisabled);
 const isFilterVariant = computed(() => props.variant === 'filter');
 const isInputVariant = computed(() => props.variant === 'input');
@@ -145,9 +145,9 @@ const resolvedTabIndex = computed(() => {
 });
 
 const ariaDisabled = computed(() => (isDisabledLike.value ? 'true' : undefined));
-const resolvedRole = computed(() => (isInChipSet.value ? 'option' : isLink.value ? undefined : 'button'));
-const ariaPressed = computed(() => (isInChipSet.value || !isFilterVariant.value ? undefined : String(selectedState.value)));
-const ariaSelected = computed(() => (isInChipSet.value ? String(selectedState.value) : undefined));
+const resolvedRole = computed(() => (isInSelectionSet.value ? 'option' : isLink.value ? undefined : 'button'));
+const ariaPressed = computed(() => (isInSelectionSet.value || !(isFilterVariant.value || (isInputVariant.value && !props.removable)) ? undefined : String(selectedState.value)));
+const ariaSelected = computed(() => (isInSelectionSet.value ? String(selectedState.value) : undefined));
 
 const showLeadingCheckIcon = computed(() => isFilterVariant.value && selectedState.value && !hasLeadingSlot.value && !props.avatar);
 const showLeadingVisual = computed(() => showLeadingCheckIcon.value || !!props.leadingIcon || hasLeadingSlot.value || !!props.avatar || hasAvatarSlot.value);
@@ -270,7 +270,7 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
   cursor: pointer;
   display: inline-flex;
   gap: 8px;
-  height: var(--md-chip-container-height);
+  height: max(48px, var(--md-chip-container-height));
   min-width: 48px;
   outline: none;
   overflow: hidden;
@@ -279,10 +279,14 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
   text-decoration: none;
   vertical-align: middle;
 
+  > .md-ripple {
+    inset-block: 8px;
+  }
+
   &__outline,
   &__background {
     border-radius: var(--md-chip-container-shape);
-    inset: 0;
+    inset: 8px 0;
     position: absolute;
   }
 
@@ -349,8 +353,12 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values();
     cursor: inherit;
     display: inline-flex;
     justify-content: center;
-    margin: 0;
+    margin-block: -8px;
+    margin-inline-end: -12px;
     padding: 0;
+    inline-size: 48px;
+    block-size: 48px;
+    flex-shrink: 0;
     z-index: 1;
 
     .md-icon {

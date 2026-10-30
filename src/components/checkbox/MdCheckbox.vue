@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="md-checkbox"
-    :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }"
-  >
+  <div class="md-checkbox" :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }">
     <MdRipple />
     <input
       ref="inputEl"
@@ -29,7 +26,8 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
 const emit = defineEmits(['update:modelValue', 'update:model-value', 'input', 'change', 'focus', 'blur']);
@@ -39,7 +37,6 @@ const _checked = ref(false);
 const _indeterminate = ref(false);
 const initialChecked = ref(false);
 const initialIndeterminate = ref(false);
-let formEl = null;
 
 const props = defineProps({
   checked: { type: Boolean, default: undefined },
@@ -115,7 +112,7 @@ watch(
 
     _checked.value = !!newValue;
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 watch(
@@ -127,7 +124,7 @@ watch(
 
     _checked.value = !!newValue;
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 watch(
@@ -136,7 +133,7 @@ watch(
     _indeterminate.value = newValue;
     syncIndeterminateToInput();
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 const onFormReset = () => {
@@ -167,13 +164,9 @@ onMounted(() => {
   initialChecked.value = _checked.value;
   initialIndeterminate.value = _indeterminate.value;
   syncIndeterminateToInput();
-  formEl = inputEl.value?.form || null;
-  formEl?.addEventListener('reset', onFormReset);
 });
 
-onBeforeUnmount(() => {
-  formEl?.removeEventListener('reset', onFormReset);
-});
+useFormReset(() => inputEl.value, onFormReset);
 </script>
 
 <style lang="scss">

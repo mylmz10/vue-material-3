@@ -1,3 +1,4 @@
+import { ref, watch } from 'vue';
 import MdOutlinedTextField from '../../../src/components/text-field/MdOutlinedTextField.vue';
 
 // More on default export: https://storybook.js.org/docs/vue/writing-stories/introduction#default-export
@@ -14,10 +15,17 @@ const Template = (args) => ({
   components: { MdOutlinedTextField },
   // The story's `args` need to be mapped into the template through the `setup()` method
   setup() {
-    return { args };
+    const value = ref(args.modelValue);
+    watch(
+      () => args.modelValue,
+      (next) => {
+        value.value = next;
+      }
+    );
+    return { args, value };
   },
-  // And then the `args` are bound to your component with `v-bind="args"`
-  template: '<md-outlined-text-field v-bind="args" />',
+  // And then the `args` are bound to your component with `v-bind="args" v-model="value"`
+  template: '<md-outlined-text-field v-bind="args" v-model="value" />',
 });
 
 export const OutlinedTextField = Template.bind({});

@@ -1,10 +1,64 @@
-import { h, ref, nextTick } from 'vue';
+import { Fragment, h, ref, nextTick } from 'vue';
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import MdChipSet from '@/components/chips/MdChipSet.vue';
 import MdFilterChip from '@/components/chips/MdFilterChip.vue';
+import MdInputChip from '@/components/chips/MdInputChip.vue';
+import MdAssistChip from '@/components/chips/MdAssistChip.vue';
 
 describe('MdChipSet', () => {
+  it('renders compiled v-for fragments and maintains removal and navigation', async () => {
+    const wrapper = mount(
+      {
+        components: { MdChipSet, MdInputChip },
+        data: () => ({ labels: ['One', 'Two', 'Three'] }),
+        template: '<MdChipSet><MdInputChip v-for="label in labels" :key="label" :label="label" removable @remove="labels = labels.filter(item => item !== label)" /></MdChipSet>',
+      },
+      { attachTo: document.body }
+    );
+    await nextTick();
+    const chips = wrapper.findAll('.md-chip');
+    expect(chips.map((chip) => chip.text())).toEqual(['Oneclose', 'Twoclose', 'Threeclose']);
+    chips[0].element.focus();
+    await chips[0].trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(chips[1].element);
+    await chips[1].trigger('keydown', { key: 'Delete' });
+    await nextTick();
+    expect(wrapper.findAll('.md-chip')).toHaveLength(2);
+    expect(document.activeElement.textContent).toContain('Three');
+    wrapper.unmount();
+  });
+
+  it('announces selection for non-removable input chips in a group', async () => {
+    const wrapper = mount(MdChipSet, { slots: { default: () => h(MdInputChip, { label: 'Selected token' }) } });
+    await nextTick();
+    const chip = wrapper.get('.md-chip');
+    expect(wrapper.attributes('role')).toBe('group');
+    expect(chip.attributes('aria-pressed')).toBe('false');
+    await chip.trigger('click');
+    expect(chip.attributes('aria-pressed')).toBe('true');
+    wrapper.unmount();
+  });
+
+  it('uses group semantics for mixed actions and retains filter toggle semantics', async () => {
+    const wrapper = mount(MdChipSet, {
+      attachTo: document.body,
+      props: { selectionMode: 'multi' },
+      slots: { default: () => [h(Fragment, {}, [h(MdFilterChip, { label: 'Filter' }), h(MdAssistChip, { label: 'Action' }), h(MdInputChip, { label: 'Token', removable: true })])] },
+    });
+    await nextTick();
+    expect(wrapper.attributes('role')).toBe('group');
+    expect(wrapper.attributes('aria-multiselectable')).toBeUndefined();
+    const chips = wrapper.findAll('.md-chip');
+    expect(chips.map((chip) => chip.attributes('role'))).toEqual(['button', 'button', 'button']);
+    expect(chips.map((chip) => chip.attributes('aria-selected'))).toEqual([undefined, undefined, undefined]);
+    expect(chips[0].attributes('aria-pressed')).toBe('false');
+    await chips[0].trigger('click');
+    expect(chips[0].attributes('aria-pressed')).toBe('true');
+    expect(chips[1].attributes('aria-pressed')).toBeUndefined();
+    wrapper.unmount();
+  });
+
   it('navigates soft-disabled and always-focusable chips without activating them', async () => {
     const wrapper = mount(MdChipSet, {
       attachTo: document.body,

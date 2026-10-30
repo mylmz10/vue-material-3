@@ -235,6 +235,7 @@ describe('select components', () => {
     await wrapper.findAll('.md-select-option')[1].trigger('click');
     form.dispatchEvent(new Event('reset'));
     await nextTick();
+    await nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([0]);
     wrapper.unmount();
@@ -256,6 +257,7 @@ describe('select components', () => {
     await wrapper.get('.md-outlined-select__trigger').trigger('click');
     await wrapper.findAll('.md-select-option')[1].trigger('click');
     form.dispatchEvent(new Event('reset'));
+    await nextTick();
     await nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([0]);

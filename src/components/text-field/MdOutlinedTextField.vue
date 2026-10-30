@@ -72,7 +72,8 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { computed, nextTick, onMounted, ref, useId, useSlots, watch } from 'vue';
 import MdTextFieldBase from './MdTextFieldBase.vue';
 import MdOutlinedField from '../field/MdOutlinedField.vue';
 import { getControlAttrs } from '../field/fieldAttrs';
@@ -125,7 +126,7 @@ const textFieldEl = ref(null);
 const initialValue = ref(inputValue.value);
 const isInputFocused = ref(false);
 const labelOffset = ref(0);
-let formEl = null;
+
 const hasInputValue = computed(() => inputValue.value !== '');
 
 const resolvedSupportingText = computed(() => {
@@ -136,7 +137,7 @@ const resolvedSupportingText = computed(() => {
   return props.supportingText;
 });
 const hasSupportingText = computed(() => !!(resolvedSupportingText.value || props.supportingTextEnd || slots['supporting-text'] || slots['supporting-text-end']));
-const ariaInvalid = computed(() => ((props.error || props.invalid) ? 'true' : ''));
+const ariaInvalid = computed(() => (props.error || props.invalid ? 'true' : ''));
 const showPrefix = computed(() => hasInputValue.value || isInputFocused.value || props.focused);
 const resolvedPlaceholder = computed(() => {
   if (!props.label) {
@@ -188,12 +189,9 @@ const onTextFieldBlur = (ev) => {
   emit('blur', ev);
 };
 
-const onFormReset = (event) => {
-  nextTick(() => {
-    if (event.defaultPrevented) return;
-    inputValue.value = initialValue.value;
-    emit('update:modelValue', inputValue.value);
-  });
+const onFormReset = () => {
+  inputValue.value = initialValue.value;
+  emit('update:modelValue', inputValue.value);
 };
 
 const updateLabelOffset = () => {
@@ -221,20 +219,14 @@ defineExpose({
 
 onMounted(() => {
   initialValue.value = normalizeValue(resolveInitialValue());
-  const inputEl = textFieldEl.value?.getInputEl?.();
-  formEl = inputEl?.form || null;
-  formEl?.addEventListener('reset', onFormReset);
   nextTick(updateLabelOffset);
-});
-
-onBeforeUnmount(() => {
-  formEl?.removeEventListener('reset', onFormReset);
 });
 
 watch([showPrefix, () => props.prefix, inputValue], async () => {
   await nextTick();
   updateLabelOffset();
 });
+useFormReset(() => textFieldEl.value?.getInputEl?.(), onFormReset);
 </script>
 
 <style lang="scss">

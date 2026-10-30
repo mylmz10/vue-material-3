@@ -1,3 +1,4 @@
+import { ref, watch } from 'vue';
 import MdFilledSelect from '../../../src/components/select/MdFilledSelect.vue';
 import MdSelectOption from '../../../src/components/select/MdSelectOption.vue';
 
@@ -10,9 +11,16 @@ export default {
 const Template = (args) => ({
   components: { MdFilledSelect, MdSelectOption },
   setup() {
-    return { args };
+    const value = ref(args.modelValue);
+    watch(
+      () => args.modelValue,
+      (next) => {
+        value.value = next;
+      }
+    );
+    return { args, value };
   },
-  template: `<MdFilledSelect v-bind="args">
+  template: `<MdFilledSelect v-bind="args" v-model="value">
     <MdSelectOption value="">Select city</MdSelectOption>
     <MdSelectOption value="istanbul" display-text="Istanbul (TR)">Istanbul</MdSelectOption>
     <MdSelectOption value="ankara">Ankara</MdSelectOption>

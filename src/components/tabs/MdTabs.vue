@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, provide, ref, watch } from 'vue';
+import { computed, nextTick, provide, ref, watch, onUpdated } from 'vue';
 import { mdTabsContextKey } from './tabsContext';
 
 const props = defineProps({
@@ -90,8 +90,19 @@ const findNearestEnabledIndex = (index) => {
   return enabledIndices[enabledIndices.length - 1];
 };
 
-const syncState = () => {
-  tabs.value = orderTabs(tabs.value);
+const syncState = ({ emitCorrection = true } = {}) => {
+  const selectedId = tabs.value[selectedIndex.value]?.id;
+  const ordered = orderTabs(tabs.value);
+  if (ordered.some((tab, index) => tab.id !== tabs.value[index]?.id)) {
+    tabs.value = ordered;
+    if (!isControlled.value)
+      selectedIndex.value = Math.max(
+        0,
+        tabs.value.findIndex((tab) => tab.id === selectedId)
+      );
+    const activeIndex = tabs.value.findIndex((tab) => tab.el === document.activeElement);
+    if (activeIndex !== -1) focusedIndex.value = activeIndex;
+  }
 
   if (!tabs.value.length) {
     selectedIndex.value = 0;
@@ -106,7 +117,7 @@ const syncState = () => {
   selectedIndex.value = nextSelectedIndex === -1 ? 0 : nextSelectedIndex;
   focusedIndex.value = nextFocusedIndex === -1 ? selectedIndex.value : nextFocusedIndex;
 
-  if (isControlled.value && nextSelectedIndex !== -1 && props.modelValue !== nextSelectedIndex) {
+  if (emitCorrection && isControlled.value && nextSelectedIndex !== -1 && props.modelValue !== nextSelectedIndex) {
     emit('update:modelValue', nextSelectedIndex);
   }
 };
@@ -166,6 +177,16 @@ const focusTabByIndex = (index) => {
   });
 };
 
+let syncQueued = false;
+const scheduleSync = () => {
+  if (syncQueued) return;
+  syncQueued = true;
+  nextTick(() => {
+    syncQueued = false;
+    syncState();
+  });
+};
+
 const registerTab = (tab) => {
   const existingIndex = getTabIndexById(tab.id);
   if (existingIndex === -1) {
@@ -176,7 +197,8 @@ const registerTab = (tab) => {
       ...tab,
     };
   }
-  syncState();
+  syncState({ emitCorrection: false });
+  scheduleSync();
 };
 
 const updateTab = (tabId, patch) => {
@@ -188,12 +210,12 @@ const updateTab = (tabId, patch) => {
     ...tabs.value[index],
     ...patch,
   };
-  syncState();
+  scheduleSync();
 };
 
 const unregisterTab = (tabId) => {
   tabs.value = tabs.value.filter((tab) => tab.id !== tabId);
-  syncState();
+  scheduleSync();
 };
 
 const activateTab = (tabId, reason = 'programmatic') => {
@@ -322,6 +344,8 @@ watch(
   },
   { immediate: true }
 );
+
+onUpdated(syncState);
 
 provide(mdTabsContextKey, {
   registerTab,

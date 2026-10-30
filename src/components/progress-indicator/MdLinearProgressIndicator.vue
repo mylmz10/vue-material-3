@@ -6,7 +6,7 @@
     :aria-label="ariaLabel"
     :aria-valuemin="indeterminate ? undefined : 0"
     :aria-valuemax="indeterminate ? undefined : 100"
-    :aria-valuenow="indeterminate ? undefined : value"
+    :aria-valuenow="indeterminate ? undefined : boundedValue"
   >
     <div class="md-linear-progress-indicator__track"></div>
     <div class="md-linear-progress-indicator__indicator" :style="indicatorStyle"></div>
@@ -25,8 +25,12 @@ const props = defineProps({
 
 const indicatorStyle = computed(() => {
   return {
-    width: props.indeterminate ? '' : `${props.value}%`,
+    width: props.indeterminate ? '' : `${boundedValue.value}%`,
   };
+});
+const boundedValue = computed(() => {
+  const value = Number(props.value);
+  return Number.isNaN(value) ? 0 : Math.min(100, Math.max(0, value));
 });
 </script>
 
@@ -98,6 +102,17 @@ $theme: tokens.md-comp-linear-progress-indicator-values();
   100% {
     left: 50%;
     transform: scaleX(0.04);
+  }
+}
+</style>
+
+<style>
+@media (prefers-reduced-motion: reduce) {
+  .md-linear-progress-indicator,
+  .md-linear-progress-indicator *,
+  .md-linear-progress-indicator::before {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>

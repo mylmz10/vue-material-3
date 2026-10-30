@@ -1,0 +1,51 @@
+import { describe, expect, it, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
+import MdTopAppBar from '@/components/top-app-bar/MdTopAppBar.vue';
+describe('MdTopAppBar', () => {
+  it('names navigation and actions and never submits a form', async () => {
+    const action = { icon: 'search', label: 'Search library' };
+    const wrapper = mount(MdTopAppBar, { props: { title: 'Library', navigationIcon: 'menu', actions: [action] } });
+    const buttons = wrapper.findAll('button');
+    expect(buttons.map((button) => button.attributes('type'))).toEqual(['button', 'button']);
+    expect(buttons.map((button) => button.attributes('aria-label'))).toEqual(['Open navigation', 'Search library']);
+    await buttons[0].trigger('click');
+    await buttons[1].trigger('click');
+    expect(wrapper.emitted('navigation')).toHaveLength(1);
+    expect(wrapper.emitted('action')[0].slice(0, 2)).toEqual([action, 0]);
+    expect(wrapper.get('h1').text()).toBe('Library');
+  });
+  it('collapses large bars from a supplied scroll container and cleans up listeners', async () => {
+    const target = document.createElement('div');
+    const remove = vi.spyOn(target, 'removeEventListener');
+    const wrapper = mount(MdTopAppBar, { props: { title: 'A long page title', variant: 'large', scrollBehavior: 'collapse', scrollTarget: target } });
+    expect(wrapper.attributes('style')).toContain('152px');
+    target.scrollTop = 100;
+    target.dispatchEvent(new Event('scroll'));
+    await wrapper.vm.$nextTick();
+    expect(wrapper.classes()).toContain('md-top-app-bar--collapsed');
+    expect(wrapper.attributes('style')).toContain('64px');
+    expect(wrapper.findAll('h1')).toHaveLength(1);
+    target.scrollTop = 0;
+    target.dispatchEvent(new Event('scroll'));
+    await wrapper.vm.$nextTick();
+    expect(wrapper.classes()).not.toContain('md-top-app-bar--collapsed');
+    wrapper.unmount();
+    expect(remove).toHaveBeenCalledWith('scroll', expect.any(Function));
+  });
+  it('keeps pinned bars expanded and rebinds scroll targets', async () => {
+    const first = document.createElement('div');
+    const second = document.createElement('div');
+    const wrapper = mount(MdTopAppBar, { props: { variant: 'medium', scrollTarget: first } });
+    await wrapper.setProps({ scrollTarget: second });
+    first.scrollTop = 200;
+    first.dispatchEvent(new Event('scroll'));
+    await wrapper.vm.$nextTick();
+    expect(wrapper.classes()).not.toContain('md-top-app-bar--scrolled');
+    second.scrollTop = 20;
+    second.dispatchEvent(new Event('scroll'));
+    await wrapper.vm.$nextTick();
+    expect(wrapper.classes()).toContain('md-top-app-bar--scrolled');
+    expect(wrapper.attributes('style')).toContain('112px');
+    wrapper.unmount();
+  });
+});

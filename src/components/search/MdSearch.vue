@@ -1,12 +1,16 @@
 <template>
-  <div class="search-wrapper">
+  <div class="search-wrapper" :class="$attrs.class" :style="$attrs.style">
     <div class="search-container">
-      <button class="search-action search-action--leading" type="button" @click="$emit('searchClick')">
+      <button aria-label="Search" class="search-action search-action--leading" type="button" :disabled="disabled" @click="$emit('searchClick')">
         <MdIcon>search</MdIcon>
       </button>
 
       <input
+        v-bind="getControlAttrs($attrs)"
+        :aria-label="$attrs['aria-label'] || 'Search'"
         v-model="inputValue"
+        :disabled="disabled"
+        :readonly="readonly"
         type="text"
         :placeholder="placeholder"
         class="search-input"
@@ -21,7 +25,13 @@
         <slot name="avatar"></slot>
       </div>
 
-      <button class="search-action search-action--trailing" type="button" @click="handleTrailingClick">
+      <button
+        :aria-label="inputValue ? 'Clear search' : trailingLabel"
+        class="search-action search-action--trailing"
+        type="button"
+        :disabled="disabled || (readonly && !!inputValue)"
+        @click="handleTrailingClick"
+      >
         <slot name="trailing" :icon="resolvedTrailingIcon" :dirty="!!inputValue">
           <MdIcon>{{ resolvedTrailingIcon }}</MdIcon>
         </slot>
@@ -33,8 +43,13 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
+import { getControlAttrs } from '../field/fieldAttrs';
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
+  disabled: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: false },
+  trailingLabel: { type: String, default: 'Voice search' },
   modelValue: {
     type: String,
     default: '',
@@ -72,6 +87,7 @@ const handleInput = () => {
 
 const handleTrailingClick = () => {
   const action = resolvedTrailingIcon.value;
+  if (props.disabled || (props.readonly && action === 'close')) return;
 
   if (action === 'close') {
     inputValue.value = '';

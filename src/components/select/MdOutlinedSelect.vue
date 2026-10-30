@@ -61,7 +61,8 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRaw, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { computed, nextTick, onMounted, provide, ref, toRaw, watch } from 'vue';
 import MdOutlinedField from '../field/MdOutlinedField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdList from '../list/MdList.vue';
@@ -421,7 +422,7 @@ const onListKeydown = (event) => {
 
   if (event.key === 'Home') {
     event.preventDefault();
-    setInitialActiveOption(1);
+    activeOptionId.value = getOptions().filter((option) => !option.disabled)[0]?.id || '';
     nextTick(() => {
       focusActiveOptionElement();
     });
@@ -430,7 +431,10 @@ const onListKeydown = (event) => {
 
   if (event.key === 'End') {
     event.preventDefault();
-    setInitialActiveOption(-1);
+    activeOptionId.value =
+      getOptions()
+        .filter((option) => !option.disabled)
+        .at(-1)?.id || '';
     nextTick(() => {
       focusActiveOptionElement();
     });
@@ -458,13 +462,11 @@ const onBlur = (event) => {
 
 const handleFormReset = () => {
   validationInvalid.value = false;
-  nextTick(() => {
-    internalValue.value = initialValue.value ?? '';
-    emit('update:modelValue', internalValue.value);
-    emit('input', internalValue.value);
-    emit('change', internalValue.value);
-    syncDisplayLabel();
-  });
+  internalValue.value = initialValue.value ?? '';
+  emit('update:modelValue', internalValue.value);
+  emit('input', internalValue.value);
+  emit('change', internalValue.value);
+  syncDisplayLabel();
 };
 
 watch(
@@ -500,12 +502,9 @@ watch(
 
 onMounted(() => {
   syncDisplayLabel();
-  triggerEl.value?.closest('form')?.addEventListener('reset', handleFormReset);
 });
 
-onBeforeUnmount(() => {
-  triggerEl.value?.closest('form')?.removeEventListener('reset', handleFormReset);
-});
+useFormReset(() => triggerEl.value, handleFormReset);
 </script>
 
 <style lang="scss">

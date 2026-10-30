@@ -34,3 +34,11 @@ Vue Material 3 currently includes these component groups:
 | Tooltip | [`MdTooltip`](/components/tooltip) |
 
 Interactive examples should live in Storybook. This page can grow into per-component usage and API documentation.
+
+## Additional standard M3 components
+
+- [Bottom Sheet](./bottom-sheet)
+- [Carousel](./carousel)
+- [Navigation Rail](./navigation-rail)
+- [Side Sheet](./side-sheet)
+- [Top App Bar](./top-app-bar)

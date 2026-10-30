@@ -1,5 +1,5 @@
 <script>
-import { h } from 'vue';
+import { Fragment, h } from 'vue';
 
 export default {
   name: 'MdChipSet',
@@ -26,6 +26,10 @@ export default {
     };
   },
   computed: {
+    isSelectionSet() {
+      const items = this.getSlotItems();
+      return items.length > 0 && items.every(this.isFilterItem);
+    },
     isMulti() {
       if (this.selectionMode === 'multi') {
         return true;
@@ -61,9 +65,15 @@ export default {
     },
   },
   methods: {
+    flattenItems(items) {
+      return items.flatMap((item) => (item?.type === Fragment ? this.flattenItems(item.children || []) : item && typeof item.type !== 'symbol' ? [item] : []));
+    },
     getSlotItems() {
-      const items = this.$slots.default ? this.$slots.default() : [];
-      return items.filter((item) => item && typeof item.type !== 'symbol');
+      return this.flattenItems(this.$slots.default ? this.$slots.default() : []);
+    },
+    isFilterItem(item) {
+      const name = item.type?.name || item.type?.__name;
+      return name === 'MdFilterChip' || (name === 'MdChip' && (!item.props?.variant || item.props.variant === 'filter'));
     },
     getItemValue(item, index) {
       if (item?.props?.value !== undefined) {
@@ -143,8 +153,7 @@ export default {
         return 0;
       }
 
-      const focusedIndex =
-        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement?.closest('[data-md-chip="true"]')) : -1;
+      const focusedIndex = typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement?.closest('[data-md-chip="true"]')) : -1;
 
       if (focusedIndex !== -1) {
         return focusedIndex;
@@ -247,9 +256,9 @@ export default {
       'div',
       {
         class: 'md-chip-set',
-        role: 'listbox',
+        role: this.isSelectionSet ? 'listbox' : 'group',
         tabindex: -1,
-        'aria-multiselectable': this.isMulti ? 'true' : undefined,
+        'aria-multiselectable': this.isSelectionSet && this.isMulti ? 'true' : undefined,
         onKeydown: this.handleKeydown,
       },
       slotItems.map((item, index) => {
@@ -278,9 +287,9 @@ export default {
               originalFocus?.(event);
             },
           },
-          item.children,
+          item.children
         );
-      }),
+      })
     );
   },
 };

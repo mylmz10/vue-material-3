@@ -6,8 +6,15 @@ import MdOutlinedTextField from '@/components/text-field/MdOutlinedTextField.vue
 
 enableAutoUnmount(afterEach);
 
-describe.each([['filled', MdFilledTextField], ['outlined', MdOutlinedTextField]])('%s text-field value', (_, component) => {
-  it.each([['', ''], [0, '0'], [null, '']])('prioritizes explicit model %s over legacy value updates', async (modelValue, expected) => {
+describe.each([
+  ['filled', MdFilledTextField],
+  ['outlined', MdOutlinedTextField],
+])('%s text-field value', (_, component) => {
+  it.each([
+    ['', ''],
+    [0, '0'],
+    [null, ''],
+  ])('prioritizes explicit model %s over legacy value updates', async (modelValue, expected) => {
     const wrapper = mount(component, { props: { modelValue, value: 'fallback' } });
     expect(wrapper.get('input').element.value).toBe(expected);
     await wrapper.setProps({ value: 'later fallback' });
@@ -50,6 +57,7 @@ describe.each([['filled', MdFilledTextField], ['outlined', MdOutlinedTextField]]
     const preventReset = (event) => event.preventDefault();
     form.addEventListener('reset', preventReset);
     form.reset();
+    await nextTick();
     await nextTick();
     expect(wrapper.get('input').element.value).toBe('25');
     expect(wrapper.emitted('update:modelValue')).toHaveLength(updates);

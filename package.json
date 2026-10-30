@@ -30,7 +30,10 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy-storybook": "gh-pages -d storybook-static",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:browser": "node tests/browser/run.mjs",
+    "test:visual": "node tests/browser/run.mjs --visual",
+    "test:package": "node scripts/package-smoke.mjs"
   },
   "repository": {
     "type": "git",
@@ -94,5 +97,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
   }
 }

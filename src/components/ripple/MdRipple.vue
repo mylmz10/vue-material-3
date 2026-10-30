@@ -36,28 +36,32 @@ const surfaceClasses = computed(() => ({
   'md-ripple-surface--unbounded': unbounded.value,
 }));
 
+let host;
+let pressAnimation;
 onMounted(() => {
-  mdRipple.value.parentElement.addEventListener('focusin', handleRippleFocus);
-  mdRipple.value.parentElement.addEventListener('focusout', handleRippleBlur);
-  mdRipple.value.parentElement.addEventListener('mousedown', handleRippleActivate);
-  mdRipple.value.parentElement.addEventListener('mouseenter', handleRippleMouseEnter);
-  mdRipple.value.parentElement.addEventListener('mouseleave', handleRippleMouseLeave);
-  mdRipple.value.parentElement.addEventListener('touchstart', handleRippleActivate);
-  mdRipple.value.parentElement.addEventListener('mouseup', handleRippleDeactivate);
-  mdRipple.value.parentElement.addEventListener('touchend', handleRippleDeactivate);
-  mdRipple.value.parentElement.addEventListener('touchcancel', handleRippleDeactivate);
+  host = mdRipple.value.parentElement;
+  host.addEventListener('focusin', handleRippleFocus);
+  host.addEventListener('focusout', handleRippleBlur);
+  host.addEventListener('pointerdown', handleRippleActivate);
+  host.addEventListener('pointerenter', handleRippleMouseEnter);
+  host.addEventListener('pointerleave', handleRippleMouseLeave);
 });
 
+function removeReleaseListeners() {
+  host?.ownerDocument.removeEventListener('pointerup', handleRippleDeactivate, true);
+  host?.ownerDocument.removeEventListener('pointercancel', handleRippleDeactivate, true);
+  host?.ownerDocument.defaultView?.removeEventListener('blur', handleRippleDeactivate);
+}
+
 onBeforeUnmount(() => {
-  mdRipple.value.parentElement.removeEventListener('focusin', handleRippleFocus);
-  mdRipple.value.parentElement.removeEventListener('focusout', handleRippleBlur);
-  mdRipple.value.parentElement.removeEventListener('mousedown', handleRippleActivate);
-  mdRipple.value.parentElement.removeEventListener('mouseenter', handleRippleMouseEnter);
-  mdRipple.value.parentElement.removeEventListener('mouseleave', handleRippleMouseLeave);
-  mdRipple.value.parentElement.removeEventListener('touchstart', handleRippleActivate);
-  mdRipple.value.parentElement.removeEventListener('mouseup', handleRippleDeactivate);
-  mdRipple.value.parentElement.removeEventListener('touchend', handleRippleDeactivate);
-  mdRipple.value.parentElement.removeEventListener('touchcancel', handleRippleDeactivate);
+  host?.removeEventListener('focusin', handleRippleFocus);
+  host?.removeEventListener('focusout', handleRippleBlur);
+  host?.removeEventListener('pointerdown', handleRippleActivate);
+  host?.removeEventListener('pointerenter', handleRippleMouseEnter);
+  host?.removeEventListener('pointerleave', handleRippleMouseLeave);
+  removeReleaseListeners();
+  clearTimeout(delayedEndPressHandle.value);
+  pressAnimation?.cancel();
 });
 
 function getDimensions() {
@@ -70,7 +74,7 @@ function determineRippleSize() {
   const softEdgeSize = Math.max(SOFT_EDGE_CONTAINER_RATIO * maxDim, SOFT_EDGE_MINIMUM_SIZE);
 
   let maxRadius = maxDim;
-  let _initialSize = Math.floor(maxDim * INITIAL_ORIGIN_SCALE);
+  let _initialSize = Math.max(2, Math.floor(maxDim * INITIAL_ORIGIN_SCALE));
 
   const hypotenuse = Math.sqrt(width ** 2 + height ** 2);
   maxRadius = hypotenuse + PADDING;
@@ -125,7 +129,8 @@ function startPressAnimation(positionEvent) {
   const translateStart = `${startPoint.x}px, ${startPoint.y}px`;
   const translateEnd = `${endPoint.x}px, ${endPoint.y}px`;
 
-  mdRippleSurface.value.animate(
+  pressAnimation?.cancel();
+  pressAnimation = mdRippleSurface.value.animate?.(
     {
       top: [0, 0],
       left: [0, 0],
@@ -161,6 +166,11 @@ function handleRippleBlur() {
 }
 
 function handleRippleActivate(positionEvent) {
+  if (positionEvent.button !== undefined && positionEvent.button !== 0) return;
+  if (host.matches(':disabled, [aria-disabled="true"]') || host.querySelector(':scope > input:disabled')) return;
+  host.ownerDocument.addEventListener('pointerup', handleRippleDeactivate, true);
+  host.ownerDocument.addEventListener('pointercancel', handleRippleDeactivate, true);
+  host.ownerDocument.defaultView?.addEventListener('blur', handleRippleDeactivate);
   pressed.value = true;
   if (delayedEndPressHandle.value !== null) {
     clearTimeout(delayedEndPressHandle.value);
@@ -170,6 +180,8 @@ function handleRippleActivate(positionEvent) {
 }
 
 function handleRippleDeactivate() {
+  removeReleaseListeners();
+  clearTimeout(delayedEndPressHandle.value);
   delayedEndPressHandle.value = setTimeout(() => {
     pressed.value = false;
     delayedEndPressHandle.value = null;
@@ -194,12 +206,13 @@ function handleRippleDeactivate() {
     outline: 0;
     -webkit-tap-highlight-color: transparent;
 
-    &::before, &::after {
+    &::before,
+    &::after {
       position: absolute;
       opacity: 0;
       pointer-events: none;
       z-index: -1;
-      content: "";
+      content: '';
     }
 
     &::after {

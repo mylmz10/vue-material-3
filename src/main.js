@@ -58,3 +58,8 @@ export { default as MdOutlinedAutoComplete } from './components/autocomplete/MdO
 export { default as MdTabs } from './components/tabs/MdTabs.vue';
 export { default as MdPrimaryTab } from './components/tabs/MdPrimaryTab.vue';
 export { default as MdSecondaryTab } from './components/tabs/MdSecondaryTab.vue';
+export { default as MdNavigationRail } from './components/navigation-rail/MdNavigationRail.vue';
+export { default as MdTopAppBar } from './components/top-app-bar/MdTopAppBar.vue';
+export { default as MdCarousel } from './components/carousel/MdCarousel.vue';
+export { default as MdBottomSheet } from './components/bottom-sheet/MdBottomSheet.vue';
+export { default as MdSideSheet } from './components/side-sheet/MdSideSheet.vue';

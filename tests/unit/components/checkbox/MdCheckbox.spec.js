@@ -62,6 +62,7 @@ describe('MdCheckbox', () => {
 
     form.reset();
     await nextTick();
+    await nextTick();
 
     expect(input.element.checked).toBe(true);
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([true]);

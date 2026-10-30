@@ -1,18 +1,7 @@
 <template>
-  <div
-    ref="dialEl"
-    class="md-time-picker-dial"
-    :aria-label="mode === 'hour' ? 'Select hour' : 'Select minute'"
-    @pointerdown="startPointerSelection"
-  >
+  <div ref="dialEl" class="md-time-picker-dial" :aria-label="mode === 'hour' ? 'Select hour' : 'Select minute'" @pointerdown="startPointerSelection">
     <svg class="md-time-picker-dial__selector" :viewBox="`0 0 ${dialSize} ${dialSize}`" aria-hidden="true">
-      <line
-        class="md-time-picker-dial__track"
-        :x1="center"
-        :y1="center"
-        :x2="selectedPoint.x"
-        :y2="selectedPoint.y"
-      />
+      <line class="md-time-picker-dial__track" :x1="center" :y1="center" :x2="selectedPoint.x" :y2="selectedPoint.y" />
       <circle class="md-time-picker-dial__center" :cx="center" :cy="center" :r="centerSize / 2" />
     </svg>
 
@@ -30,14 +19,7 @@
       {{ option.label }}
     </button>
 
-    <button
-      type="button"
-      class="md-time-picker-dial__handle"
-      :class="{ 'md-time-picker-dial__handle--tick': isTickHandle }"
-      :style="handleStyle"
-      :aria-label="selectedAriaLabel"
-      @click.stop
-    >
+    <button type="button" class="md-time-picker-dial__handle" :class="{ 'md-time-picker-dial__handle--tick': isTickHandle }" :style="handleStyle" :aria-label="selectedAriaLabel" @click.stop>
       {{ handleLabel }}
     </button>
   </div>
@@ -265,8 +247,8 @@ onBeforeUnmount(() => {
 }
 
 .md-time-picker-dial__label {
-  block-size: 40px;
-  inline-size: 40px;
+  block-size: 48px;
+  inline-size: 48px;
   transition: color 180ms ease, background-color 180ms ease;
 }
 
