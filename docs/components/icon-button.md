@@ -7,12 +7,14 @@ const selected = ref(false);
 
 Icon buttons expose common icon-only actions and toggle actions.
 
+## Example
+
 <div class="md-doc-preview">
-  <MdIconButton icon="star" />
-  <MdIconButton icon="favorite" filled />
-  <MdIconButton icon="bookmark" tonal />
-  <MdIconButton icon="settings" outlined />
-  <MdIconButton v-model:selected="selected" toggle icon="visibility" selected-icon="visibility_off" />
+  <MdIconButton type="button" icon="star" aria-label="Add to favorites" />
+  <MdIconButton type="button" icon="favorite" aria-label="Like" filled />
+  <MdIconButton type="button" icon="bookmark" aria-label="Save" tonal />
+  <MdIconButton type="button" icon="settings" aria-label="Open settings" outlined />
+  <MdIconButton type="button" v-model:selected="selected" toggle aria-label="Toggle visibility" icon="visibility" selected-icon="visibility_off" />
 </div>
 
 ## Import
@@ -24,10 +26,38 @@ import { MdIconButton } from 'vue-material-3';
 ## Usage
 
 ```vue
-<MdIconButton icon="star" />
-<MdIconButton v-model:selected="selected" toggle icon="visibility" selected-icon="visibility_off" />
+<script setup>
+import { ref } from 'vue';
+import { MdIconButton } from 'vue-material-3';
+const selected = ref(false);
+</script>
+
+<template>
+  <MdIconButton type="button" icon="star" aria-label="Add to favorites" />
+  <MdIconButton type="button" v-model:selected="selected" toggle aria-label="Toggle visibility" icon="visibility" selected-icon="visibility_off" />
+</template>
 ```
+
+## API
+
+### Props
+
+| Prop                        | Default     | Description                                                        |
+| --------------------------- | ----------- | ------------------------------------------------------------------ |
+| `icon / selectedIcon`       | `undefined` | Default and selected Material Symbols names.                       |
+| `toggle / selected`         | `false`     | Enable toggle behavior and bind selection with `v-model:selected`. |
+| `filled / tonal / outlined` | `false`     | Visual variant flags.                                              |
+| `disabled / softDisabled`   | `false`     | Block activation.                                                  |
+| `type`                      | `'submit'`  | Native button type; set `button` for actions inside forms.         |
+
+### Events
+
+`update:selected`, `input`, and `change` report toggle selection. Use native `@click` for activation.
+
+### Slots
+
+`default` supplies icon content when `icon` is omitted; `selected` overrides selected-state content.
 
 ## Storybook
 
-Use <a href="/vue-material-3/storybook/?path=/story/components-icon-button--icon-button" target="_blank" rel="noreferrer">Storybook</a> for controls.
+Explore variants and controls in [Storybook](https://mylmz10.github.io/vue-material-3/storybook/?path=/story/components-icon-button--icon-button).

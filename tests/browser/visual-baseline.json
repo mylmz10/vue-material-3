@@ -1,0 +1,330 @@
+{
+  "light": {
+    "#fixtures .md-icon-button": {
+      "width": 40,
+      "height": 40,
+      "color": "rgb(73, 69, 79)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "9999px"
+    },
+    "#field input": {
+      "width": 928,
+      "height": 24,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-circular-progress-indicator": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(103, 80, 164)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "50%"
+    },
+    ".md-linear-progress-indicator": {
+      "width": 960,
+      "height": 4,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip": {
+      "width": 96,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip__remove": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(73, 69, 79)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-time-picker-dial__label": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    "textContrast": 16.23,
+    "focus": true,
+    "reduced": false
+  },
+  "dark": {
+    "#fixtures .md-icon-button": {
+      "width": 40,
+      "height": 40,
+      "color": "rgb(202, 196, 208)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "9999px"
+    },
+    "#field input": {
+      "width": 928,
+      "height": 24,
+      "color": "rgb(230, 224, 233)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-circular-progress-indicator": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(208, 188, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "50%"
+    },
+    ".md-linear-progress-indicator": {
+      "width": 960,
+      "height": 4,
+      "color": "rgb(230, 224, 233)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip": {
+      "width": 96,
+      "height": 48,
+      "color": "rgb(230, 224, 233)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip__remove": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(202, 196, 208)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-time-picker-dial__label": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(230, 224, 233)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    "textContrast": 14.35,
+    "focus": true,
+    "reduced": false
+  },
+  "narrow-rtl": {
+    "#fixtures .md-icon-button": {
+      "width": 40,
+      "height": 40,
+      "color": "rgb(73, 69, 79)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "9999px"
+    },
+    "#field input": {
+      "width": 296,
+      "height": 24,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-circular-progress-indicator": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(103, 80, 164)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "50%"
+    },
+    ".md-linear-progress-indicator": {
+      "width": 328,
+      "height": 4,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip": {
+      "width": 96,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip__remove": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(73, 69, 79)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-time-picker-dial__label": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "rtl",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    "textContrast": 16.23,
+    "focus": true,
+    "reduced": true
+  },
+  "text-scale": {
+    "#fixtures .md-icon-button": {
+      "width": 40,
+      "height": 40,
+      "color": "rgb(73, 69, 79)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "32px",
+      "outline": "none",
+      "borderRadius": "9999px"
+    },
+    "#field input": {
+      "width": 656,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "32px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-circular-progress-indicator": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(103, 80, 164)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "16px",
+      "outline": "none",
+      "borderRadius": "50%"
+    },
+    ".md-linear-progress-indicator": {
+      "width": 688,
+      "height": 4,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "32px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip": {
+      "width": 122,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "32px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-chip__remove": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(73, 69, 79)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "32px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    ".md-time-picker-dial__label": {
+      "width": 48,
+      "height": 48,
+      "color": "rgb(29, 27, 32)",
+      "background": "rgba(0, 0, 0, 0)",
+      "direction": "ltr",
+      "disabled": false,
+      "fontSize": "32px",
+      "outline": "none",
+      "borderRadius": "0px"
+    },
+    "textContrast": 16.23,
+    "focus": true,
+    "reduced": true
+  }
+}

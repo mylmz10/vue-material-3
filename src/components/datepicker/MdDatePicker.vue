@@ -378,10 +378,10 @@ const canConfirm = computed(() => {
   }
 
   if (!isRangeSelection.value) {
-    return true;
+    return !draftDate.value || isDateAllowed(draftDate.value, constraints.value);
   }
 
-  return !!draftRange.value.start && !!draftRange.value.end;
+  return !!draftRange.value.start && !!draftRange.value.end && isRangeAllowed(draftRange.value, constraints.value);
 });
 
 const setViewMode = (nextViewMode) => {
@@ -397,7 +397,10 @@ const getSelectedFocusIso = () => (isRangeSelection.value ? getRangeFocusIso(dra
 
 const updateFocusedDate = async () => {
   const currentFocusedDate = parseModelValue(focusedIso.value);
-  if (!currentFocusedDate || currentFocusedDate.year() !== displayedYear.value || currentFocusedDate.month() !== displayedMonth.value) {
+  if (
+    !currentFocusedDate || !isDateAllowed(currentFocusedDate, constraints.value) ||
+    currentFocusedDate.year() !== displayedYear.value || currentFocusedDate.month() !== displayedMonth.value
+  ) {
     focusedIso.value = findFirstFocusableDate({
       year: displayedYear.value,
       month: displayedMonth.value,
@@ -530,7 +533,7 @@ const updateDraftRange = (rangeValue, { commit = false } = {}) => {
 
 const selectDay = (isoDate) => {
   const selectedDate = parseModelValue(isoDate);
-  if (!selectedDate) {
+  if (!selectedDate || !isDateAllowed(selectedDate, constraints.value)) {
     return;
   }
 
@@ -691,6 +694,8 @@ const handleCalendarKeydown = async (event) => {
     return;
   }
 
+  if (event.key !== 'Escape' && !calendarViewEl.value?.contains(event.target)) return;
+
   const focusHandlers = {
     ArrowLeft: () => moveFocusDate(focusedIso.value, -1, 'day', constraints.value),
     ArrowRight: () => moveFocusDate(focusedIso.value, 1, 'day', constraints.value),
@@ -703,16 +708,21 @@ const handleCalendarKeydown = async (event) => {
   if (event.key === 'Home' || event.key === 'End') {
     event.preventDefault();
     const focusedDate = parseModelValue(focusedIso.value) || dayjs().year(displayedYear.value).month(displayedMonth.value).date(1);
-    const firstDayOfWeek = dayjs().locale(localeKey.value).localeData().firstDayOfWeek();
-    const targetWeekday = event.key === 'Home' ? firstDayOfWeek : (firstDayOfWeek + 6) % 7;
-    let candidate = focusedDate.weekday(targetWeekday);
+    let candidate = focusedDate.locale(localeKey.value).weekday(event.key === 'Home' ? 0 : 6);
     if (event.key === 'Home' && candidate.isAfter(focusedDate, 'day')) {
       candidate = candidate.subtract(1, 'week');
     }
     if (event.key === 'End' && candidate.isBefore(focusedDate, 'day')) {
       candidate = candidate.add(1, 'week');
     }
-    await focusCalendarDate(candidate.startOf('day'));
+    const direction = event.key === 'Home' ? 1 : -1;
+    for (let day = 0; day < 7; day++) {
+      if (isDateAllowed(candidate, constraints.value)) {
+        await focusCalendarDate(candidate.startOf('day'));
+        break;
+      }
+      candidate = candidate.add(direction, 'day');
+    }
     return;
   }
 
@@ -770,6 +780,7 @@ watch(
     displayedYear.value,
     props.min,
     props.max,
+    props.isDateDisabled,
     props.selectionMode,
     typeof props.modelValue === 'string' ? props.modelValue : props.modelValue?.start,
     typeof props.modelValue === 'object' ? props.modelValue?.end : null,
@@ -878,6 +889,7 @@ $motion: tokens.md-sys-motion-values();
     --date-unselected-outside-month-label-text-color: #{map.get($docked-theme, date-unselected-outside-month-label-text-color)};
     --date-unselected-hover-state-layer-color: #{map.get($docked-theme, date-unselected-hover-state-layer-color)};
     --date-hover-state-layer-opacity: #{map.get($docked-theme, date-hover-state-layer-opacity)};
+    --date-focus-state-layer-opacity: #{map.get($docked-theme, date-focus-state-layer-opacity)};
     --date-today-container-outline-color: #{map.get($docked-theme, date-today-container-outline-color)};
     --date-today-container-outline-width: #{map.get($docked-theme, date-today-container-outline-width)};
     --date-today-label-text-color: #{map.get($docked-theme, date-today-label-text-color)};
@@ -934,6 +946,7 @@ $motion: tokens.md-sys-motion-values();
     --date-unselected-label-text-color: #{map.get($modal-theme, date-unselected-label-text-color)};
     --date-unselected-hover-state-layer-color: #{map.get($modal-theme, date-unselected-hover-state-layer-color)};
     --date-hover-state-layer-opacity: #{map.get($modal-theme, date-hover-state-layer-opacity)};
+    --date-focus-state-layer-opacity: #{map.get($modal-theme, date-focus-state-layer-opacity)};
     --date-today-container-outline-color: #{map.get($modal-theme, date-today-container-outline-color)};
     --date-today-container-outline-width: #{map.get($modal-theme, date-today-container-outline-width)};
     --date-today-label-text-color: #{map.get($modal-theme, date-today-label-text-color)};
@@ -1130,11 +1143,14 @@ $motion: tokens.md-sys-motion-values();
     --date-unselected-label-text-color: #{theme.value('on-surface')};
     --date-unselected-outside-month-label-text-color: #{theme.value('on-surface-variant')};
     --date-unselected-hover-state-layer-color: #{theme.value('on-surface-variant')};
+    --date-unselected-focus-state-layer-color: #{theme.value('on-surface-variant')};
     --date-today-container-outline-color: #{theme.value('primary')};
     --date-today-label-text-color: #{theme.value('primary')};
+    --date-today-focus-state-layer-color: #{theme.value('primary')};
     --date-selected-container-color: #{theme.value('primary')};
     --date-selected-label-text-color: #{theme.value('on-primary')};
     --date-selected-hover-state-layer-color: #{theme.value('on-primary')};
+    --date-selected-focus-state-layer-color: #{theme.value('on-primary')};
     --weekdays-label-text-color: #{theme.value('on-surface')};
     --menu-button-hover-state-layer-color: #{theme.value('on-surface-variant')};
     --menu-button-focus-state-layer-color: #{theme.value('on-surface-variant')};

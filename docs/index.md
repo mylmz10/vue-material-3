@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Vue Material 3
   text: Material Design 3 components for Vue 3.
-  tagline: Practical, composable UI primitives with a Storybook-first component workflow and dedicated guide documentation.
+  tagline: Practical, composable UI primitives with live examples, component references, and setup guides.
   actions:
     - theme: brand
       text: Get Started
@@ -14,7 +14,7 @@ hero:
       link: /components/
     - theme: alt
       text: Storybook
-      link: /storybook/
+      link: https://mylmz10.github.io/vue-material-3/storybook/
       target: _blank
 
 features:
@@ -23,9 +23,16 @@ features:
   - title: Themeable Foundations
     details: Tokens, typography, elevation, shape, and component styles are kept close to Material Design 3 concepts.
   - title: Live Examples
-    details: Use Storybook for interactive component states while VitePress handles installation, theming, migration, and API docs.
+    details: Explore live examples in each component reference and additional variants and Controls in Storybook.
 ---
 
 ## Storybook
 
-Use <a href="/vue-material-3/storybook/" target="_blank" rel="noreferrer">Storybook</a> to inspect component variants, controls, and visual states interactively.
+Use [Storybook](https://mylmz10.github.io/vue-material-3/storybook/) to inspect component variants, controls, and visual states interactively.
+
+## Related documentation
+
+- [Installation](/guide/installation)
+- [Components](/components/)
+- [API Reference](/api/)
+- [Migration Notes](/migration/)

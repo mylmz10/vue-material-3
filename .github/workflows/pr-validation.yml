@@ -38,3 +38,20 @@ jobs:
 
       - name: Build Storybook
         run: npm run build-storybook
+
+      - name: Test packaged consumer
+        run: npm run test:package
+
+      - name: Browser integration tests
+        run: npm run test:browser
+
+      - name: Visual geometry and state checks
+        run: npm run test:visual
+
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-checks
+          path: test-results/browser
+          if-no-files-found: ignore

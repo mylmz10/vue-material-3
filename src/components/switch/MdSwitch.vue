@@ -1,7 +1,8 @@
 <template>
-  <div class="md-switch" :class="{ 'md-switch--disabled': disabled, 'md-switch--checked': _checked, 'md-switch--with-icon': icon }">
+  <div class="md-switch" :style="$attrs.style" :class="[$attrs.class, { 'md-switch--disabled': disabled, 'md-switch--checked': _checked, 'md-switch--with-icon': icon }]">
     <input
       ref="inputEl"
+      v-bind="getControlAttrs($attrs)"
       :checked="_checked"
       :disabled="disabled"
       :name="name || undefined"
@@ -26,13 +27,16 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
+import { useFormReset } from '../../composables/useFormReset';
+import { onMounted, ref, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 
 const _checked = ref(false);
 const inputEl = ref(null);
 const initialChecked = ref(false);
-let formEl = null;
 
 const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur']);
 
@@ -69,7 +73,7 @@ watch(
 
     _checked.value = !!newValue;
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 watch(
@@ -81,7 +85,7 @@ watch(
 
     _checked.value = !!newValue;
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 const onInput = (ev) => {
@@ -127,13 +131,9 @@ defineExpose({
 onMounted(() => {
   _checked.value = resolveChecked();
   initialChecked.value = _checked.value;
-  formEl = inputEl.value?.form || null;
-  formEl?.addEventListener('reset', onFormReset);
 });
 
-onBeforeUnmount(() => {
-  formEl?.removeEventListener('reset', onFormReset);
-});
+useFormReset(() => inputEl.value, onFormReset);
 </script>
 
 <style lang="scss">
@@ -192,14 +192,8 @@ $theme: tokens.md-comp-switch-values();
       inset-block-start: 50%;
       width: map.get($theme, unselected-handle-width);
       height: map.get($theme, unselected-handle-height);
-      transform: translate(
-        calc((#{map.get($theme, track-height)} - #{map.get($theme, unselected-handle-width)}) / 2),
-        -50%
-      );
-      transition:
-        transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
-        width 150ms cubic-bezier(0.4, 0, 0.2, 1),
-        height 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translate(calc((#{map.get($theme, track-height)} - #{map.get($theme, unselected-handle-width)}) / 2), -50%);
+      transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), width 150ms cubic-bezier(0.4, 0, 0.2, 1), height 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
       #{$this}__handle {
         align-items: center;
@@ -217,10 +211,7 @@ $theme: tokens.md-comp-switch-values();
       #{$this}__handle-container {
         width: map.get($theme, pressed-handle-width);
         height: map.get($theme, pressed-handle-height);
-        transform: translate(
-          calc((#{map.get($theme, track-height)} - #{map.get($theme, pressed-handle-width)}) / 2),
-          -50%
-        );
+        transform: translate(calc((#{map.get($theme, track-height)} - #{map.get($theme, pressed-handle-width)}) / 2), -50%);
         #{$this}__handle {
           background-color: map.get($theme, unselected-pressed-handle-color);
         }
@@ -244,11 +235,7 @@ $theme: tokens.md-comp-switch-values();
         width: map.get($theme, selected-handle-width);
         height: map.get($theme, selected-handle-height);
         transform: translate(
-          calc(
-            (#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) +
-              ((#{map.get($theme, track-height)} - #{map.get($theme, selected-handle-width)}) / 2) -
-              2px
-          ),
+          calc((#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) + ((#{map.get($theme, track-height)} - #{map.get($theme, selected-handle-width)}) / 2) - 2px),
           -50%
         );
 
@@ -262,11 +249,7 @@ $theme: tokens.md-comp-switch-values();
           width: map.get($theme, pressed-handle-width);
           height: map.get($theme, pressed-handle-height);
           transform: translate(
-            calc(
-              (#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) +
-                ((#{map.get($theme, track-height)} - #{map.get($theme, pressed-handle-width)}) / 2) -
-                2px
-            ),
+            calc((#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) + ((#{map.get($theme, track-height)} - #{map.get($theme, pressed-handle-width)}) / 2) - 2px),
             -50%
           );
 
@@ -319,10 +302,7 @@ $theme: tokens.md-comp-switch-values();
       #{$this}__handle-container {
         width: map.get($theme, with-icon-handle-width);
         height: map.get($theme, with-icon-handle-height);
-        transform: translate(
-          calc((#{map.get($theme, track-height)} - #{map.get($theme, with-icon-handle-width)}) / 2),
-          -50%
-        );
+        transform: translate(calc((#{map.get($theme, track-height)} - #{map.get($theme, with-icon-handle-width)}) / 2), -50%);
       }
     }
 
@@ -335,11 +315,7 @@ $theme: tokens.md-comp-switch-values();
       #{$this}__track {
         #{$this}__handle-container {
           transform: translate(
-            calc(
-              (#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) +
-                ((#{map.get($theme, track-height)} - #{map.get($theme, with-icon-handle-width)}) / 2) -
-                2px
-            ),
+            calc((#{map.get($theme, track-width)} - #{map.get($theme, track-height)}) + ((#{map.get($theme, track-height)} - #{map.get($theme, with-icon-handle-width)}) / 2) - 2px),
             -50%
           );
         }

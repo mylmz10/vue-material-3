@@ -1,8 +1,9 @@
 <template>
-  <div class="md-radio" :class="{ 'md-radio--disabled': disabled, 'md-radio--checked': checked }">
+  <div class="md-radio" :style="$attrs.style" :class="[$attrs.class, { 'md-radio--disabled': disabled, 'md-radio--checked': checked }]">
     <MdRipple />
     <input
       ref="inputEl"
+      v-bind="getControlAttrs($attrs)"
       :checked="checked"
       :disabled="disabled"
       :name="name || undefined"
@@ -23,6 +24,10 @@
 </template>
 
 <script setup>
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
+import { useFormReset } from '../../composables/useFormReset';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
@@ -41,7 +46,6 @@ const props = defineProps({
 const inputEl = ref(null);
 const internalChecked = ref(false);
 const initialChecked = ref(false);
-let formEl = null;
 
 const resolveChecked = () => {
   if (props.modelValue !== undefined) {
@@ -52,11 +56,11 @@ const resolveChecked = () => {
 };
 
 watch(
-  () => props.modelValue,
-  () => {
-    internalChecked.value = resolveChecked();
+  () => [props.modelValue, props.value],
+  (_, previous) => {
+    if (props.modelValue !== undefined || previous?.[0] !== undefined) internalChecked.value = resolveChecked();
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 watch(
@@ -68,8 +72,22 @@ watch(
 
     internalChecked.value = resolveChecked();
   },
-  { immediate: true },
+  { immediate: true }
 );
+
+const syncGroup = (event) => {
+  const input = inputEl.value;
+  const other = event.target;
+  if (input && other?.type === 'radio' && input.name && other.name === input.name && other.form === input.form && other.getRootNode() === input.getRootNode()) {
+    internalChecked.value = input.checked;
+  }
+};
+let groupRoot;
+onMounted(() => {
+  groupRoot = inputEl.value?.getRootNode();
+  groupRoot?.addEventListener('change', syncGroup, true);
+});
+onBeforeUnmount(() => groupRoot?.removeEventListener('change', syncGroup, true));
 
 const onInput = (ev) => {
   if (props.disabled) {
@@ -120,13 +138,9 @@ defineExpose({
 onMounted(() => {
   internalChecked.value = resolveChecked();
   initialChecked.value = internalChecked.value;
-  formEl = inputEl.value?.form || null;
-  formEl?.addEventListener('reset', onFormReset);
 });
 
-onBeforeUnmount(() => {
-  formEl?.removeEventListener('reset', onFormReset);
-});
+useFormReset(() => inputEl.value, onFormReset);
 </script>
 
 <style lang="scss">

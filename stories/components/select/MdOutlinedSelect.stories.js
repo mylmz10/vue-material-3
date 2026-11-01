@@ -1,3 +1,4 @@
+import { ref, watch } from 'vue';
 import MdOutlinedSelect from '../../../src/components/select/MdOutlinedSelect.vue';
 import MdSelectOption from '../../../src/components/select/MdSelectOption.vue';
 
@@ -10,9 +11,16 @@ export default {
 const Template = (args) => ({
   components: { MdOutlinedSelect, MdSelectOption },
   setup() {
-    return { args };
+    const value = ref(args.modelValue);
+    watch(
+      () => args.modelValue,
+      (next) => {
+        value.value = next;
+      }
+    );
+    return { args, value };
   },
-  template: `<MdOutlinedSelect v-bind="args">
+  template: `<MdOutlinedSelect v-bind="args" v-model="value">
     <MdSelectOption value="">Select city</MdSelectOption>
     <MdSelectOption value="istanbul" display-text="Istanbul (TR)">Istanbul</MdSelectOption>
     <MdSelectOption value="ankara">Ankara</MdSelectOption>

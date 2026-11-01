@@ -1,5 +1,5 @@
 <script>
-import { h } from 'vue';
+import { Fragment, h } from 'vue';
 
 export default {
   name: 'MdChipSet',
@@ -26,6 +26,10 @@ export default {
     };
   },
   computed: {
+    isSelectionSet() {
+      const items = this.getSlotItems();
+      return items.length > 0 && items.every(this.isFilterItem);
+    },
     isMulti() {
       if (this.selectionMode === 'multi') {
         return true;
@@ -61,9 +65,15 @@ export default {
     },
   },
   methods: {
+    flattenItems(items) {
+      return items.flatMap((item) => (item?.type === Fragment ? this.flattenItems(item.children || []) : item && typeof item.type !== 'symbol' ? [item] : []));
+    },
     getSlotItems() {
-      const items = this.$slots.default ? this.$slots.default() : [];
-      return items.filter((item) => item && typeof item.type !== 'symbol');
+      return this.flattenItems(this.$slots.default ? this.$slots.default() : []);
+    },
+    isFilterItem(item) {
+      const name = item.type?.name || item.type?.__name;
+      return name === 'MdFilterChip' || (name === 'MdChip' && (!item.props?.variant || item.props.variant === 'filter'));
     },
     getItemValue(item, index) {
       if (item?.props?.value !== undefined) {
@@ -113,9 +123,7 @@ export default {
       const value = this.getItemValue(item, index);
 
       if (!this.isMulti) {
-        if (selected) {
-          this.applySingleSelection(value);
-        }
+        this.applySingleSelection(selected ? value : null);
         return;
       }
 
@@ -136,15 +144,14 @@ export default {
       return Array.from(this.$el.querySelectorAll('[data-md-chip="true"]'));
     },
     getEnabledChipElements() {
-      return this.getChipElements().filter((chipElement) => chipElement.getAttribute('aria-disabled') !== 'true');
+      return this.getChipElements().filter((chipElement) => !chipElement.matches('.md-chip--disabled:not(.md-chip--always-focusable)'));
     },
     resolveCurrentIndex(chipElements) {
       if (!chipElements.length) {
         return 0;
       }
 
-      const focusedIndex =
-        typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement?.closest('[data-md-chip="true"]')) : -1;
+      const focusedIndex = typeof document !== 'undefined' ? chipElements.findIndex((chipElement) => chipElement === document.activeElement?.closest('[data-md-chip="true"]')) : -1;
 
       if (focusedIndex !== -1) {
         return focusedIndex;
@@ -171,6 +178,11 @@ export default {
         else this.$el.focus();
       });
     },
+    isItemFocusable(item) {
+      const disabled = item?.props?.disabled;
+      const alwaysFocusable = item?.props?.alwaysFocusable ?? item?.props?.['always-focusable'];
+      return !(disabled === '' || disabled) || alwaysFocusable === '' || !!alwaysFocusable;
+    },
     syncActiveIndex() {
       const slotItems = this.getSlotItems();
       if (!slotItems.length) {
@@ -178,18 +190,18 @@ export default {
         return;
       }
 
-      const firstSelectedIndex = slotItems.findIndex((item, index) => !item?.props?.disabled && this.isItemSelected(item, index));
+      const firstSelectedIndex = slotItems.findIndex((item, index) => this.isItemFocusable(item) && this.isItemSelected(item, index));
 
       if (firstSelectedIndex !== -1) {
         this.activeIndex = firstSelectedIndex;
         return;
       }
 
-      const firstEnabledIndex = slotItems.findIndex((item) => !item?.props?.disabled);
+      const firstEnabledIndex = slotItems.findIndex((item) => this.isItemFocusable(item));
       this.activeIndex = this.getActiveIndex(slotItems, firstEnabledIndex);
     },
-    getActiveIndex(slotItems, fallback = slotItems.findIndex((item) => !item?.props?.disabled)) {
-      return slotItems[this.activeIndex] && !slotItems[this.activeIndex]?.props?.disabled ? this.activeIndex : fallback;
+    getActiveIndex(slotItems, fallback = slotItems.findIndex((item) => this.isItemFocusable(item))) {
+      return slotItems[this.activeIndex] && this.isItemFocusable(slotItems[this.activeIndex]) ? this.activeIndex : fallback;
     },
     handleKeydown(event) {
       const chipElements = this.getEnabledChipElements();
@@ -242,9 +254,9 @@ export default {
       'div',
       {
         class: 'md-chip-set',
-        role: 'listbox',
+        role: this.isSelectionSet ? 'listbox' : 'group',
         tabindex: -1,
-        'aria-multiselectable': this.isMulti ? 'true' : undefined,
+        'aria-multiselectable': this.isSelectionSet && this.isMulti ? 'true' : undefined,
         onKeydown: this.handleKeydown,
       },
       slotItems.map((item, index) => {
@@ -259,7 +271,7 @@ export default {
             ...item.props,
             key: item?.key ?? index,
             selected,
-            tabIndex: item?.props?.disabled ? -1 : index === activeIndex ? 0 : -1,
+            tabIndex: this.isItemFocusable(item) && index === activeIndex ? 0 : -1,
             onClick: (event) => {
               originalClick?.(event);
               this.handleChipClick(index, event);
@@ -273,9 +285,9 @@ export default {
               originalFocus?.(event);
             },
           },
-          item.children,
+          item.children
         );
-      }),
+      })
     );
   },
 };

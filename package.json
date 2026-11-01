@@ -30,7 +30,10 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy-storybook": "gh-pages -d storybook-static",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:browser": "node tests/browser/run.mjs",
+    "test:visual": "node tests/browser/run.mjs --visual",
+    "test:package": "node scripts/package-smoke.mjs"
   },
   "repository": {
     "type": "git",
@@ -56,21 +59,21 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@rushstack/eslint-patch": "^1.1.0",
-    "@storybook/addon-links": "^10.2.17",
-    "@storybook/vue3-vite": "^10.2.17",
+    "@storybook/addon-links": "^10.6.2",
+    "@storybook/vue3-vite": "^10.6.2",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/test-utils": "^2.4.6",
     "cz-conventional-changelog": "^3.0.1",
     "eslint": "^8.57.1",
-    "eslint-plugin-storybook": "^10.2.17",
+    "eslint-plugin-storybook": "^10.6.2",
     "eslint-plugin-vue": "^8.2.0",
     "gh-pages": "^6.1.1",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "prettier": "^2.5.1",
     "sass": "^1.50.0",
-    "storybook": "^10.2.17",
+    "storybook": "^10.6.2",
     "vite": "^7.3.1",
     "vitepress": "^1.6.4",
     "vitest": "^5.0.4",
@@ -81,7 +84,7 @@
     "esbuild": "0.28.2",
     "vitepress": {
       "vite": {
-        ".": "6.4.3",
+        ".": "6.4.5",
         "esbuild": "0.25.12"
       }
     }
@@ -94,5 +97,8 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
   }
 }

@@ -3,6 +3,7 @@
     <div class="md-date-picker-field__control" @click="handleWrapperClick">
       <component
         :is="fieldComponent"
+        ref="fieldEl"
         v-bind="getControlAttrs($attrs)"
         v-model="inputValue"
         :label="resolvedLabel"
@@ -64,20 +65,13 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import MdDatePicker from './MdDatePicker.vue';
 import MdFilledTextField from '../text-field/MdFilledTextField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdOutlinedTextField from '../text-field/MdOutlinedTextField.vue';
-import {
-  DEFAULT_DISPLAY_FORMAT,
-  formatDisplayValue,
-  formatRangeDisplayValue,
-  isDateAllowed,
-  isRangeAllowed,
-  parseDisplayValue,
-  parseRangeDisplayValue,
-} from './datePickerUtils';
+import { DEFAULT_DISPLAY_FORMAT, formatDisplayValue, formatRangeDisplayValue, isDateAllowed, isRangeAllowed, parseDisplayValue, parseRangeDisplayValue } from './datePickerUtils';
 
 import { getControlAttrs } from '../field/fieldAttrs';
 
@@ -149,6 +143,11 @@ const props = defineProps({
 const emit = defineEmits(['invalid-input', 'update:modelValue']);
 
 const rootEl = ref(null);
+const fieldEl = ref(null);
+let initialValue;
+onBeforeMount(() => {
+  initialValue = props.modelValue && typeof props.modelValue === 'object' ? { ...props.modelValue } : props.modelValue;
+});
 const isOpen = ref(false);
 const inputValue = ref('');
 const localError = ref(false);
@@ -164,10 +163,8 @@ const resolvedError = computed(() => props.error || localError.value);
 const resolvedErrorText = computed(() => props.errorText || (isRangeSelection.value ? 'Enter a valid date range' : 'Enter a valid date'));
 const resolvedLabel = computed(() => props.label || (isRangeSelection.value ? 'Dates' : 'Date'));
 
-const syncInputValue = () => {
-  inputValue.value = isRangeSelection.value
-    ? formatRangeDisplayValue(props.modelValue, props.displayFormat, props.locale)
-    : formatDisplayValue(props.modelValue, props.displayFormat, props.locale);
+const syncInputValue = (value = props.modelValue) => {
+  inputValue.value = isRangeSelection.value ? formatRangeDisplayValue(value, props.displayFormat, props.locale) : formatDisplayValue(value, props.displayFormat, props.locale);
   localError.value = false;
 };
 
@@ -221,11 +218,13 @@ const parseFieldValue = () => {
     return;
   }
 
-  if (!isDateAllowed(parsedValue, {
-    min: props.min,
-    max: props.max,
-    isDateDisabled: props.isDateDisabled,
-  })) {
+  if (
+    !isDateAllowed(parsedValue, {
+      min: props.min,
+      max: props.max,
+      isDateDisabled: props.isDateDisabled,
+    })
+  ) {
     localError.value = true;
     emit('invalid-input', inputValue.value);
     return;
@@ -261,6 +260,7 @@ const handleFieldChange = () => {
 };
 
 const handlePickerValueUpdate = (value) => {
+  if (props.disabled) return;
   emit('update:modelValue', value);
   localError.value = false;
 
@@ -272,7 +272,7 @@ const handlePickerValueUpdate = (value) => {
 };
 
 const handleModalOpenUpdate = (value) => {
-  isOpen.value = value;
+  isOpen.value = value && !props.disabled;
 };
 
 const handleModalInvalidInput = (value) => {
@@ -300,11 +300,31 @@ const handleRootKeydown = (event) => {
 };
 
 watch(
-  () => props.modelValue,
+  [() => props.modelValue, () => props.displayFormat, () => props.locale, () => props.selectionMode],
   () => {
     syncInputValue();
   },
   { immediate: true, deep: true }
+);
+
+watch(
+  () => props.disabled,
+  (disabled) => {
+    if (disabled) isOpen.value = false;
+  }
+);
+
+useFormReset(
+  () => fieldEl.value?.getInputEl?.(),
+  async () => {
+    const value = initialValue && typeof initialValue === 'object' ? { ...initialValue } : initialValue;
+    isOpen.value = false;
+    // Let the nested field apply its reset before restoring the current display format.
+    await nextTick();
+    if (!fieldEl.value) return;
+    syncInputValue(value);
+    emit('update:modelValue', value);
+  }
 );
 
 onMounted(() => {
@@ -361,9 +381,7 @@ $motion: tokens.md-sys-motion-values();
 
   .fade-grow-enter-active,
   .fade-grow-leave-active {
-    transition:
-      opacity #{map.get($motion, duration-medium2)} #{map.get($motion, easing-standard)},
-      transform #{map.get($motion, duration-medium2)} #{map.get($motion, easing-standard)};
+    transition: opacity #{map.get($motion, duration-medium2)} #{map.get($motion, easing-standard)}, transform #{map.get($motion, duration-medium2)} #{map.get($motion, easing-standard)};
   }
 
   .fade-grow-enter-from,

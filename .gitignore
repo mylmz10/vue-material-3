@@ -44,3 +44,5 @@ docs/.vitepress/cache
 
 .swarm/
 .claude-flow/
+# Browser test screenshots and diagnostics
+test-results/

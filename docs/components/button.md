@@ -2,7 +2,7 @@
 
 Buttons communicate actions that users can take. Vue Material 3 provides the Material Design 3 button variants as separate Vue components.
 
-## Variants
+## Example
 
 <div class="md-doc-preview">
   <MdFilledButton label="Filled" />
@@ -12,18 +12,18 @@ Buttons communicate actions that users can take. Vue Material 3 provides the Mat
   <MdTextButton label="Text" />
 </div>
 
-| Component | Use case |
-| --- | --- |
-| `MdFilledButton` | High-emphasis primary actions. |
-| `MdFilledTonalButton` | Medium-emphasis actions that need a filled surface. |
-| `MdElevatedButton` | Actions that need separation from the background. |
-| `MdOutlinedButton` | Medium-emphasis actions without a filled container. |
-| `MdTextButton` | Low-emphasis actions, compact toolbars, and inline actions. |
+| Component             | Use case                                                    |
+| --------------------- | ----------------------------------------------------------- |
+| `MdFilledButton`      | High-emphasis primary actions.                              |
+| `MdFilledTonalButton` | Medium-emphasis actions that need a filled surface.         |
+| `MdElevatedButton`    | Actions that need separation from the background.           |
+| `MdOutlinedButton`    | Medium-emphasis actions without a filled container.         |
+| `MdTextButton`        | Low-emphasis actions, compact toolbars, and inline actions. |
 
 ## Import
 
 ```js
-import { MdFilledButton, MdOutlinedButton, MdTextButton } from 'vue-material-3';
+import { MdElevatedButton, MdFilledButton, MdFilledTonalButton, MdOutlinedButton, MdTextButton } from 'vue-material-3';
 ```
 
 ## Usage
@@ -53,7 +53,7 @@ import { MdTextButton } from 'vue-material-3';
 </script>
 ```
 
-## Icons
+### Icons
 
 Buttons support a trailing icon through either the `trailingIcon` prop or the `trailing-icon` slot.
 
@@ -72,7 +72,7 @@ import { MdFilledButton } from 'vue-material-3';
 </script>
 ```
 
-## Links
+### Links
 
 When `href` is provided, the component renders an anchor instead of a native button.
 
@@ -90,7 +90,9 @@ import { MdTextButton } from 'vue-material-3';
 </script>
 ```
 
-## Props
+## API
+
+### Props
 
 All button variants share the same public props.
 
@@ -107,25 +109,29 @@ All button variants share the same public props.
   </div>
 </div>
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `label` | `string` | `undefined` | Text rendered inside the button. Falls back to the default slot when omitted. |
-| `trailingIcon` | `string` | `undefined` | Material Symbols icon name rendered after the label. |
-| `disabled` | `boolean` | `false` | Disables native button interaction. For link buttons, click is prevented and `aria-disabled` is set. |
-| `softDisabled` | `boolean` | `false` | Applies disabled styling and prevents click behavior while keeping the element focus behavior softer than `disabled`. |
-| `href` | `string` | `''` | Renders the button as an anchor when provided. |
-| `target` | `string` | `''` | Anchor target used with `href`. |
-| `download` | `string` | `''` | Anchor download attribute used with `href`. |
-| `type` | `string` | `'button'` | Native button type when the component renders a `<button>`. |
+| Prop           | Type      | Default     | Description                                                                                                           |
+| -------------- | --------- | ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| `label`        | `string`  | `undefined` | Text rendered inside the button. Falls back to the default slot when omitted.                                         |
+| `trailingIcon` | `string`  | `undefined` | Material Symbols icon name rendered after the label.                                                                  |
+| `disabled`     | `boolean` | `false`     | Disables native button interaction. For link buttons, click is prevented and `aria-disabled` is set.                  |
+| `softDisabled` | `boolean` | `false`     | Applies disabled styling and prevents click behavior while keeping the element focus behavior softer than `disabled`. |
+| `href`         | `string`  | `''`        | Renders the button as an anchor when provided.                                                                        |
+| `target`       | `string`  | `''`        | Anchor target used with `href`.                                                                                       |
+| `download`     | `string`  | `''`        | Anchor download attribute used with `href`.                                                                           |
+| `type`         | `string`  | `'button'`  | Native button type when the component renders a `<button>`.                                                           |
 
-## Slots
+### Events
 
-| Slot | Description |
-| --- | --- |
-| `default` | Button label content used when `label` is not provided. |
+Use native `@click` to handle activation. Disabled buttons prevent activation.
+
+### Slots
+
+| Slot            | Description                                             |
+| --------------- | ------------------------------------------------------- |
+| `default`       | Button label content used when `label` is not provided. |
 | `trailing-icon` | Custom trailing icon content. Overrides `trailingIcon`. |
 
-## Accessibility
+### Accessibility
 
 - Native buttons receive the `disabled` attribute when `disabled` is true.
 - Link buttons receive `aria-disabled` when `disabled` or `softDisabled` is true.
@@ -134,4 +140,4 @@ All button variants share the same public props.
 
 ## Storybook
 
-Use <a href="/vue-material-3/storybook/?path=/story/components-buttons--filled-button" target="_blank" rel="noreferrer">Storybook</a> to inspect button variants interactively.
+Explore variants and controls in [Storybook](https://mylmz10.github.io/vue-material-3/storybook/?path=/story/components-buttons--filled-button).

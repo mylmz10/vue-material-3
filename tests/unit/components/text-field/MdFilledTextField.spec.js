@@ -97,6 +97,7 @@ describe('MdFilledTextField', () => {
 
     form.dispatchEvent(new Event('reset'));
     await nextTick();
+    await nextTick();
 
     const latestUpdate = (wrapper.emitted('update:modelValue') || []).at(-1);
     expect(latestUpdate).toEqual(['10']);

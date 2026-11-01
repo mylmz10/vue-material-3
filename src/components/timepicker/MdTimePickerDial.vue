@@ -1,18 +1,7 @@
 <template>
-  <div
-    ref="dialEl"
-    class="md-time-picker-dial"
-    :aria-label="mode === 'hour' ? 'Select hour' : 'Select minute'"
-    @pointerdown="startPointerSelection"
-  >
+  <div ref="dialEl" class="md-time-picker-dial" :aria-label="mode === 'hour' ? 'Select hour' : 'Select minute'" @pointerdown="startPointerSelection">
     <svg class="md-time-picker-dial__selector" :viewBox="`0 0 ${dialSize} ${dialSize}`" aria-hidden="true">
-      <line
-        class="md-time-picker-dial__track"
-        :x1="center"
-        :y1="center"
-        :x2="selectedPoint.x"
-        :y2="selectedPoint.y"
-      />
+      <line class="md-time-picker-dial__track" :x1="center" :y1="center" :x2="selectedPoint.x" :y2="selectedPoint.y" />
       <circle class="md-time-picker-dial__center" :cx="center" :cy="center" :r="centerSize / 2" />
     </svg>
 
@@ -25,19 +14,12 @@
       :style="getLabelStyle(option)"
       :data-dial-value="option.value"
       :aria-pressed="String(isSelected(option.value))"
-      @click.stop="selectValue(option.value)"
+      @click.stop="selectValue(option.value, $event)"
     >
       {{ option.label }}
     </button>
 
-    <button
-      type="button"
-      class="md-time-picker-dial__handle"
-      :class="{ 'md-time-picker-dial__handle--tick': isTickHandle }"
-      :style="handleStyle"
-      :aria-label="selectedAriaLabel"
-      @click.stop
-    >
+    <button type="button" class="md-time-picker-dial__handle" :class="{ 'md-time-picker-dial__handle--tick': isTickHandle }" :style="handleStyle" :aria-label="selectedAriaLabel" @click.stop>
       {{ handleLabel }}
     </button>
   </div>
@@ -80,11 +62,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['select-hour', 'select-minute']);
+const emit = defineEmits(['select-hour', 'select-minute', 'selection-complete']);
 
 const dialEl = ref(null);
 let pointerMoveListener = null;
 let pointerUpListener = null;
+let pointerCancelListener = null;
 let activePointerId = null;
 
 const dialSize = DIAL_SIZE;
@@ -148,8 +131,11 @@ const emitSelection = (value) => {
   emit('select-minute', value);
 };
 
-const selectValue = (value) => {
+const selectValue = (value, event) => {
+  // Pointer gestures already select and complete before the synthesized click.
+  if (event.detail > 0) return;
   emitSelection(value);
+  emit('selection-complete', props.mode);
 };
 
 const updateFromPointer = (event) => {
@@ -174,6 +160,10 @@ const stopPointerSelection = () => {
     pointerUpListener = null;
   }
 
+  if (pointerCancelListener) {
+    window.removeEventListener('pointercancel', pointerCancelListener);
+    pointerCancelListener = null;
+  }
   activePointerId = null;
 };
 
@@ -192,11 +182,18 @@ const startPointerSelection = (event) => {
     if (upEvent.pointerId !== activePointerId) {
       return;
     }
+    updateFromPointer(upEvent);
+    const completedMode = props.mode;
     stopPointerSelection();
+    emit('selection-complete', completedMode);
+  };
+  pointerCancelListener = (cancelEvent) => {
+    if (cancelEvent.pointerId === activePointerId) stopPointerSelection();
   };
 
   window.addEventListener('pointermove', pointerMoveListener);
   window.addEventListener('pointerup', pointerUpListener);
+  window.addEventListener('pointercancel', pointerCancelListener);
 };
 
 onBeforeUnmount(() => {
@@ -250,8 +247,8 @@ onBeforeUnmount(() => {
 }
 
 .md-time-picker-dial__label {
-  block-size: 40px;
-  inline-size: 40px;
+  block-size: 48px;
+  inline-size: 48px;
   transition: color 180ms ease, background-color 180ms ease;
 }
 

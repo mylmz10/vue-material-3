@@ -87,6 +87,7 @@ describe('MdOutlinedTextField', () => {
     await wrapper.get('input').setValue('99');
     form.dispatchEvent(new Event('reset'));
     await nextTick();
+    await nextTick();
 
     expect((wrapper.emitted('update:modelValue') || []).at(-1)).toEqual(['12']);
 

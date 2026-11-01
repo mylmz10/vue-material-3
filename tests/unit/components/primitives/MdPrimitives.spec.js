@@ -87,6 +87,17 @@ describe('visual primitives', () => {
     expect(wrapper.attributes('aria-valuenow')).toBeUndefined();
   });
 
+  it.each([0, 35, 99, 100])('keeps an endpoint marker for determinate linear progress at %s percent', async (value) => {
+    const wrapper = mount(MdLinearProgressIndicator, { props: { value } });
+    expect(wrapper.get('.md-linear-progress-indicator__stop').attributes('aria-hidden')).toBe('true');
+    expect(wrapper.get('.md-linear-progress-indicator__indicator').element.style.width).toBe(`${value}%`);
+    await wrapper.setProps({ indeterminate: true });
+    expect(wrapper.find('.md-linear-progress-indicator__stop').exists()).toBe(false);
+    await wrapper.setProps({ indeterminate: false });
+    expect(wrapper.find('.md-linear-progress-indicator__stop').exists()).toBe(true);
+    wrapper.unmount();
+  });
+
   it('renders circular progress value and indeterminate mode', async () => {
     const wrapper = mount(MdCircularProgressIndicator, {
       props: {
@@ -95,6 +106,7 @@ describe('visual primitives', () => {
     });
 
     expect(wrapper.attributes('value')).toBe('72');
+    expect(wrapper.find('.md-linear-progress-indicator__stop').exists()).toBe(false);
 
     await wrapper.setProps({ indeterminate: true });
     expect(wrapper.attributes('value')).toBeUndefined();

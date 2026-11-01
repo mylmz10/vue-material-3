@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { enableAutoUnmount, mount } from '@vue/test-utils';
+import { buildMonthGrid, getWeekdayLabels } from '@/components/datepicker/datePickerUtils';
 import MdDatePicker from '@/components/datepicker/MdDatePicker.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
@@ -14,6 +15,22 @@ describe('MdDatePicker', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it.each([
+    ['tr-TR', ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'], '2026-06-01', '2026-07-05', '2026-06-01', '2026-06-07'],
+    ['en-US', ['S', 'M', 'T', 'W', 'T', 'F', 'S'], '2026-05-31', '2026-07-04', '2026-06-07', '2026-06-13'],
+  ])('aligns headings, month cells and Home/End for %s', async (locale, labels, first, last, home, end) => {
+    expect(getWeekdayLabels(locale)).toEqual(labels);
+    const days = buildMonthGrid({ year: 2026, month: 5, locale });
+    expect(days[0].iso).toBe(first);
+    expect(days.at(-1).iso).toBe(last);
+    expect(days.findIndex((day) => day.iso === '2026-06-01')).toBe(locale === 'tr-TR' ? 0 : 1);
+    const wrapper = mount(MdDatePicker, { attachTo: document.body, props: { modelValue: locale === 'tr-TR' ? '2026-06-03' : '2026-06-10', locale, variant: 'docked', open: true } });
+    await wrapper.get(`[data-iso="${locale === 'tr-TR' ? '2026-06-03' : '2026-06-10'}"]`).trigger('keydown', { key: 'Home' });
+    expect(wrapper.get(`[data-iso="${home}"]`).attributes('tabindex')).toBe('0');
+    await wrapper.get(`[data-iso="${home}"]`).trigger('keydown', { key: 'End' });
+    expect(wrapper.get(`[data-iso="${end}"]`).attributes('tabindex')).toBe('0');
   });
 
   it('commits the selected date on confirm in modal mode', async () => {
@@ -71,8 +88,8 @@ describe('MdDatePicker', () => {
       },
     });
 
-    await wrapper.get('.md-date-picker').trigger('keydown', { key: 'ArrowRight' });
-    await wrapper.get('.md-date-picker').trigger('keydown', { key: 'Enter' });
+    await wrapper.get('[data-iso="2026-03-14"]').trigger('keydown', { key: 'ArrowRight' });
+    await wrapper.get('[data-iso="2026-03-15"]').trigger('keydown', { key: 'Enter' });
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['2026-03-15']);
   });
@@ -146,10 +163,12 @@ describe('MdDatePicker', () => {
     await wrapper.get('[data-iso="2026-03-24"]').trigger('click');
     await findButtonByText(wrapper, 'OK').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-18',
-      end: '2026-03-24',
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-18',
+        end: '2026-03-24',
+      },
+    ]);
   });
 
   it('sorts reverse range selections in docked mode', async () => {
@@ -167,10 +186,12 @@ describe('MdDatePicker', () => {
     await wrapper.get('[data-iso="2026-03-20"]').trigger('click');
     await wrapper.get('[data-iso="2026-03-16"]').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-16',
-      end: '2026-03-20',
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-16',
+        end: '2026-03-20',
+      },
+    ]);
   });
 
   it('parses valid modal input ranges before confirming when selectionMode is range', async () => {
@@ -193,10 +214,12 @@ describe('MdDatePicker', () => {
     await input.trigger('change');
     await findButtonByText(wrapper, 'OK').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-20',
-      end: '2026-03-25',
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-20',
+        end: '2026-03-25',
+      },
+    ]);
   });
 
   it('reverts draft range changes on cancel in modal mode', async () => {
@@ -237,9 +260,11 @@ describe('MdDatePicker', () => {
     await wrapper.get('[data-iso="2026-03-13"]').trigger('click');
     await wrapper.get('[data-iso="2026-03-16"]').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-13',
-      end: null,
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-13',
+        end: null,
+      },
+    ]);
   });
 });

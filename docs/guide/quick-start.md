@@ -1,19 +1,35 @@
 # Quick Start
 
-Import the component you need from `vue-material-3`:
+After [installing the package, styles, and fonts](/guide/installation), import the components you need into a Vue single-file component.
+
+## Usage
 
 ```vue
-<template>
-  <MdElevatedButton label="Get Started" />
-</template>
-
 <script setup>
-import { MdElevatedButton } from 'vue-material-3';
+import { ref } from 'vue';
+import { MdFilledButton, MdOutlinedTextField } from 'vue-material-3';
+import 'vue-material-3/style.css';
+
+const name = ref('');
+const savedName = ref('');
 </script>
+
+<template>
+  <MdOutlinedTextField v-model="name" label="Name" />
+  <MdFilledButton label="Save" @click="savedName = name" />
+  <p role="status">Saved name: {{ savedName }}</p>
+</template>
 ```
 
-Most components are designed to be used directly in Vue templates and documented with interactive examples in Storybook.
+The stylesheet can instead be imported once in your application entry. `v-model` keeps the field and the parent state in sync.
 
-## Recommended Workflow
+## Explore components
 
-Use this docs site for setup, theming, and API reference. Use Storybook when you want to inspect states, variants, and component behavior.
+Component pages include a live example, imports, complete basic usage, and an API summary. Storybook adds more variants and interactive Controls. Use the component page for the written contract and Storybook to explore visual states.
+
+## Related documentation
+
+- [Components](/components/)
+- [API Reference](/api/)
+- [Theming](/guide/theming)
+- [Storybook](https://mylmz10.github.io/vue-material-3/storybook/)

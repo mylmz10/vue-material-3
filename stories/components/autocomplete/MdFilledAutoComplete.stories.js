@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import MdFilledAutoComplete from '../../../src/components/autocomplete/MdFilledAutoComplete.vue';
 
 export default {
@@ -15,10 +15,17 @@ const Template = (args) => ({
   components: { MdFilledAutoComplete },
   setup() {
     const value = ref(args.modelValue);
+    watch(
+      () => args.modelValue,
+      (next) => {
+        value.value = next;
+      }
+    );
     return { args, value };
   },
   template: `<div style="max-width: 320px;">
-    <MdFilledAutoComplete v-model="value" :label="args.label" :items="args.items" />
+    <MdFilledAutoComplete v-bind="args" v-model="value" />
+    <output aria-live="polite">{{ value }}</output>
   </div>`,
 });
 

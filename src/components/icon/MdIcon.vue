@@ -1,5 +1,10 @@
 <template>
-  <i class="material-symbols-outlined md-icon"><slot></slot></i>
+  <i
+    :aria-hidden="$attrs['aria-label'] || $attrs['aria-labelledby'] ? undefined : 'true'"
+    :role="$attrs['aria-label'] || $attrs['aria-labelledby'] ? 'img' : undefined"
+    class="material-symbols-outlined md-icon"
+    ><slot></slot
+  ></i>
 </template>
 <script>
 export default {
