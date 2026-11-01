@@ -63,6 +63,20 @@ describe('MdCarousel', () => {
     expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
   });
 
+  it('brings a focused custom item into view without stealing focus or selecting in Show all', async () => {
+    const wrapper = render({ attachTo: document.body, slots: { item: '<button>Open item</button>' } });
+    const buttons = wrapper.findAll('.md-carousel__item button');
+    buttons[1].element.focus();
+    await nextTick();
+    expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
+    expect(document.activeElement).toBe(buttons[1].element);
+    await wrapper.get('.md-carousel__show-all').trigger('click');
+    buttons[2].element.focus();
+    await nextTick();
+    expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
+    expect(document.activeElement).toBe(buttons[2].element);
+  });
+
   it('updates selection from native scrolling and cancels queued work on unmount', async () => {
     let callback;
     vi.stubGlobal(
@@ -77,7 +91,7 @@ describe('MdCarousel', () => {
     const viewport = wrapper.get('.md-carousel__viewport');
     viewport.element.getBoundingClientRect = () => ({ left: 0, right: 500 });
     wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
-      slide.element.getBoundingClientRect = () => ({ left: (index - 1) * 200 + 4, right: (index - 1) * 200 + 204 });
+      slide.element.getBoundingClientRect = () => ({ left: (index - 1) * 200 + 16, right: (index - 1) * 200 + 216 });
     });
     await viewport.trigger('scroll');
     callback();
@@ -104,7 +118,7 @@ describe('MdCarousel', () => {
     viewport.element.scrollBy = scroll;
     viewport.element.getBoundingClientRect = () => ({ left: 0, right: 500 });
     wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
-      slide.element.getBoundingClientRect = () => ({ left: (index - 1) * 200 + 4, right: (index - 1) * 200 + 204 });
+      slide.element.getBoundingClientRect = () => ({ left: (index - 1) * 200 + 16, right: (index - 1) * 200 + 216 });
     });
     await viewport.trigger('scroll');
     callback();
@@ -114,6 +128,18 @@ describe('MdCarousel', () => {
     await wrapper.setProps({ modelValue: 2 });
     await nextTick();
     expect(scroll).toHaveBeenCalledOnce();
+  });
+
+  it('does not restart navigation when an inline item array is recreated during acknowledgement', async () => {
+    const items = () => [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+    const wrapper = render({ props: { items: items(), modelValue: 0 } });
+    const scroll = vi.fn();
+    wrapper.get('.md-carousel__viewport').element.scrollBy = scroll;
+    wrapper.vm.select(2);
+    await wrapper.setProps({ modelValue: 2, items: items() });
+    await nextTick();
+    expect(scroll).toHaveBeenCalledOnce();
+    expect(scroll.mock.calls[0][0].behavior).toBe('smooth');
   });
 
   it('provides a vertical show-all alternative and restores the carousel', async () => {
@@ -154,7 +180,7 @@ describe('MdCarousel', () => {
     viewport.element.getBoundingClientRect = () => ({ left: 0, right: 320 });
     let offset = 0;
     wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
-      slide.element.getBoundingClientRect = () => ({ left: index * 320 + 4 - offset, right: index * 320 + 324 - offset });
+      slide.element.getBoundingClientRect = () => ({ left: index * 320 + 16 - offset, right: index * 320 + 336 - offset });
     });
     wrapper.vm.select(2);
     await wrapper.setProps({ modelValue: 2 });
@@ -166,6 +192,45 @@ describe('MdCarousel', () => {
     await viewport.trigger('scrollend');
     frame();
     expect(wrapper.emitted('update:modelValue')).toEqual([[2]]);
+  });
+
+  it('ignores a stale scrollend from an earlier layout while a new navigation is still moving', async () => {
+    let resize;
+    let frame;
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback) {
+          resize = callback;
+        }
+        observe() {}
+        disconnect() {}
+      }
+    );
+    vi.stubGlobal('requestAnimationFrame', (callback) => {
+      frame = callback;
+      return 1;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+    const wrapper = render({ props: { items: Array.from({ length: 8 }, (_, index) => `${index}`), modelValue: 0 } });
+    const viewport = wrapper.get('.md-carousel__viewport').element;
+    Object.defineProperty(viewport, 'clientWidth', { value: 1000 });
+    Object.defineProperty(viewport, 'scrollWidth', { value: 3000 });
+    viewport.getBoundingClientRect = () => ({ left: 0, right: 1000 });
+    wrapper.get('.md-carousel__sizer').element.getBoundingClientRect = () => ({ width: 360 });
+    viewport.scrollBy = vi.fn();
+    resize();
+    const width = parseFloat(viewport.style.getPropertyValue('--md-carousel-large-width'));
+    wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
+      slide.element.getBoundingClientRect = () => ({ left: index * (width + 8) + 16 - viewport.scrollLeft, right: index * (width + 8) + 16 + width - viewport.scrollLeft });
+    });
+    wrapper.vm.select(7);
+    await wrapper.setProps({ modelValue: 7 });
+    viewport.scrollLeft = 500;
+    await wrapper.get('.md-carousel__viewport').trigger('scrollend');
+    await wrapper.get('.md-carousel__viewport').trigger('scroll');
+    frame();
+    expect(wrapper.emitted('update:modelValue')).toEqual([[7]]);
   });
 
   it('restores a rejected controlled target without repeating the request', async () => {
@@ -191,7 +256,7 @@ describe('MdCarousel', () => {
     const viewport = wrapper.get('.md-carousel__viewport');
     viewport.element.getBoundingClientRect = () => ({ left: 0, right: 320 });
     wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
-      slide.element.getBoundingClientRect = () => ({ left: index * 320 + 4 - offset, right: index * 320 + 324 - offset });
+      slide.element.getBoundingClientRect = () => ({ left: index * 320 + 16 - offset, right: index * 320 + 336 - offset });
     });
     viewport.element.scrollBy = vi.fn(({ left }) => {
       offset += left;

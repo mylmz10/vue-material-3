@@ -55,6 +55,8 @@ const state = reactive({
   selected: 'b',
   tab: 0,
   slider: 20,
+  sliderMax: 100,
+  sliderStep: 1,
   dialHour: 10,
   hour: '10:30',
   chips: ['one', 'two'],
@@ -101,7 +103,7 @@ window.fixture = { state, mounted, components };
       <button id="audit-content-last">Last content action</button>
       <template #footer><button id="audit-dialog-close" @click="state.auditDialog = false">Close long dialog</button></template>
     </MdDialog>
-    <MdDialog v-model="state.auditShort" aria-label="Audit short dialog">
+    <MdDialog v-model="state.auditShort" keep-mounted aria-label="Audit short dialog">
       <MdOutlinedSelect label="Modal select"><MdSelectOption value="a">Alpha</MdSelectOption><MdSelectOption value="b">Beta</MdSelectOption></MdOutlinedSelect>
       <template #footer><button @click="state.auditShort = false">Close short dialog</button></template>
     </MdDialog>
@@ -124,14 +126,19 @@ window.fixture = { state, mounted, components };
           { label: 'Settings', icon: 'settings' },
         ]"
       />
-      <MdCarousel
-        v-model="state.carousel"
-        :items="[
-          { label: 'First', image: coast },
-          { label: 'Second', image: coast },
-          { label: 'Third', image: coast },
-        ]"
-      />
+      <div class="carousel-docs-layout" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; min-width: 0">
+        <MdCarousel
+          v-model="state.carousel"
+          :items="[
+            { label: 'First', image: coast },
+            { label: 'Second', image: coast },
+            { label: 'Third', image: coast },
+            { label: 'Fourth', image: coast },
+            { label: 'Fifth', image: coast },
+            { label: 'Sixth', image: coast },
+          ]"
+        />
+      </div>
       <MdSegmentedButtonSet v-model="state.segment" :items="[{ label: 'One' }, { label: 'Two' }]"
         ><MdSegmentedButton :value="1" label="One" /><MdSegmentedButton :value="2" label="Two"
       /></MdSegmentedButtonSet>
@@ -159,7 +166,7 @@ window.fixture = { state, mounted, components };
         >
       </section>
       <MdTabs v-model="state.tab"><MdPrimaryTab label="First" /><MdPrimaryTab label="Second" /></MdTabs>
-      <section id="slider"><MdSlider v-model="state.slider" aria-label="Volume" /></section>
+      <section id="slider"><MdSlider v-model="state.slider" :max="state.sliderMax" :step="state.sliderStep" :labeled="state.sliderStep !== 1" aria-label="Volume" /></section>
       <MdChipSet><MdInputChip v-for="chip in state.chips" :key="chip" :label="chip" removable @remove="state.chips = state.chips.filter((item) => item !== chip)" /></MdChipSet>
       <section id="field">
         <MdOutlinedTextField v-model="state.text" label="Name" required :readonly="state.readonly" :disabled="state.disabled" :error="state.error" error-text="Enter a valid name" />

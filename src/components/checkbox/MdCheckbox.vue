@@ -1,8 +1,9 @@
 <template>
-  <div class="md-checkbox" :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }">
+  <div class="md-checkbox" :style="$attrs.style" :class="[$attrs.class, { 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }]">
     <MdRipple />
     <input
       ref="inputEl"
+      v-bind="getControlAttrs($attrs)"
       type="checkbox"
       :checked="_checked"
       :disabled="disabled"
@@ -26,6 +27,9 @@
 </template>
 
 <script setup>
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 import { useFormReset } from '../../composables/useFormReset';
 import { onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';

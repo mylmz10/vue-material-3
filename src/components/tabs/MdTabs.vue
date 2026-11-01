@@ -232,7 +232,7 @@ const activateTab = (tabId, reason = 'programmatic') => {
 
   focusedIndex.value = index;
 
-  if (reason === 'focus' && props.activationMode === 'manual') {
+  if (reason === 'focus' && (props.activationMode === 'manual' || index === selectedIndex.value)) {
     return;
   }
 

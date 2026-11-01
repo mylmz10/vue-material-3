@@ -157,9 +157,12 @@ const clampToBounds = (value) => {
 };
 
 const alignToStep = (value) => {
-  const { min } = normalizedBounds.value;
+  const { min, max } = normalizedBounds.value;
   const stepValue = normalizedStep.value;
-  const steppedValue = min + Math.round((value - min) / stepValue) * stepValue;
+  const stepCount = (max - min) / stepValue;
+  const maxStep = Math.floor(stepCount + Number.EPSILON * Math.max(1, Math.abs(stepCount)));
+  const index = Math.max(0, Math.min(maxStep, Math.round((value - min) / stepValue)));
+  const steppedValue = min + index * stepValue;
   return Number(steppedValue.toFixed(stepPrecision.value));
 };
 

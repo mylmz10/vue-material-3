@@ -3,8 +3,9 @@
     <div class="md-time-picker-field__control" @click="openPicker">
       <component
         :is="fieldComponent"
+        ref="fieldEl"
         v-bind="getControlAttrs($attrs)"
-        :modelValue="displayValue"
+        v-model="displayValue"
         :label="resolvedLabel"
         :supporting-text="supportingText"
         :error="error"
@@ -13,13 +14,7 @@
         :disabled="disabled"
       >
         <template #end>
-          <button
-            type="button"
-            class="md-time-picker-field__icon-button"
-            :disabled="disabled"
-            aria-label="Open time picker"
-            @click.stop="openPicker"
-          >
+          <button type="button" class="md-time-picker-field__icon-button" :disabled="disabled" aria-label="Open time picker" @click.stop="openPicker">
             <MdIcon>schedule</MdIcon>
           </button>
         </template>
@@ -34,14 +29,15 @@
       :locale="locale"
       :cancel-text="cancelText"
       :confirm-text="confirmText"
-      @update:modelValue="(value) => emit('update:modelValue', value)"
+      @update:modelValue="handlePickerValueUpdate"
       @update:open="handleOpenUpdate"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { computed, nextTick, onBeforeMount, ref, watch } from 'vue';
 import MdFilledTextField from '../text-field/MdFilledTextField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdOutlinedTextField from '../text-field/MdOutlinedTextField.vue';
@@ -106,9 +102,39 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
+const fieldEl = ref(null);
+let initialValue;
+onBeforeMount(() => {
+  initialValue = props.modelValue;
+});
 const fieldComponent = computed(() => (props.fieldVariant === 'filled' ? MdFilledTextField : MdOutlinedTextField));
 const resolvedLabel = computed(() => props.label || 'Time');
-const displayValue = computed(() => (props.modelValue ? formatDisplayValue(props.modelValue, props.locale, props.hourCycle) : ''));
+const displayValue = ref('');
+const syncDisplayValue = (value) => {
+  displayValue.value = value ? formatDisplayValue(value, props.locale, props.hourCycle) : '';
+};
+watch([() => props.modelValue, () => props.locale, () => props.hourCycle], () => syncDisplayValue(props.modelValue), { immediate: true });
+watch(
+  () => props.disabled,
+  (disabled) => {
+    if (disabled) isOpen.value = false;
+  }
+);
+useFormReset(
+  () => fieldEl.value?.getInputEl?.(),
+  async () => {
+    isOpen.value = false;
+    // Let the nested field apply its reset before restoring the current display format.
+    await nextTick();
+    if (!fieldEl.value) return;
+    syncDisplayValue(initialValue);
+    emit('update:modelValue', initialValue);
+  }
+);
+
+const handlePickerValueUpdate = (value) => {
+  if (!props.disabled) emit('update:modelValue', value);
+};
 
 const openPicker = () => {
   if (props.disabled) {
@@ -119,7 +145,7 @@ const openPicker = () => {
 };
 
 const handleOpenUpdate = (value) => {
-  isOpen.value = value;
+  isOpen.value = value && !props.disabled;
 };
 </script>
 

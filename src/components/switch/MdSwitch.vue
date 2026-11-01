@@ -1,7 +1,8 @@
 <template>
-  <div class="md-switch" :class="{ 'md-switch--disabled': disabled, 'md-switch--checked': _checked, 'md-switch--with-icon': icon }">
+  <div class="md-switch" :style="$attrs.style" :class="[$attrs.class, { 'md-switch--disabled': disabled, 'md-switch--checked': _checked, 'md-switch--with-icon': icon }]">
     <input
       ref="inputEl"
+      v-bind="getControlAttrs($attrs)"
       :checked="_checked"
       :disabled="disabled"
       :name="name || undefined"
@@ -26,6 +27,9 @@
 </template>
 
 <script setup>
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 import { useFormReset } from '../../composables/useFormReset';
 import { onMounted, ref, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';

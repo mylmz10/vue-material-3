@@ -628,6 +628,7 @@ const handleTriggerClick = (event) => {
 };
 
 const handleActionClick = () => {
+  if (props.disabled) return;
   emit('action');
   if (isPersistentRich.value) {
     closeTooltip('action');
@@ -643,8 +644,12 @@ onMounted(() => {
 });
 
 watch(
-  () => props.modelValue,
-  async (nextValue) => {
+  [() => props.modelValue, () => props.disabled],
+  async ([nextValue, disabled]) => {
+    if (disabled) {
+      closeTooltip('disabled');
+      return;
+    }
     if (nextValue === undefined) {
       return;
     }

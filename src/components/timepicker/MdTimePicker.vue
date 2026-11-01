@@ -445,6 +445,8 @@ const resolveDialogInitialFocus = (containerEl) => {
   return containerEl.querySelector(`[data-segment="${activeSegment.value}"]`) || containerEl.querySelector('.md-time-picker__time-selector');
 };
 
+watch(resolvedHourCycle, syncInputSegments);
+
 watch(
   () => props.modelValue,
   () => {

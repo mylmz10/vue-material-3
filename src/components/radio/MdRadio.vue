@@ -1,8 +1,9 @@
 <template>
-  <div class="md-radio" :class="{ 'md-radio--disabled': disabled, 'md-radio--checked': checked }">
+  <div class="md-radio" :style="$attrs.style" :class="[$attrs.class, { 'md-radio--disabled': disabled, 'md-radio--checked': checked }]">
     <MdRipple />
     <input
       ref="inputEl"
+      v-bind="getControlAttrs($attrs)"
       :checked="checked"
       :disabled="disabled"
       :name="name || undefined"
@@ -23,6 +24,9 @@
 </template>
 
 <script setup>
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
 import { useFormReset } from '../../composables/useFormReset';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
@@ -78,8 +82,12 @@ const syncGroup = (event) => {
     internalChecked.value = input.checked;
   }
 };
-onMounted(() => inputEl.value?.ownerDocument.addEventListener('change', syncGroup, true));
-onBeforeUnmount(() => inputEl.value?.ownerDocument.removeEventListener('change', syncGroup, true));
+let groupRoot;
+onMounted(() => {
+  groupRoot = inputEl.value?.getRootNode();
+  groupRoot?.addEventListener('change', syncGroup, true);
+});
+onBeforeUnmount(() => groupRoot?.removeEventListener('change', syncGroup, true));
 
 const onInput = (ev) => {
   if (props.disabled) {

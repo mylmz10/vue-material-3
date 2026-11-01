@@ -68,6 +68,7 @@ const openSubMenuId = ref(null);
 const subMenuRegistry = new Map();
 const mdMenuContextKey = 'mdMenuContext';
 const mdSubMenuContextKey = 'mdSubMenuContext';
+const dialogOpen = inject('mdDialogOpen', null);
 const parentMenuContext = inject(mdMenuContextKey, null);
 const parentSubMenuContext = inject(mdSubMenuContextKey, null);
 const hasActivator = computed(() => !!slots.activator);
@@ -202,6 +203,7 @@ const showSurface = () => {
   window.addEventListener('scroll', positionSurface, true);
 };
 const hideSurface = () => {
+  if (typeof window === 'undefined') return;
   window.removeEventListener('resize', positionSurface);
   window.removeEventListener('scroll', positionSurface, true);
   if (usePopover.value && contentEl.value?.matches(':popover-open')) contentEl.value.hidePopover();
@@ -249,6 +251,16 @@ const setOpen = (nextOpen, options = {}) => {
     });
   }
 };
+
+if (dialogOpen) {
+  watch(
+    dialogOpen,
+    (opened) => {
+      if (!opened) setOpen(false, { source: 'dialog', restoreFocus: false });
+    },
+    { immediate: true, flush: 'sync' }
+  );
+}
 
 const open = (options = {}) => {
   setOpen(true, options);

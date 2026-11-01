@@ -38,13 +38,14 @@ let bodyOverflowBeforeLock = '';
 
 <script setup>
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
-import { nextTick, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue';
+import { nextTick, onBeforeUnmount, provide, ref, useId, useSlots, watch } from 'vue';
 
 defineOptions({ inheritAttrs: false });
 
 const slots = useSlots();
 const headerId = `md-dialog-${useId()}-header`;
 const _open = ref(false);
+provide('mdDialogOpen', _open);
 const dialogEl = ref(null);
 const containerEl = ref(null);
 const previousFocusedElement = ref(null);

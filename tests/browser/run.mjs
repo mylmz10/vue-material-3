@@ -85,7 +85,22 @@ try {
           'Math.abs(document.querySelector("dialog[open] [role=listbox]").getBoundingClientRect().width - document.querySelector("dialog[open] .md-menu__activator").getBoundingClientRect().width) < 2'
         )
       );
-      await key('Escape');
+      await ev('window.fixture.state.auditShort = false');
+      await waitFor('!document.querySelector("dialog[open]")');
+      assert.equal(await ev('document.querySelectorAll(":popover-open").length'), 0);
+      await click('#open-audit-short');
+      await waitFor('!!document.querySelector("dialog[open] [role=combobox]")');
+      assert.equal(await ev('document.querySelector("dialog[open] [role=combobox]").getAttribute("aria-expanded")'), 'false');
+      await click('dialog[open] [role=combobox]');
+      await waitFor('document.activeElement.getAttribute("role") === "option"');
+      assert.equal(
+        await ev(
+          'Array.from(document.querySelectorAll("dialog[open] [role=option]")).every(a => {const r=a.getBoundingClientRect();return a.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})'
+        ),
+        true
+      );
+      await click('dialog[open] [role=option]');
+      assert.equal(await ev('document.querySelector("dialog[open] [role=combobox]").getAttribute("aria-expanded")'), 'false');
       await key('Escape');
       await waitFor('!document.querySelector("dialog[open]")');
     });
@@ -152,6 +167,66 @@ try {
       await ev('window.fixture.state.appbarVariant = "large"');
       await command('Emulation.setDeviceMetricsOverride', { width: 1000, height: 900, deviceScaleFactor: 1, mobile: false });
     });
+    await check('multi-browse packs responsive masks and preserves media geometry in RTL', async () => {
+      const snapshot = () =>
+        ev(`(() => {
+        const v = document.querySelector('.md-carousel__viewport'), bounds = v.getBoundingClientRect();
+        return { left: bounds.left, right: bounds.right,
+          masks: Array.from(v.querySelectorAll('.md-carousel__mask')).map(el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width,opacity:Number(getComputedStyle(el).getPropertyValue('--md-carousel-label-opacity'))}; }).filter(r=>r.width>1),
+          image: v.querySelector('img').getBoundingClientRect().width,
+          content: v.querySelector('.md-carousel__content').getBoundingClientRect().width };
+      })()`);
+      for (const width of [1000, 360]) {
+        await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+        await ev('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+        const start = await snapshot();
+        assert.ok(
+          await ev(
+            '(() => {const c=document.querySelector(".md-carousel"),p=c.parentElement,v=c.querySelector(".md-carousel__viewport");return c.getBoundingClientRect().width<=p.getBoundingClientRect().width+1 && v.scrollWidth>v.clientWidth;})()'
+          )
+        );
+
+        assert.ok(start.masks.length >= 3);
+        assert.ok(start.masks[0].width > start.masks.at(-2).width);
+        assert.ok(start.masks.at(-2).width > start.masks.at(-1).width);
+        assert.ok(start.masks.at(-1).width >= 40 && start.masks.at(-1).width <= 56);
+        assert.ok(start.masks.at(-1).opacity < 0.01);
+        assert.ok(Math.abs(start.masks[0].left - start.left - 16) < 1);
+        assert.ok(Math.abs(start.masks.at(-1).right - start.right + 16) < 1);
+        for (let i = 1; i < start.masks.length; i++) assert.ok(Math.abs(start.masks[i].left - start.masks[i - 1].right - 8) < 1);
+        await ev(
+          `(() => {const v=document.querySelector('.md-carousel__viewport');v.style.scrollSnapType='none';v.scrollTo({left:(parseFloat(getComputedStyle(v).getPropertyValue('--md-carousel-large-width'))+8)/2,behavior:'instant'});})()`
+        );
+        await ev('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+        const middle = await snapshot();
+        assert.ok(Math.abs(middle.image - start.image) < 1);
+        assert.ok(Math.abs(middle.content - start.content) < 1);
+        assert.ok(middle.masks.some((r) => r.width > start.masks.at(-2).width + 1 && r.width < start.masks[0].width - 1));
+        await ev('document.querySelector(".md-carousel__viewport").style.scrollSnapType=""');
+        await focus('.md-carousel__viewport');
+        await key('Home');
+        await waitFor('document.querySelector(".md-carousel__viewport").scrollLeft === 0');
+      }
+      await ev('document.querySelector(".md-carousel").style.setProperty("--md-carousel-gap", "16px")');
+      await waitFor(
+        '(() => {const m=Array.from(document.querySelectorAll(".md-carousel__mask")).filter(e=>e.getBoundingClientRect().width>1);return Math.abs(m[1].getBoundingClientRect().left-m[0].getBoundingClientRect().right-16)<1;})()'
+      );
+      await ev('document.querySelector(".md-carousel").style.removeProperty("--md-carousel-gap")');
+      await waitFor(
+        '(() => {const m=Array.from(document.querySelectorAll(".md-carousel__mask")).filter(e=>e.getBoundingClientRect().width>1);return Math.abs(m[1].getBoundingClientRect().left-m[0].getBoundingClientRect().right-8)<1;})()'
+      );
+      await ev('document.documentElement.dir="rtl"');
+      await focus('.md-carousel__viewport');
+      await key('End');
+      await waitFor('window.fixture.state.carousel === document.querySelectorAll(".md-carousel__item").length-1');
+      await waitFor(
+        '(() => {const v=document.querySelector(".md-carousel__viewport"),m=v.querySelector(".md-carousel__item:last-child .md-carousel__mask");return Math.abs(m.getBoundingClientRect().left-v.getBoundingClientRect().left-16)<1;})()'
+      );
+      await key('Home');
+      await waitFor('document.querySelector(".md-carousel__viewport").scrollLeft === 0');
+      await ev('document.documentElement.dir="ltr"');
+      await command('Emulation.setDeviceMetricsOverride', { width: 1000, height: 900, deviceScaleFactor: 1, mobile: false });
+    });
     await check('rail, carousel and segmented control keyboard updates', async () => {
       await focus('.md-navigation-rail button');
       await key('ArrowDown');
@@ -160,17 +235,24 @@ try {
       assert.match(await ev('getComputedStyle(document.querySelector(".md-navigation-rail__destination--selected .md-icon")).fontVariationSettings'), /FILL.*1/);
       await focus('.md-carousel__viewport');
       await key('End');
-      await waitFor('window.fixture.state.carousel === 2');
+      await waitFor('window.fixture.state.carousel === document.querySelectorAll(".md-carousel__item").length - 1');
       await waitFor(
-        '(() => {const v=document.querySelector(".md-carousel__viewport"),s=v.querySelector(".md-carousel__item:last-child");return Math.abs(s.getBoundingClientRect().left-v.getBoundingClientRect().left-4)<1;})()'
+        '(() => {const v=document.querySelector(".md-carousel__viewport"),s=v.querySelector(".md-carousel__item:last-child .md-carousel__mask");return Math.abs(s.getBoundingClientRect().right-v.getBoundingClientRect().right+16)<1;})()'
       );
-      assert.equal(await ev('window.fixture.state.carousel'), 2);
-      await key('Home');
-      await waitFor('window.fixture.state.carousel === 0');
+      assert.equal(await ev('window.fixture.state.carousel'), await ev('document.querySelectorAll(".md-carousel__item").length - 1'));
       await click('.md-carousel__show-all');
       assert.equal(await ev('document.querySelector(".md-carousel__show-all").getAttribute("aria-expanded")'), 'true');
       assert.equal(await ev('getComputedStyle(document.querySelector(".md-carousel__viewport")).display'), 'grid');
+      assert.equal(await ev('Array.from(document.querySelectorAll(".md-carousel__mask")).every(m=>!m.inert && !m.hasAttribute("style"))'), true);
+      assert.equal(await ev('window.fixture.state.carousel'), await ev('document.querySelectorAll(".md-carousel__item").length - 1'));
       await click('.md-carousel__show-all');
+      await waitFor(
+        '(() => {const v=document.querySelector(".md-carousel__viewport"),m=v.querySelector(".md-carousel__item:last-child .md-carousel__mask");return Math.abs(m.getBoundingClientRect().right-v.getBoundingClientRect().right+16)<1;})()'
+      );
+      await focus('.md-carousel__viewport');
+      await key('Home');
+      await waitFor('window.fixture.state.carousel === 0');
+      await waitFor('document.querySelector(".md-carousel__viewport").scrollLeft === 0');
       await focus('.md-segmented-button');
       await key('Tab');
       await key(' ');
@@ -192,7 +274,7 @@ try {
       })()`);
       await key('End');
       await waitFor('window.fixture.carouselMotionObserved === true');
-      assert.equal(await ev('window.fixture.state.carousel'), 2);
+      assert.equal(await ev('window.fixture.state.carousel'), await ev('document.querySelectorAll(".md-carousel__item").length - 1'));
       assert.notEqual(await ev('getComputedStyle(document.querySelector(".md-carousel__image")).transform'), 'none');
       await waitFor('(() => {const v=document.querySelector(".md-carousel__viewport");return Math.abs(v.scrollLeft-(v.scrollWidth-v.clientWidth))<1;})()');
       await command('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
@@ -266,6 +348,13 @@ try {
       await waitFor('window.fixture.state.slider > 20');
       await ev('window.fixture.state.slider = 70');
       await waitFor('document.querySelector("#slider input[type=range]").value === "70"');
+      await ev('Object.assign(window.fixture.state, { sliderMax: 10, sliderStep: 6, slider: 10 })');
+      await waitFor('document.querySelector("#slider input[type=range]").value === "6"');
+      assert.equal(await ev('document.querySelector("#slider .md-slider__label--end span").textContent.trim()'), '6');
+      await focus('#slider input[type=range]');
+      await key('ArrowLeft');
+      await waitFor('window.fixture.state.slider === 0');
+      await ev('Object.assign(window.fixture.state, { sliderMax: 100, sliderStep: 1, slider: 70 })');
     });
     await check('uncontrolled native radio group visuals stay synchronized', async () => {
       await click('#radios .md-radio:nth-child(2) input');

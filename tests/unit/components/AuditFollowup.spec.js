@@ -254,7 +254,7 @@ it('invalidates a native-scroll acknowledgement when layout restores the old mod
   viewport.element.scrollBy = vi.fn();
   viewport.element.getBoundingClientRect = () => ({ left: 0, right: 320 });
   wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
-    slide.element.getBoundingClientRect = () => ({ left: (index - 1) * 320 + 4, right: (index - 1) * 320 + 324 });
+    slide.element.getBoundingClientRect = () => ({ left: (index - 1) * 320 + 16, right: (index - 1) * 320 + 336 });
   });
   await viewport.trigger('scroll');
   frame();
