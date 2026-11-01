@@ -1,39 +1,82 @@
+<script setup>
+import { ref } from 'vue';
+const modalOpen = ref(false);
+const standardOpen = ref(false);
+</script>
+
 # Bottom Sheet
 
 `MdBottomSheet` presents supplementary content at the bottom of the viewport. The default modal variant uses a native dialog, a scrim, focus trapping, body scroll locking, Escape/backdrop dismissal, and focus restoration. It uses the baseline Material Design 3 surface, 28px top corners, and an optional 32×4px drag handle.
 
+## Example
+
+<div class="md-doc-preview md-doc-preview--column">
+  <div class="md-doc-preview__row">
+    <MdFilledButton label="Open modal sheet" @click="modalOpen = true" />
+    <MdOutlinedButton label="Open standard sheet" @click="standardOpen = true" />
+  </div>
+  <MdBottomSheet v-model="modalOpen" headline="Place details">
+    <p>Explore the coastal trail and save this place for later.</p>
+    <template #footer="{ close }"><MdTextButton label="Done" @click="close('done')" /></template>
+  </MdBottomSheet>
+  <MdBottomSheet v-model="standardOpen" :modal="false" headline="Trail information">
+    <p>This standard sheet leaves the rest of the page interactive.</p>
+    <template #footer="{ close }"><MdTextButton label="Done" @click="close('done')" /></template>
+  </MdBottomSheet>
+</div>
+
+## Import
+
+```js
+import { MdBottomSheet } from 'vue-material-3';
+```
+
+## Usage
+
 ```vue
 <script setup>
 import { ref } from 'vue';
-import { MdBottomSheet } from 'vue-material-3';
+import { MdBottomSheet, MdFilledButton, MdTextButton } from 'vue-material-3';
 const open = ref(false);
 </script>
 
 <template>
-  <button @click="open = true">Show details</button>
+  <MdFilledButton label="Show details" @click="open = true" />
   <MdBottomSheet v-model="open" headline="Place details">
     <p>Additional information about this place.</p>
-    <template #footer="{ close }"><button @click="close('done')">Done</button></template>
+    <template #footer="{ close }"><MdTextButton label="Done" @click="close('done')" /></template>
   </MdBottomSheet>
 </template>
 ```
 
-Use `:modal="false"` for a standard sheet inside your layout. It leaves the main page interactive and does not move focus on opening. Place it after the primary content; the application controls its surrounding layout. Escape dismisses it only while focus is inside, and closing returns focus to the launcher if focus was inside the sheet.
-
 ## API
 
-| Prop                   | Default                | Behavior                                                           |
-| ---------------------- | ---------------------- | ------------------------------------------------------------------ |
-| `modelValue`           | `false`                | Controlled open state; bind with `v-model`.                        |
-| `modal`                | `true`                 | Native modal dialog or in-flow complementary section.              |
-| `headline`             | `''`                   | Visible and accessible title; `header` slot overrides its content. |
-| `closeLabel`           | `'Close bottom sheet'` | Accessible name for the close button.                              |
-| `closeOnEscape`        | `true`                 | Allows Escape dismissal.                                           |
-| `closeOnBackdropClick` | `true`                 | Allows clicking outside a modal sheet to dismiss it.               |
-| `restoreFocus`         | `true`                 | Returns focus on closing.                                          |
-| `initialFocus`         | `null`                 | Modal-only selector/function, as with `MdDialog`.                  |
-| `dragHandle`           | `true`                 | Shows the drag handle; close button remains available.             |
+Use `:modal="false"` for a standard sheet inside your layout. It leaves the main page interactive and does not move focus on opening. Place it after the primary content; the application controls its surrounding layout. Escape dismisses it only while focus is inside, and closing returns focus to the launcher if focus was inside the sheet.
+
+### Props
+
+| Prop                   | Default                | Behavior                                                                                                      |
+| ---------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `modelValue`           | `false`                | Controlled open state; bind with `v-model`.                                                                   |
+| `modal`                | `true`                 | Native modal dialog or in-flow complementary section.                                                         |
+| `headline`             | `''`                   | Visible and accessible title; `header` slot overrides its content.                                            |
+| `closeLabel`           | `'Close bottom sheet'` | Accessible name for the close button.                                                                         |
+| `closeOnEscape`        | `true`                 | Allows Escape dismissal.                                                                                      |
+| `closeOnBackdropClick` | `true`                 | Allows clicking outside a modal sheet to dismiss it.                                                          |
+| `restoreFocus`         | `true`                 | Returns focus on closing.                                                                                     |
+| `initialFocus`         | `null`                 | Modal-only selector/function, as with `MdDialog`.                                                             |
+| `dragHandle`           | `true`                 | Shows the drag handle; close button remains available.                                                        |
 | `swipeToClose`         | `true`                 | Upward drags expand; downward drags collapse an expanded sheet or dismiss a collapsed sheet (64px threshold). |
+
+### Events
+
+`update:modelValue(false)` requests dismissal; `cancel({ source })` reports its source. Apply model updates in the parent.
+
+### Slots
+
+`header` supplies title content. `default` and `footer` receive `{ close }`.
+
+### Behavior
 
 The default and `footer` slots receive `{ close }`; `header` provides title content. `close(source)` requests dismissal. `cancel` emits `{ source }` (`close-button`, `escape`, `backdrop`, `swipe`, or your action source); `update:modelValue` emits `false`. The parent must apply the update. Custom `aria-label`/`aria-labelledby` override the automatic title.
 
@@ -44,3 +87,7 @@ Dragging starts only on the handle, so ordinary content scrolling and selection 
 Design references: [M3 bottom sheets](https://m3.material.io/components/bottom-sheets/overview), [Material Components baseline anatomy and theme attributes](https://github.com/material-components/material-components-android/blob/master/docs/components/BottomSheet.md).
 
 Modal sheets slide in with the shared M3 emphasized-decelerate motion tokens, slide out with emphasized-accelerate tokens, and animate height-preset changes. Reduced motion disables these transitions. The close action uses `MdIconButton`; application footer content should use the existing Material button components, as the Storybook examples do. The handle stays a dedicated accessible drag/resize control.
+
+## Storybook
+
+Explore variants and controls in [Storybook](https://mylmz10.github.io/vue-material-3/storybook/?path=/story/components-bottom-sheet--modal).

@@ -2,6 +2,8 @@
 
 Dividers separate content within lists and layouts.
 
+## Example
+
 <div class="md-doc-preview md-doc-preview--column">
   <div class="md-doc-preview__surface">
     <span>Section one</span>
@@ -19,9 +21,32 @@ import { MdDivider } from 'vue-material-3';
 ## Usage
 
 ```vue
-<MdDivider />
+<script setup>
+import { MdDivider } from 'vue-material-3';
+</script>
+
+<template>
+  <MdDivider />
+</template>
 ```
+
+## API
+
+### Props
+
+| Prop       | Default | Description             |
+| ---------- | ------- | ----------------------- |
+| `vertical` | `false` | Use a vertical divider. |
+| `tag`      | `'div'` | Root HTML element.      |
+
+### Events
+
+No component events.
+
+### Slots
+
+No public slots.
 
 ## Storybook
 
-Use <a href="/vue-material-3/storybook/?path=/story/components-divider--divider" target="_blank" rel="noreferrer">Storybook</a> for controls.
+Explore variants and controls in [Storybook](https://mylmz10.github.io/vue-material-3/storybook/?path=/story/components-divider--horizontal).

@@ -214,7 +214,13 @@ const updateTab = (tabId, patch) => {
 };
 
 const unregisterTab = (tabId) => {
+  const selectedId = tabs.value[selectedIndex.value]?.id;
+  const focusedId = tabs.value[focusedIndex.value]?.id;
   tabs.value = tabs.value.filter((tab) => tab.id !== tabId);
+  const nextSelected = getTabIndexById(selectedId);
+  const nextFocused = getTabIndexById(focusedId);
+  if (!isControlled.value && nextSelected !== -1) selectedIndex.value = nextSelected;
+  if (nextFocused !== -1) focusedIndex.value = nextFocused;
   scheduleSync();
 };
 

@@ -88,8 +88,8 @@ describe('MdDatePicker', () => {
       },
     });
 
-    await wrapper.get('.md-date-picker').trigger('keydown', { key: 'ArrowRight' });
-    await wrapper.get('.md-date-picker').trigger('keydown', { key: 'Enter' });
+    await wrapper.get('[data-iso="2026-03-14"]').trigger('keydown', { key: 'ArrowRight' });
+    await wrapper.get('[data-iso="2026-03-15"]').trigger('keydown', { key: 'Enter' });
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['2026-03-15']);
   });
@@ -163,10 +163,12 @@ describe('MdDatePicker', () => {
     await wrapper.get('[data-iso="2026-03-24"]').trigger('click');
     await findButtonByText(wrapper, 'OK').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-18',
-      end: '2026-03-24',
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-18',
+        end: '2026-03-24',
+      },
+    ]);
   });
 
   it('sorts reverse range selections in docked mode', async () => {
@@ -184,10 +186,12 @@ describe('MdDatePicker', () => {
     await wrapper.get('[data-iso="2026-03-20"]').trigger('click');
     await wrapper.get('[data-iso="2026-03-16"]').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-16',
-      end: '2026-03-20',
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-16',
+        end: '2026-03-20',
+      },
+    ]);
   });
 
   it('parses valid modal input ranges before confirming when selectionMode is range', async () => {
@@ -210,10 +214,12 @@ describe('MdDatePicker', () => {
     await input.trigger('change');
     await findButtonByText(wrapper, 'OK').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-20',
-      end: '2026-03-25',
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-20',
+        end: '2026-03-25',
+      },
+    ]);
   });
 
   it('reverts draft range changes on cancel in modal mode', async () => {
@@ -254,9 +260,11 @@ describe('MdDatePicker', () => {
     await wrapper.get('[data-iso="2026-03-13"]').trigger('click');
     await wrapper.get('[data-iso="2026-03-16"]').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{
-      start: '2026-03-13',
-      end: null,
-    }]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+      {
+        start: '2026-03-13',
+        end: null,
+      },
+    ]);
   });
 });

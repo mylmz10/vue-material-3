@@ -2,6 +2,7 @@
   <MdMenu class="md-autocomplete" :class="$attrs.class" :style="$attrs.style" v-model="menuOpened" content-role="presentation" :focus-first-item-on-open="false" :restore-focus-on-close="false">
     <template v-slot:activator>
       <MdOutlinedTextField
+        ref="textFieldEl"
         v-bind="getControlAttrs($attrs)"
         v-model="searchText"
         :label="props.label"
@@ -49,6 +50,7 @@ import MdMenu from '../menu/MdMenu.vue';
 import MdList from '../list/MdList.vue';
 import MdListItem from '../list/MdListItem.vue';
 
+import { useFormReset } from '../../composables/useFormReset';
 import { getControlAttrs } from '../field/fieldAttrs';
 
 defineOptions({ inheritAttrs: false });
@@ -69,6 +71,20 @@ let menuOpened = ref(false);
 let searchText = ref(null);
 let selecting = ref(false);
 let isPristine = ref(true);
+const textFieldEl = ref(null);
+let initialValue = null;
+useFormReset(
+  () => textFieldEl.value?.getInputEl?.(),
+  () => {
+    isPristine.value = true;
+    activeIndex.value = -1;
+    selecting.value = false;
+    menuOpened.value = false;
+    searchText.value = initialValue;
+    emit('update:modelValue', initialValue);
+    emit('update:search', initialValue);
+  }
+);
 
 const filteredItems = computed(() => {
   if (!selecting.value && searchText.value) {
@@ -78,6 +94,7 @@ const filteredItems = computed(() => {
 });
 
 onBeforeMount(() => {
+  initialValue = props.modelValue;
   searchText.value = props.modelValue;
 });
 

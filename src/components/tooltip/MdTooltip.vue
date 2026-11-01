@@ -5,6 +5,7 @@
       class="md-tooltip__trigger"
       @mouseenter="handleTriggerMouseEnter"
       @mouseleave="handleTriggerMouseLeave"
+      @keydown="handleEscapeKeydown"
       @focusin="handleTriggerFocusIn"
       @focusout="handleTriggerFocusOut"
       @pointerdown="handleTriggerPointerDown"
@@ -16,7 +17,7 @@
       <slot />
     </span>
 
-    <teleport to="body">
+    <teleport :to="teleportTarget">
       <div
         v-if="isOpen"
         :id="tooltipId"
@@ -29,6 +30,7 @@
         }"
         :style="tooltipStyle"
         role="tooltip"
+        @keydown="handleEscapeKeydown"
         @mouseenter="handleTooltipMouseEnter"
         @mouseleave="handleTooltipMouseLeave"
         @focusin="handleTooltipFocusIn"
@@ -132,6 +134,10 @@ const triggerEl = ref(null);
 const tooltipEl = ref(null);
 const isOpen = ref(false);
 const tooltipStyle = ref({});
+const teleportTarget = ref('body');
+const syncTeleportTarget = () => {
+  teleportTarget.value = triggerEl.value?.closest('dialog') || 'body';
+};
 const hoveredTrigger = ref(false);
 const hoveredTooltip = ref(false);
 const ignoreNextClick = ref(false);
@@ -140,6 +146,7 @@ const instanceId = `md-tooltip-${++tooltipInstanceIndex}`;
 const tooltipId = computed(() => props.id || `${instanceId}-surface`);
 
 const describedTriggers = new Map();
+let restoringFocus = false;
 const clearTriggerDescriptions = () => {
   for (const [element, id] of describedTriggers) {
     const ids = (element.getAttribute('aria-describedby') || '').split(/\s+/).filter((token) => token && token !== id);
@@ -239,11 +246,24 @@ const closeTooltip = (source = 'programmatic') => {
     return;
   }
 
+  const restoreFocus = (source === 'escape' || source === 'action') && tooltipEl.value?.contains(document.activeElement);
+  const trigger = describedTriggers.keys().next().value;
   clearCloseTimer();
   clearLongPressTimer();
   hoveredTrigger.value = false;
   hoveredTooltip.value = false;
   isOpen.value = false;
+  if (restoreFocus)
+    nextTick(() => {
+      if (trigger?.isConnected) {
+        restoringFocus = true;
+        try {
+          trigger.focus();
+        } finally {
+          restoringFocus = false;
+        }
+      }
+    });
   tooltipStyle.value = {};
   removeGlobalListeners();
   emit('update:modelValue', false);
@@ -260,7 +280,7 @@ const getHorizontalAlignedLeft = (triggerRect, surfaceRect, align = 'center') =>
     return triggerRect.right - surfaceRect.width;
   }
 
-  return triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2);
+  return triggerRect.left + (triggerRect.width - surfaceRect.width) / 2;
 };
 
 const getVerticalAlignedTop = (triggerRect, surfaceRect, align = 'center') => {
@@ -272,7 +292,7 @@ const getVerticalAlignedTop = (triggerRect, surfaceRect, align = 'center') => {
     return triggerRect.bottom - surfaceRect.height;
   }
 
-  return triggerRect.top + ((triggerRect.height - surfaceRect.height) / 2);
+  return triggerRect.top + (triggerRect.height - surfaceRect.height) / 2;
 };
 
 const normalizePlacement = (placement) => {
@@ -353,7 +373,7 @@ const resolvePlainPosition = (triggerRect, surfaceRect) => {
     return clampToViewport(explicitPlacement, surfaceRect);
   }
 
-  const centeredLeft = triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2);
+  const centeredLeft = triggerRect.left + (triggerRect.width - surfaceRect.width) / 2;
   const topCandidate = {
     left: centeredLeft,
     top: triggerRect.top - surfaceRect.height - plainGap.value,
@@ -374,7 +394,7 @@ const resolveRichPosition = (triggerRect, surfaceRect) => {
   }
 
   const centeredBelow = {
-    left: triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2),
+    left: triggerRect.left + (triggerRect.width - surfaceRect.width) / 2,
     top: triggerRect.bottom + RICH_GAP,
   };
   const candidates = [
@@ -396,7 +416,7 @@ const resolveRichPosition = (triggerRect, surfaceRect) => {
     },
     centeredBelow,
     {
-      left: triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2),
+      left: triggerRect.left + (triggerRect.width - surfaceRect.width) / 2,
       top: triggerRect.top - surfaceRect.height - RICH_GAP,
     },
   ];
@@ -444,6 +464,8 @@ const handleEscapeKeydown = (event) => {
     return;
   }
 
+  event.preventDefault();
+  event.stopPropagation();
   closeTooltip('escape');
 };
 
@@ -460,6 +482,7 @@ function addGlobalListeners() {
 }
 
 const openTooltip = async (source = 'programmatic') => {
+  syncTeleportTarget();
   if (props.disabled) {
     return;
   }
@@ -507,6 +530,7 @@ const handleTriggerMouseLeave = () => {
 };
 
 const handleTriggerFocusIn = () => {
+  if (restoringFocus) return;
   syncTriggerDescriptions();
   hoveredTrigger.value = true;
   clearCloseTimer();
@@ -611,6 +635,8 @@ const handleActionClick = () => {
 };
 
 onMounted(() => {
+  syncTeleportTarget();
+  if (isOpen.value) nextTick(updatePosition);
   syncTriggerDescriptions();
   getTooltipRegistry().set(instanceId, closeTooltip);
   if (isOpen.value) closeOtherTooltips();
@@ -638,6 +664,7 @@ watch(
     isOpen.value = !!nextValue;
 
     if (nextValue) {
+      syncTeleportTarget();
       closeOtherTooltips();
       addGlobalListeners();
       await nextTick();

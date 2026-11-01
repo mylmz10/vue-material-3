@@ -30,7 +30,7 @@ import { useFormReset } from '../../composables/useFormReset';
 import { onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-const emit = defineEmits(['update:modelValue', 'update:model-value', 'input', 'change', 'focus', 'blur']);
+const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur']);
 
 const inputEl = ref(null);
 const _checked = ref(false);
@@ -70,7 +70,6 @@ const syncIndeterminateToInput = () => {
 
 const emitCheckedUpdate = () => {
   emit('update:modelValue', _checked.value);
-  emit('update:model-value', _checked.value);
 };
 
 const onInput = (ev) => {

@@ -262,6 +262,7 @@ const selectValue = (nextValue, emitInteraction = false, closeAfterSelect = fals
 };
 
 const selectActiveOption = () => {
+  if (props.disabled) return;
   const selectedOption = getOptions().find((option) => option.id === activeOptionId.value);
   if (!selectedOption || selectedOption.disabled) {
     return;
@@ -407,7 +408,15 @@ const onActivatorKeydown = (event) => {
   }
 };
 
+watch(
+  () => props.disabled,
+  (disabled) => {
+    if (disabled) closeMenu();
+  }
+);
+
 const onListKeydown = (event) => {
+  if (props.disabled) return;
   if (event.key === 'ArrowDown') {
     event.preventDefault();
     moveActiveOption(1);

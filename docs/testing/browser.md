@@ -1,12 +1,16 @@
-# Browser and package checks
+# Browser and Package Checks
 
 Use Node 22 and the existing installed dependencies. No additional test package or browser download is needed. Set `CHROME_BIN` to a Chrome/Chromium executable if it is not in a supported system location. The runner launches an isolated temporary profile and deletes it afterward. It never connects to your normal browser.
+
+## Commands
 
 ```sh
 npm run test:browser
 npm run test:visual
 npm run test:package
 ```
+
+## Coverage
 
 `test:browser` starts Vite on localhost and sends native keyboard, mouse and touch input through Chrome's debugging protocol. Assertions cover modal focus isolation/restoration, hidden/disabled targets, nested dialogs, drawer Escape, autocomplete input focus, select boundaries, submenu navigation, controlled values, radio groups, ripple release, fields, picker gestures and removal/unmount. Unit tests cover cancellation, registration and listener/timer cleanup where browser assertions alone cannot prove it.
 
@@ -26,4 +30,14 @@ Review both JSON changes and PNG artifacts. Chrome reports its version in the lo
 
 Package consumers must import `vue-material-3/style.css` once. Roboto and Material Symbols Outlined are external font prerequisites: load them in the application, or supply your own typography/icon content. Storybook's preview config supplies fonts for the examples; they are not bundled into the package.
 
-Existing field/select/autocomplete stories feed emitted model values back into a parent ref, and watch incoming controls so Storybook updates also reach the parent. Use Controls for supported disabled, readonly and error states; use a `.dark` container for dark tokens. `modelValue` takes precedence over a legacy `value`; select's `value` is an initial default, while text-field legacy `value` stays reactive only when `modelValue` is absent. See each component page for props, emits and slots.
+Existing field/select/autocomplete stories feed emitted model values back into a parent ref, and watch incoming controls so Storybook updates also reach the parent. Use Controls for supported disabled, readonly and error states; use a `.dark` container for dark tokens. `modelValue` takes precedence over a legacy `value`; select's `value` is an initial default, while text-field legacy `value` stays reactive only when `modelValue` is absent. See each [component reference](/components/) for key props, events, and slots.
+
+## Limitations
+
+These checks do not establish full visual or accessibility conformance. Geometry/style assertions and screenshots complement manual review; they do not compare pixels. Review historical reports against their own source receipts rather than treating their test counts as current.
+
+## Related documentation
+
+- [Installation](/guide/installation)
+- [Components](/components/)
+- [Storybook](https://mylmz10.github.io/vue-material-3/storybook/)

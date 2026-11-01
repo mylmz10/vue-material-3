@@ -378,10 +378,10 @@ const canConfirm = computed(() => {
   }
 
   if (!isRangeSelection.value) {
-    return true;
+    return !draftDate.value || isDateAllowed(draftDate.value, constraints.value);
   }
 
-  return !!draftRange.value.start && !!draftRange.value.end;
+  return !!draftRange.value.start && !!draftRange.value.end && isRangeAllowed(draftRange.value, constraints.value);
 });
 
 const setViewMode = (nextViewMode) => {
@@ -397,7 +397,10 @@ const getSelectedFocusIso = () => (isRangeSelection.value ? getRangeFocusIso(dra
 
 const updateFocusedDate = async () => {
   const currentFocusedDate = parseModelValue(focusedIso.value);
-  if (!currentFocusedDate || currentFocusedDate.year() !== displayedYear.value || currentFocusedDate.month() !== displayedMonth.value) {
+  if (
+    !currentFocusedDate || !isDateAllowed(currentFocusedDate, constraints.value) ||
+    currentFocusedDate.year() !== displayedYear.value || currentFocusedDate.month() !== displayedMonth.value
+  ) {
     focusedIso.value = findFirstFocusableDate({
       year: displayedYear.value,
       month: displayedMonth.value,
@@ -530,7 +533,7 @@ const updateDraftRange = (rangeValue, { commit = false } = {}) => {
 
 const selectDay = (isoDate) => {
   const selectedDate = parseModelValue(isoDate);
-  if (!selectedDate) {
+  if (!selectedDate || !isDateAllowed(selectedDate, constraints.value)) {
     return;
   }
 
@@ -691,6 +694,8 @@ const handleCalendarKeydown = async (event) => {
     return;
   }
 
+  if (event.key !== 'Escape' && !calendarViewEl.value?.contains(event.target)) return;
+
   const focusHandlers = {
     ArrowLeft: () => moveFocusDate(focusedIso.value, -1, 'day', constraints.value),
     ArrowRight: () => moveFocusDate(focusedIso.value, 1, 'day', constraints.value),
@@ -710,7 +715,14 @@ const handleCalendarKeydown = async (event) => {
     if (event.key === 'End' && candidate.isBefore(focusedDate, 'day')) {
       candidate = candidate.add(1, 'week');
     }
-    await focusCalendarDate(candidate.startOf('day'));
+    const direction = event.key === 'Home' ? 1 : -1;
+    for (let day = 0; day < 7; day++) {
+      if (isDateAllowed(candidate, constraints.value)) {
+        await focusCalendarDate(candidate.startOf('day'));
+        break;
+      }
+      candidate = candidate.add(direction, 'day');
+    }
     return;
   }
 
@@ -768,6 +780,7 @@ watch(
     displayedYear.value,
     props.min,
     props.max,
+    props.isDateDisabled,
     props.selectionMode,
     typeof props.modelValue === 'string' ? props.modelValue : props.modelValue?.start,
     typeof props.modelValue === 'object' ? props.modelValue?.end : null,

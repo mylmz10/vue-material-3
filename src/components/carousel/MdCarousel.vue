@@ -117,6 +117,7 @@ const scrollToIndex = (index, animate = false) => {
   const bounds = viewport.getBoundingClientRect();
   const target = slide.getBoundingClientRect();
   const delta = isRtl() ? target.right - bounds.right + 4 : target.left - bounds.left - 4;
+  if (!animate) requestedIndex = undefined;
   clearNavigation();
   const smooth = animate && !motionQuery?.matches && Math.abs(delta) > 1;
   if (animate && Math.abs(delta) > 1 && viewport.scrollBy) {

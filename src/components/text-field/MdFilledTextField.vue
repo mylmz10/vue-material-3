@@ -202,6 +202,7 @@ const reportValidity = () => textFieldEl.value?.reportValidity?.();
 const setCustomValidity = (message) => textFieldEl.value?.setCustomValidity?.(message);
 
 defineExpose({
+  getInputEl: () => textFieldEl.value?.getInputEl?.(),
   focus,
   blur,
   checkValidity,

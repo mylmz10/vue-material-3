@@ -123,9 +123,7 @@ export default {
       const value = this.getItemValue(item, index);
 
       if (!this.isMulti) {
-        if (selected) {
-          this.applySingleSelection(value);
-        }
+        this.applySingleSelection(selected ? value : null);
         return;
       }
 

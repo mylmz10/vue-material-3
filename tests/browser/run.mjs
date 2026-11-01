@@ -36,6 +36,74 @@ try {
     console.log(`PASS ${name}`);
   };
   if (!visual) {
+    await check('long dialogs scroll while rich tooltip actions stay in the modal top layer', async () => {
+      await click('#open-audit-dialog');
+      await waitFor('!!document.querySelector("dialog[open] #audit-tooltip-trigger")');
+      await click('#audit-tooltip-trigger');
+      await waitFor('!!document.querySelector("dialog[open] .md-tooltip__action")');
+      assert.equal(
+        await ev('(() => {const a=document.querySelector(".md-tooltip__action"),r=a.getBoundingClientRect();return a.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})()'),
+        true
+      );
+      await focus('.md-tooltip__action');
+      assert.equal(await ev('document.activeElement.matches(".md-tooltip__action")'), true);
+      await key('Escape');
+      await waitFor('!document.querySelector(".md-tooltip__action")');
+      assert.equal(await ev('!!document.querySelector("dialog[open]")'), true);
+      assert.equal(await active(), 'audit-tooltip-trigger');
+      await click('#audit-tooltip-trigger');
+      await focus('.md-tooltip__action');
+      await key('Enter');
+      await waitFor('window.fixture.state.auditActions === 1');
+      assert.equal(await ev('(() => {const c=document.querySelector("dialog[open] .md-modal__content");return c.scrollHeight > c.clientHeight && getComputedStyle(c).overflowY === "auto";})()'), true);
+      await click('#audit-content-last');
+      assert.equal(
+        await ev('(() => {const a=document.querySelector("#audit-content-last"),r=a.getBoundingClientRect();return a === document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);})()'),
+        true
+      );
+      assert.ok(await ev('document.querySelector("#audit-dialog-close").getBoundingClientRect().bottom <= innerHeight'));
+      await click('#audit-dialog-close');
+      await waitFor('!document.querySelector("dialog[open]")');
+    });
+    await check('a select remains pointer-accessible in a short scrollable dialog', async () => {
+      await click('#open-audit-short');
+      await waitFor('!!document.querySelector("dialog[open] [role=combobox]")');
+      await click('dialog[open] [role=combobox]');
+      await waitFor('document.activeElement.getAttribute("role") === "option"');
+      assert.equal(
+        await ev('(() => {const a=document.querySelector("dialog[open] [role=option]"),r=a.getBoundingClientRect();return a.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})()'),
+        true
+      );
+      assert.equal(
+        await ev(
+          'Array.from(document.querySelectorAll("dialog[open] [role=option]")).every(a => {const r=a.getBoundingClientRect();return a.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})'
+        ),
+        true
+      );
+      assert.ok(
+        await ev(
+          'Math.abs(document.querySelector("dialog[open] [role=listbox]").getBoundingClientRect().width - document.querySelector("dialog[open] .md-menu__activator").getBoundingClientRect().width) < 2'
+        )
+      );
+      await key('Escape');
+      await key('Escape');
+      await waitFor('!document.querySelector("dialog[open]")');
+    });
+    await check('DatePicker header keys and constrained Home preserve native behavior', async () => {
+      await focus('#date [aria-label="Next month"]');
+      await key('Enter');
+      await waitFor(`!!document.querySelector('#date [data-iso="2026-11-15"]')`);
+      await focus('#date [aria-label="Previous month"]');
+      await key('Enter');
+      await waitFor(`!!document.querySelector('#date [data-iso="2026-10-15"]')`);
+      await ev('window.fixture.state.dateMin = "2026-10-15"');
+      await focus('#date [data-iso="2026-10-15"]');
+      await key('Home');
+      await key('Enter');
+      assert.equal(await ev('window.fixture.state.date'), '2026-10-15');
+      await ev('window.fixture.state.dateMin = undefined');
+    });
+
     await check('new sheets: native modality, bounded scrolling, RTL and focus restoration', async () => {
       for (const kind of ['bottom', 'side']) {
         await click(`#open-${kind}`);
@@ -45,6 +113,15 @@ try {
         assert.ok(await ev('(() => {const r=document.querySelector(".md-sheet[open] .md-sheet__panel").getBoundingClientRect();return r.width<=innerWidth && r.height<=innerHeight})()'));
         assert.equal(await ev('document.querySelector(".md-sheet[open] .md-sheet__content").scrollHeight > document.querySelector(".md-sheet[open] .md-sheet__content").clientHeight'), true);
         if (kind === 'bottom') {
+          await click('#sheet-tooltip-trigger');
+          await waitFor('!!document.querySelector(".md-sheet[open] > .md-tooltip__surface")');
+          assert.equal(
+            await ev(
+              '(() => {const a=document.querySelector(".md-sheet[open] .md-tooltip__action"),r=a.getBoundingClientRect();return a.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})()'
+            ),
+            true
+          );
+          await click('.md-sheet[open] .md-tooltip__action');
           assert.ok(await ev('document.querySelector(".md-sheet[open] .md-sheet__panel").getBoundingClientRect().height <= innerHeight / 2'));
           await click('.md-sheet[open] .md-sheet__handle-target');
           await waitFor('document.querySelector(".md-sheet[open] .md-sheet__handle-target").getAttribute("aria-expanded") === "true"');
@@ -102,8 +179,19 @@ try {
     await check('carousel moves through intermediate frames without model bounce and respects reduced motion', async () => {
       await ev('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
       await focus('.md-carousel__viewport');
+      await ev(`(() => {
+        const viewport = document.querySelector('.md-carousel__viewport');
+        window.fixture.carouselMotionObserved = false;
+        const observe = () => {
+          if (viewport.scrollLeft > 1 && viewport.scrollLeft < viewport.scrollWidth - viewport.clientWidth - 1) {
+            window.fixture.carouselMotionObserved = true;
+            viewport.removeEventListener('scroll', observe);
+          }
+        };
+        viewport.addEventListener('scroll', observe, { passive: true });
+      })()`);
       await key('End');
-      await waitFor('(() => {const v=document.querySelector(".md-carousel__viewport");return v.scrollLeft>1 && v.scrollLeft<v.scrollWidth-v.clientWidth-1;})()');
+      await waitFor('window.fixture.carouselMotionObserved === true');
       assert.equal(await ev('window.fixture.state.carousel'), 2);
       assert.notEqual(await ev('getComputedStyle(document.querySelector(".md-carousel__image")).transform'), 'none');
       await waitFor('(() => {const v=document.querySelector(".md-carousel__viewport");return Math.abs(v.scrollLeft-(v.scrollWidth-v.clientWidth))<1;})()');

@@ -53,8 +53,8 @@ const resolveChecked = () => {
 
 watch(
   () => [props.modelValue, props.value],
-  () => {
-    internalChecked.value = resolveChecked();
+  (_, previous) => {
+    if (props.modelValue !== undefined || previous?.[0] !== undefined) internalChecked.value = resolveChecked();
   },
   { immediate: true }
 );

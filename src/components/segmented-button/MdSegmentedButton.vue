@@ -3,6 +3,7 @@
     type="button"
     class="md-segmented-button"
     :class="{ 'md-segmented-button--selected': selected, 'md-segmented-button--disabled': disabled }"
+    :aria-pressed="selected"
     v-bind:disabled="disabled"
     @mouseup="handlePointerRelease"
     @touchend="handlePointerRelease"

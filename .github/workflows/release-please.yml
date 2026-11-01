@@ -48,9 +48,10 @@ jobs:
 
       - name: Normalize release outputs
         id: release-meta
+        env:
+          OUTPUTS_JSON: ${{ toJSON(steps.release.outputs) }}
         run: |
-          OUTPUTS_JSON='${{ toJSON(steps.release.outputs) }}'
-          echo "${OUTPUTS_JSON}" > /tmp/release-please-outputs.json
+          printf '%s\n' "${OUTPUTS_JSON}" > /tmp/release-please-outputs.json
 
           RELEASE_CREATED=$(jq -r '[
             .release_created,

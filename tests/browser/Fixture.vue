@@ -12,6 +12,7 @@ const {
   MdSegmentedButtonSet,
   MdSegmentedButton,
   MdDialog,
+  MdTooltip,
   MdNavigationDrawer,
   MdOutlinedAutoComplete,
   MdOutlinedSelect,
@@ -40,6 +41,13 @@ const state = reactive({
   carousel: 0,
   segment: 0,
   dialog: false,
+  auditDialog: false,
+  auditShort: false,
+  auditTooltip: false,
+  sheetTooltip: false,
+  auditActions: 0,
+  date: '2026-10-15',
+  dateMin: undefined,
   nested: false,
   drawer: false,
   menu: false,
@@ -68,11 +76,35 @@ window.fixture = { state, mounted, components };
     <button id="open-bottom" @click="state.bottom = true">Open bottom sheet</button>
     <button id="open-side" @click="state.side = true">Open side sheet</button>
     <MdBottomSheet v-model="state.bottom" headline="Bottom sheet"
-      ><p v-for="i in 40" :key="i">Scrollable content {{ i }}</p></MdBottomSheet
+      ><MdTooltip v-model="state.sheetTooltip" variant="rich" persistent headline="Sheet details" action-label="Sheet tooltip action"><button id="sheet-tooltip-trigger">Details</button></MdTooltip>
+      <p v-for="i in 40" :key="i">Scrollable content {{ i }}</p></MdBottomSheet
     >
     <MdSideSheet modal v-model="state.side" headline="Side sheet"
       ><p v-for="i in 40" :key="i">Scrollable content {{ i }}</p></MdSideSheet
     >
+    <button id="open-audit-dialog" @click="state.auditDialog = true">Open long dialog</button>
+    <button id="open-audit-short" @click="state.auditShort = true">Open short dialog</button>
+    <MdDialog v-model="state.auditDialog" aria-label="Audit long dialog">
+      <template #header>Long content</template>
+      <MdTooltip
+        v-model="state.auditTooltip"
+        variant="rich"
+        persistent
+        headline="Helpful details"
+        supporting-text="Rich tooltip inside a modal"
+        action-label="Tooltip action"
+        @action="state.auditActions++"
+      >
+        <button id="audit-tooltip-trigger">Show details</button>
+      </MdTooltip>
+      <div style="height: 1000px">Long dialog body</div>
+      <button id="audit-content-last">Last content action</button>
+      <template #footer><button id="audit-dialog-close" @click="state.auditDialog = false">Close long dialog</button></template>
+    </MdDialog>
+    <MdDialog v-model="state.auditShort" aria-label="Audit short dialog">
+      <MdOutlinedSelect label="Modal select"><MdSelectOption value="a">Alpha</MdSelectOption><MdSelectOption value="b">Beta</MdSelectOption></MdOutlinedSelect>
+      <template #footer><button @click="state.auditShort = false">Close short dialog</button></template>
+    </MdDialog>
     <section id="new-components">
       <MdTopAppBar
         title="A long application title that must fit on a narrow screen"
@@ -136,7 +168,7 @@ window.fixture = { state, mounted, components };
       <MdCircularProgressIndicator :value="state.progress" :indeterminate="state.loading" aria-label="Upload" /><MdLinearProgressIndicator :value="state.progress" :indeterminate="state.loading" />
       <section id="radios"><MdRadio name="fixture-radio" value="a" checked /><MdRadio name="fixture-radio" value="b" /></section>
       <section id="time" class="md-time-picker-dialog"><MdTimePickerDial :hour24="state.dialHour" :minute="30" @select-hour="state.dialHour = $event" /></section>
-      <section id="date"><MdDatePicker model-value="2026-10-15" variant="docked" /></section>
+      <section id="date"><MdDatePicker v-model="state.date" :min="state.dateMin" variant="docked" /></section>
     </section>
   </main>
 </template>

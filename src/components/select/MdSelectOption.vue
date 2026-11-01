@@ -150,6 +150,7 @@ const onSelect = (event) => {
 const onKeydown = (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
+    event.stopPropagation();
     onSelect(event);
   }
 };
