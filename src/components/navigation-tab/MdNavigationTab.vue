@@ -1,5 +1,5 @@
 <template>
-  <button type="button" class="md-navigation-tab" :class="{ 'md-navigation-tab--selected': selected }">
+  <button :aria-current="selected ? 'page' : undefined" type="button" class="md-navigation-tab" :class="{ 'md-navigation-tab--selected': selected }">
     <MdRipple />
     <span class="md-navigation-tab__content">
       <span class="md-navigation-tab__active-indicator"></span>

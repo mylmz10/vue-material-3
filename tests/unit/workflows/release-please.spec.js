@@ -37,6 +37,18 @@ const validate = (overrides = {}) => {
 };
 
 describe('release publication source', () => {
+  it('passes release notes as data rather than shell source', () => {
+    const step = steps.find((entry) => entry.name === 'Normalize release outputs');
+    expect(step.env.OUTPUTS_JSON).toBe('${{ toJSON(steps.release.outputs) }}');
+    expect(step.run).not.toContain('${{');
+    const outputs = { release_created: 'true', body: "Preserve user's choice; $(exit 17) `exit 18`\nsecond line" };
+    const target = path.join(fixture, 'outputs.json');
+    const run = step.run.split('RELEASE_CREATED=')[0].replace('/tmp/release-please-outputs.json', target);
+    const result = spawnSync('bash', ['-c', run], { env: { ...process.env, OUTPUTS_JSON: JSON.stringify(outputs) }, encoding: 'utf8' });
+    expect(result.status, result.stderr).toBe(0);
+    expect(JSON.parse(readFileSync(target, 'utf8'))).toEqual(outputs);
+  });
+
   it('pins checkout and verification to the same automated/manual release metadata', () => {
     const checkout = steps.find((step) => step.name === 'Checkout release commit');
     const verify = steps.find((step) => step.name === 'Verify release source and version');

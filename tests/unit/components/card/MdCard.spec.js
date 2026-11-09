@@ -3,6 +3,20 @@ import { mount } from '@vue/test-utils';
 import MdCard from '@/components/card/MdCard.vue';
 
 describe('MdCard', () => {
+  it('does not activate an interactive card from nested controls', async () => {
+    const wrapper = mount(MdCard, {
+      props: { interactive: true },
+      slots: { default: '<button><span>Nested action</span></button><a href="#details">Details</a><input aria-label="Name" /><span class="card-text">Card content</span>' },
+    });
+    await wrapper.get('button span').trigger('click');
+    await wrapper.get('a').trigger('click');
+    await wrapper.get('input').trigger('click');
+    expect(wrapper.emitted('click')).toBeUndefined();
+    await wrapper.get('.card-text').trigger('click');
+    expect(wrapper.emitted('click')).toHaveLength(1);
+    wrapper.unmount();
+  });
+
   it('renders header, avatar and footer actions', () => {
     const wrapper = mount(MdCard, {
       props: {

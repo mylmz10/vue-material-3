@@ -1,31 +1,30 @@
 # Migration Notes
 
-Use this section for breaking changes, upgrade paths, and release-to-release notes.
+Use this checklist when upgrading the package. The project is pre-1.0, so review the release's changelog before updating. These are current compatibility requirements, not a version-specific breaking-change history.
 
-## Before 1.0.0
+## Runtime and assets
 
-The package is still evolving and may include breaking changes before `1.0.0`.
+- Use Vue `^3.5.0`; components use Vue 3.5 APIs.
+- Import `vue-material-3/style.css` once. Component imports do not load CSS.
+- Load Roboto, Material Symbols Outlined, and legacy Material Icons, or self-host equivalent fonts.
 
-Recommended migration note format:
+See [Installation](/guide/installation) for setup examples.
 
-```md
-## 0.x to 0.y
+## Models and forms
 
-### Breaking Changes
+Use `v-model` for reactive parent-owned state. Text fields and selects retain legacy `value` support with different semantics: text-field `value` remains reactive when no model is supplied, while select `value` supplies the initial selection and reset baseline.
 
-- Change description.
+For range sliders, the model is `{ valueStart, valueEnd }`. Standalone date/time picker visibility is a separate `v-model:open`. Navigation drawers use `:opened` with `@change`.
 
-### Migration
+Check the relevant component's API before changing existing bindings. Preserve accessible names and form labels when updating templates.
 
-Before:
+## Verify the upgrade
 
-\```vue
-<!-- old usage -->
-\```
+Exercise the states your application uses: disabled and readonly fields, validation, keyboard navigation, modal dismissal, and both color schemes. For changes to this repository, follow [Browser and Package Checks](/testing/browser).
 
-After:
+## Related documentation
 
-\```vue
-<!-- new usage -->
-\```
-```
+- [Components](/components/)
+- [API Reference](/api/)
+- [Theming](/guide/theming)
+- [Storybook](https://mylmz10.github.io/vue-material-3/storybook/)

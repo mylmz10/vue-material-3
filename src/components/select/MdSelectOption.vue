@@ -7,6 +7,7 @@
       'md-select-option--disabled': disabled,
       'md-select-option--active': isActive,
     }"
+    :id="optionId"
     role="option"
     :data-option-id="optionId"
     :tabindex="optionTabIndex"
@@ -149,6 +150,7 @@ const onSelect = (event) => {
 const onKeydown = (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
+    event.stopPropagation();
     onSelect(event);
   }
 };

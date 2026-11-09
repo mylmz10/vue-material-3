@@ -86,6 +86,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
 
 const props = defineProps({
   ariaLabel: { type: String, default: '' },
@@ -138,18 +139,12 @@ const normalizedMax = computed(() => normalizedBounds.value.max);
 
 const hasTicks = computed(() => props.ticks || props.withTickMarks);
 
-const getStepPrecision = (stepValue) => {
-  const stepAsString = String(stepValue);
-
-  if (stepAsString.includes('e-')) {
-    return Number(stepAsString.split('e-')[1] || 0);
-  }
-
-  const decimal = stepAsString.split('.')[1];
-  return decimal ? decimal.length : 0;
+const getStepPrecision = (value) => {
+  const [coefficient, exponent = '0'] = String(value).toLowerCase().split('e');
+  return Math.max(0, (coefficient.split('.')[1]?.length || 0) - Number(exponent));
 };
 
-const stepPrecision = computed(() => getStepPrecision(normalizedStep.value));
+const stepPrecision = computed(() => Math.min(100, Math.max(getStepPrecision(normalizedStep.value), getStepPrecision(normalizedMin.value))));
 
 const normalizeNumber = (value, fallback) => {
   const numericValue = Number(value);
@@ -162,9 +157,12 @@ const clampToBounds = (value) => {
 };
 
 const alignToStep = (value) => {
-  const { min } = normalizedBounds.value;
+  const { min, max } = normalizedBounds.value;
   const stepValue = normalizedStep.value;
-  const steppedValue = min + Math.round((value - min) / stepValue) * stepValue;
+  const stepCount = (max - min) / stepValue;
+  const maxStep = Math.floor(stepCount + Number.EPSILON * Math.max(1, Math.abs(stepCount)));
+  const index = Math.max(0, Math.min(maxStep, Math.round((value - min) / stepValue)));
+  const steppedValue = min + index * stepValue;
   return Number(steppedValue.toFixed(stepPrecision.value));
 };
 
@@ -276,6 +274,21 @@ const activeTrackStyle = computed(() => ({
   left: `${Math.min(startPercent.value, endPercent.value)}%`,
   width: `${Math.max(endPercent.value - startPercent.value, 0)}%`,
 }));
+
+const initialValues = { start: startValue.value, end: endValue.value };
+useFormReset(
+  () => endInputEl.value,
+  () => {
+    startValue.value = normalizeSliderValue(initialValues.start, normalizedMin.value);
+    endValue.value = normalizeSliderValue(initialValues.end, normalizedMax.value);
+    if (props.range) {
+      if (startValue.value > endValue.value) [startValue.value, endValue.value] = [endValue.value, startValue.value];
+      emit('update:valueStart', startValue.value);
+      emit('update:valueEnd', endValue.value);
+      emit('update:modelValue', { valueStart: startValue.value, valueEnd: endValue.value });
+    } else emit('update:modelValue', endValue.value);
+  }
+);
 
 const sliderStyle = computed(() => ({
   '--slider-start-percent': `${startPercent.value}%`,

@@ -1,20 +1,52 @@
 # Theming
 
-Vue Material 3 follows the Material Design 3 token model. Component styles are backed by SCSS token files under `src/styles/tokens`.
+Vue Material 3 uses the Material Design 3 color, typography, and component token model. Load `vue-material-3/style.css` once before applying theme overrides.
 
-## Typography
-
-The project includes Material 3 type scale styles. Import the package entry in your app to include the library styles exposed by the package:
+## Load styles and typography
 
 ```js
-import 'vue-material-3';
+import 'vue-material-3/style.css';
 ```
 
-When working inside this repository, Storybook and the package entry import the typography styles used by the component examples.
+The published JavaScript does not load this stylesheet. Roboto and icon fonts must be loaded separately; see [Installation](/guide/installation#load-fonts).
 
-## Tokens
+## Switch color schemes
 
-Component tokens live in files such as:
+The default scheme is light. Apply `.light` or `.dark` to an ancestor to select a scheme:
+
+```html
+<div class="dark">
+  <!-- Material components inside use dark theme tokens. -->
+</div>
+```
+
+Alternatively, set `data-theme="light|dark"` or `data-color-scheme="light|dark"` on an ancestor, such as the document root:
+
+```js
+document.documentElement.dataset.theme = 'dark';
+```
+
+Choose one selector convention for the application. The package does not automatically follow the operating system's color preference; the application owns that choice.
+
+## Customize tokens
+
+Override public CSS custom properties on the relevant component or an ancestor. For example, customize a button without changing the rest of the theme:
+
+```vue
+<script setup>
+import { MdFilledButton } from 'vue-material-3';
+</script>
+
+<template>
+  <MdFilledButton label="Save" style="--md-sys-color-primary: #386a20; --md-sys-color-on-primary: #ffffff" />
+</template>
+```
+
+Use each component reference for its documented sizing or color variables. Check contrast and disabled/focus states when changing colors.
+
+## Repository token sources
+
+Contributors can inspect SCSS sources such as:
 
 ```text
 src/styles/tokens/_md-comp-filled-button.scss
@@ -22,12 +54,11 @@ src/styles/tokens/_md-comp-outlined-text-field.scss
 src/styles/tokens/_md-ref-palette.scss
 ```
 
-Use these files as the source of truth when documenting or updating component-level theme behavior.
+These repository paths are implementation sources, not supported imports from the published package. Verify token changes in light and dark themes using the component examples and Storybook.
 
-## Storybook
+## Related documentation
 
-Use Storybook to verify visual states after token changes:
-
-```bash
-npm run storybook
-```
+- [Installation](/guide/installation)
+- [Components](/components/)
+- [Browser and Package Checks](/testing/browser)
+- [Storybook](https://mylmz10.github.io/vue-material-3/storybook/)

@@ -38,13 +38,14 @@ let bodyOverflowBeforeLock = '';
 
 <script setup>
 import MdElevationOverlay from '../elevation/MdElevationOverlay.vue';
-import { nextTick, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue';
+import { nextTick, onBeforeUnmount, provide, ref, useId, useSlots, watch } from 'vue';
 
 defineOptions({ inheritAttrs: false });
 
 const slots = useSlots();
 const headerId = `md-dialog-${useId()}-header`;
 const _open = ref(false);
+provide('mdDialogOpen', _open);
 const dialogEl = ref(null);
 const containerEl = ref(null);
 const previousFocusedElement = ref(null);
@@ -126,7 +127,7 @@ const unlockBodyScroll = () => {
 };
 
 const isVisibleTarget = (element) => {
-  if (!containerEl.value?.contains(element) || element.closest('dialog') !== dialogEl.value || element.matches(':disabled, input[type="hidden"]') || element.closest('[hidden], [inert]')) return false;
+  if (!dialogEl.value?.contains(element) || element.closest('dialog') !== dialogEl.value || element.matches(':disabled, input[type="hidden"]') || element.closest('[hidden], [inert]')) return false;
   for (let current = element; current; current = current.parentElement) {
     const style = getComputedStyle(current);
     if (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse') return false;
@@ -137,7 +138,7 @@ const isVisibleTarget = (element) => {
 
 const getFocusableElements = () => {
   if (!containerEl.value) return [];
-  return Array.from(containerEl.value.querySelectorAll(focusableSelector)).filter(
+  return Array.from(dialogEl.value.querySelectorAll(focusableSelector)).filter(
     (element) => (element.tabIndex >= 0 || (element.matches('[contenteditable="true"]') && !element.hasAttribute('tabindex'))) && isVisibleTarget(element)
   );
 };
@@ -416,6 +417,7 @@ $sys-color: theme.values();
     -webkit-font-smoothing: antialiased;
 
     #{$this}__header {
+      flex-shrink: 0;
       padding-inline-start: 24px;
       padding-inline-end: 24px;
       color: dialog-token(headline-color);
@@ -425,6 +427,8 @@ $sys-color: theme.values();
       line-height: map.get($theme, headline-line-height);
     }
     #{$this}__content {
+      min-block-size: 0;
+      overflow: auto;
       padding-inline-start: 24px;
       padding-inline-end: 24px;
       margin-block-start: 16px;
@@ -436,6 +440,7 @@ $sys-color: theme.values();
       line-height: map.get($theme, supporting-text-line-height);
     }
     #{$this}__footer {
+      flex-shrink: 0;
       padding-inline-start: 24px;
       padding-inline-end: 24px;
       display: flex;

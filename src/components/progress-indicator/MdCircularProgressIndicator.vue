@@ -1,7 +1,7 @@
 <template>
   <progress
-    :value="!indeterminate ? value : undefined"
-    :style="{ '--p': value }"
+    :value="!indeterminate ? boundedValue : undefined"
+    :style="{ '--p': boundedValue }"
     max="100"
     class="md-circular-progress-indicator"
     :class="{ 'md-circular-progress-indicator--indeterminate': indeterminate }"
@@ -9,9 +9,15 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+
+const props = defineProps({
   value: { type: [String, Number], default: 0 },
   indeterminate: { type: Boolean },
+});
+const boundedValue = computed(() => {
+  const value = Number(props.value);
+  return Number.isNaN(value) ? 0 : Math.min(100, Math.max(0, value));
 });
 </script>
 
@@ -160,6 +166,17 @@ $theme: tokens.md-comp-circular-progress-indicator-values();
     border-left-color: currentColor;
     border-bottom-color: currentColor;
     transform: rotate(225deg);
+  }
+}
+</style>
+
+<style>
+@media (prefers-reduced-motion: reduce) {
+  .md-circular-progress-indicator,
+  .md-circular-progress-indicator *,
+  .md-circular-progress-indicator::before {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>

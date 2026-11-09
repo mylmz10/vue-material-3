@@ -49,7 +49,7 @@
         @keydown="$emit('keydown', $event)"
         @invalid="$emit('invalid', $event)"
       >
-      <template v-if="showPrefixSlot" #prefix>
+        <template v-if="showPrefixSlot" #prefix>
           <slot name="prefix" />
         </template>
         <template v-if="slots.suffix" #suffix>
@@ -72,7 +72,8 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { computed, nextTick, onMounted, ref, useId, useSlots, watch } from 'vue';
 import MdTextFieldBase from './MdTextFieldBase.vue';
 import MdFilledField from '../field/MdFilledField.vue';
 import { getControlAttrs } from '../field/fieldAttrs';
@@ -99,7 +100,7 @@ const props = defineProps({
   maxlength: { type: Number, default: undefined },
   min: { type: String, default: '' },
   minlength: { type: Number, default: undefined },
-  modelValue: { type: [String, Number], default: '' },
+  modelValue: { type: [String, Number], default: undefined },
   name: { type: String, default: '' },
   pattern: { type: String, default: '' },
   placeholder: { type: String, default: '' },
@@ -119,13 +120,13 @@ const emit = defineEmits(['focus', 'blur', 'input', 'change', 'invalid', 'select
 
 const normalizeValue = (value) => (value === null || value === undefined ? '' : `${value}`);
 
-const resolveInitialValue = () => (props.modelValue === 0 ? props.modelValue : props.modelValue || props.value);
+const resolveInitialValue = () => (props.modelValue !== undefined ? props.modelValue : props.value);
 const inputValue = ref(normalizeValue(resolveInitialValue()));
 const textFieldEl = ref(null);
 const initialValue = ref(inputValue.value);
 const isInputFocused = ref(false);
 const labelOffset = ref(0);
-let formEl = null;
+
 const hasInputValue = computed(() => inputValue.value !== '');
 
 const resolvedSupportingText = computed(() => {
@@ -136,22 +137,22 @@ const resolvedSupportingText = computed(() => {
   return props.supportingText;
 });
 const hasSupportingText = computed(() => !!(resolvedSupportingText.value || props.supportingTextEnd || slots['supporting-text'] || slots['supporting-text-end']));
-const ariaInvalid = computed(() => ((props.error || props.invalid) ? 'true' : ''));
+const ariaInvalid = computed(() => (props.error || props.invalid ? 'true' : ''));
 const showPrefix = computed(() => hasInputValue.value || isInputFocused.value || props.focused);
 const showPrefixSlot = computed(() => showPrefix.value && !!slots.prefix);
 const resolvedPrefix = computed(() => (showPrefix.value ? props.prefix : ''));
 
 watch(
   () => props.modelValue,
-  (value) => {
-    inputValue.value = normalizeValue(value);
+  () => {
+    inputValue.value = normalizeValue(resolveInitialValue());
   }
 );
 
 watch(
   () => props.value,
   (value) => {
-    if (props.modelValue !== undefined && props.modelValue !== null && props.modelValue !== '') {
+    if (props.modelValue !== undefined) {
       return;
     }
 
@@ -201,6 +202,7 @@ const reportValidity = () => textFieldEl.value?.reportValidity?.();
 const setCustomValidity = (message) => textFieldEl.value?.setCustomValidity?.(message);
 
 defineExpose({
+  getInputEl: () => textFieldEl.value?.getInputEl?.(),
   focus,
   blur,
   checkValidity,
@@ -210,20 +212,14 @@ defineExpose({
 
 onMounted(() => {
   initialValue.value = normalizeValue(resolveInitialValue());
-  const inputEl = textFieldEl.value?.getInputEl?.();
-  formEl = inputEl?.form || null;
-  formEl?.addEventListener('reset', onFormReset);
   nextTick(updateLabelOffset);
-});
-
-onBeforeUnmount(() => {
-  formEl?.removeEventListener('reset', onFormReset);
 });
 
 watch([showPrefix, () => props.prefix, inputValue], async () => {
   await nextTick();
   updateLabelOffset();
 });
+useFormReset(() => textFieldEl.value?.getInputEl?.(), onFormReset);
 </script>
 
 <style lang="scss">

@@ -1,11 +1,9 @@
 <template>
-  <div
-    class="md-checkbox"
-    :class="{ 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }"
-  >
+  <div class="md-checkbox" :style="$attrs.style" :class="[$attrs.class, { 'md-checkbox--disabled': disabled, 'md-checkbox--checked': _checked, 'md-checkbox--indeterminate': _indeterminate }]">
     <MdRipple />
     <input
       ref="inputEl"
+      v-bind="getControlAttrs($attrs)"
       type="checkbox"
       :checked="_checked"
       :disabled="disabled"
@@ -29,17 +27,20 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { getControlAttrs } from '../field/fieldAttrs';
+
+defineOptions({ inheritAttrs: false });
+import { useFormReset } from '../../composables/useFormReset';
+import { onMounted, ref, watch } from 'vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
-const emit = defineEmits(['update:modelValue', 'update:model-value', 'input', 'change', 'focus', 'blur']);
+const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur']);
 
 const inputEl = ref(null);
 const _checked = ref(false);
 const _indeterminate = ref(false);
 const initialChecked = ref(false);
 const initialIndeterminate = ref(false);
-let formEl = null;
 
 const props = defineProps({
   checked: { type: Boolean, default: undefined },
@@ -73,7 +74,6 @@ const syncIndeterminateToInput = () => {
 
 const emitCheckedUpdate = () => {
   emit('update:modelValue', _checked.value);
-  emit('update:model-value', _checked.value);
 };
 
 const onInput = (ev) => {
@@ -115,7 +115,7 @@ watch(
 
     _checked.value = !!newValue;
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 watch(
@@ -127,7 +127,7 @@ watch(
 
     _checked.value = !!newValue;
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 watch(
@@ -136,7 +136,7 @@ watch(
     _indeterminate.value = newValue;
     syncIndeterminateToInput();
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 const onFormReset = () => {
@@ -167,13 +167,9 @@ onMounted(() => {
   initialChecked.value = _checked.value;
   initialIndeterminate.value = _indeterminate.value;
   syncIndeterminateToInput();
-  formEl = inputEl.value?.form || null;
-  formEl?.addEventListener('reset', onFormReset);
 });
 
-onBeforeUnmount(() => {
-  formEl?.removeEventListener('reset', onFormReset);
-});
+useFormReset(() => inputEl.value, onFormReset);
 </script>
 
 <style lang="scss">

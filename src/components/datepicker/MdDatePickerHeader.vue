@@ -2,21 +2,21 @@
   <div class="md-date-picker-header" :class="`md-date-picker-header--${variant}`">
     <template v-if="variant === 'docked'">
       <div class="md-date-picker-header__group">
-        <MdIconButton icon="chevron_left" type="button" :disabled="!canPrevMonth" @click="$emit('prev-month')" />
+        <MdIconButton icon="chevron_left" type="button" :disabled="!canPrevMonth" aria-label="Previous month" @click="$emit('prev-month')" />
         <button type="button" class="md-date-picker-header__value" :class="{ 'md-date-picker-header__value--disabled': viewMode === 'years' }" @click="$emit('toggle-months')">
           <span>{{ monthLabel }}</span>
           <MdIcon>arrow_drop_down</MdIcon>
         </button>
-        <MdIconButton icon="chevron_right" type="button" :disabled="!canNextMonth" @click="$emit('next-month')" />
+        <MdIconButton icon="chevron_right" type="button" :disabled="!canNextMonth" aria-label="Next month" @click="$emit('next-month')" />
       </div>
 
       <div class="md-date-picker-header__group">
-        <MdIconButton icon="chevron_left" type="button" :disabled="!canPrevYear" @click="$emit('prev-year')" />
+        <MdIconButton icon="chevron_left" type="button" :disabled="!canPrevYear" aria-label="Previous year" @click="$emit('prev-year')" />
         <button type="button" class="md-date-picker-header__value" :class="{ 'md-date-picker-header__value--disabled': viewMode === 'months' }" @click="$emit('toggle-years')">
           <span>{{ year }}</span>
           <MdIcon>arrow_drop_down</MdIcon>
         </button>
-        <MdIconButton icon="chevron_right" type="button" :disabled="!canNextYear" @click="$emit('next-year')" />
+        <MdIconButton icon="chevron_right" type="button" :disabled="!canNextYear" aria-label="Next year" @click="$emit('next-year')" />
       </div>
     </template>
 
@@ -31,8 +31,8 @@
         <MdIcon>{{ viewMode === 'years' ? 'arrow_drop_up' : 'arrow_drop_down' }}</MdIcon>
       </button>
       <div v-if="viewMode !== 'years'" class="md-date-picker-header__group md-date-picker-header__group--trailing">
-        <MdIconButton icon="chevron_left" type="button" :disabled="!canPrevMonth" @click="$emit('prev-month')" />
-        <MdIconButton icon="chevron_right" type="button" :disabled="!canNextMonth" @click="$emit('next-month')" />
+        <MdIconButton icon="chevron_left" type="button" :disabled="!canPrevMonth" aria-label="Previous month" @click="$emit('prev-month')" />
+        <MdIconButton icon="chevron_right" type="button" :disabled="!canNextMonth" aria-label="Next month" @click="$emit('next-month')" />
       </div>
     </template>
   </div>

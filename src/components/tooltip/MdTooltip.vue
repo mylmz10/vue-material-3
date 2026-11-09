@@ -3,9 +3,9 @@
     <span
       ref="triggerEl"
       class="md-tooltip__trigger"
-      :aria-describedby="tooltipId"
       @mouseenter="handleTriggerMouseEnter"
       @mouseleave="handleTriggerMouseLeave"
+      @keydown="handleEscapeKeydown"
       @focusin="handleTriggerFocusIn"
       @focusout="handleTriggerFocusOut"
       @pointerdown="handleTriggerPointerDown"
@@ -17,7 +17,7 @@
       <slot />
     </span>
 
-    <teleport to="body">
+    <teleport :to="teleportTarget">
       <div
         v-if="isOpen"
         :id="tooltipId"
@@ -30,6 +30,7 @@
         }"
         :style="tooltipStyle"
         role="tooltip"
+        @keydown="handleEscapeKeydown"
         @mouseenter="handleTooltipMouseEnter"
         @mouseleave="handleTooltipMouseLeave"
         @focusin="handleTooltipFocusIn"
@@ -63,7 +64,7 @@ let tooltipInstanceIndex = 0;
 </script>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots, watch } from 'vue';
 
 const CLOSE_DELAY_MS = 1500;
 const LONG_PRESS_DELAY_MS = 500;
@@ -133,12 +134,39 @@ const triggerEl = ref(null);
 const tooltipEl = ref(null);
 const isOpen = ref(false);
 const tooltipStyle = ref({});
+const teleportTarget = ref('body');
+const syncTeleportTarget = () => {
+  teleportTarget.value = triggerEl.value?.closest('dialog') || 'body';
+};
 const hoveredTrigger = ref(false);
 const hoveredTooltip = ref(false);
 const ignoreNextClick = ref(false);
 
 const instanceId = `md-tooltip-${++tooltipInstanceIndex}`;
 const tooltipId = computed(() => props.id || `${instanceId}-surface`);
+
+const describedTriggers = new Map();
+let restoringFocus = false;
+const clearTriggerDescriptions = () => {
+  for (const [element, id] of describedTriggers) {
+    const ids = (element.getAttribute('aria-describedby') || '').split(/\s+/).filter((token) => token && token !== id);
+    if (ids.length) element.setAttribute('aria-describedby', ids.join(' '));
+    else element.removeAttribute('aria-describedby');
+  }
+  describedTriggers.clear();
+};
+const syncTriggerDescriptions = () => {
+  clearTriggerDescriptions();
+  if (!isOpen.value) return;
+  const targets = triggerEl.value?.querySelectorAll('button, a[href], input, textarea, select, [tabindex], [contenteditable="true"]') || [];
+  for (const element of targets) {
+    const ids = new Set((element.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean));
+    if (ids.has(tooltipId.value)) continue;
+    ids.add(tooltipId.value);
+    element.setAttribute('aria-describedby', [...ids].join(' '));
+    describedTriggers.set(element, tooltipId.value);
+  }
+};
 
 let closeTimer = null;
 let longPressTimer = null;
@@ -218,11 +246,24 @@ const closeTooltip = (source = 'programmatic') => {
     return;
   }
 
+  const restoreFocus = (source === 'escape' || source === 'action') && tooltipEl.value?.contains(document.activeElement);
+  const trigger = describedTriggers.keys().next().value;
   clearCloseTimer();
   clearLongPressTimer();
   hoveredTrigger.value = false;
   hoveredTooltip.value = false;
   isOpen.value = false;
+  if (restoreFocus)
+    nextTick(() => {
+      if (trigger?.isConnected) {
+        restoringFocus = true;
+        try {
+          trigger.focus();
+        } finally {
+          restoringFocus = false;
+        }
+      }
+    });
   tooltipStyle.value = {};
   removeGlobalListeners();
   emit('update:modelValue', false);
@@ -239,7 +280,7 @@ const getHorizontalAlignedLeft = (triggerRect, surfaceRect, align = 'center') =>
     return triggerRect.right - surfaceRect.width;
   }
 
-  return triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2);
+  return triggerRect.left + (triggerRect.width - surfaceRect.width) / 2;
 };
 
 const getVerticalAlignedTop = (triggerRect, surfaceRect, align = 'center') => {
@@ -251,7 +292,7 @@ const getVerticalAlignedTop = (triggerRect, surfaceRect, align = 'center') => {
     return triggerRect.bottom - surfaceRect.height;
   }
 
-  return triggerRect.top + ((triggerRect.height - surfaceRect.height) / 2);
+  return triggerRect.top + (triggerRect.height - surfaceRect.height) / 2;
 };
 
 const normalizePlacement = (placement) => {
@@ -332,7 +373,7 @@ const resolvePlainPosition = (triggerRect, surfaceRect) => {
     return clampToViewport(explicitPlacement, surfaceRect);
   }
 
-  const centeredLeft = triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2);
+  const centeredLeft = triggerRect.left + (triggerRect.width - surfaceRect.width) / 2;
   const topCandidate = {
     left: centeredLeft,
     top: triggerRect.top - surfaceRect.height - plainGap.value,
@@ -353,7 +394,7 @@ const resolveRichPosition = (triggerRect, surfaceRect) => {
   }
 
   const centeredBelow = {
-    left: triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2),
+    left: triggerRect.left + (triggerRect.width - surfaceRect.width) / 2,
     top: triggerRect.bottom + RICH_GAP,
   };
   const candidates = [
@@ -375,7 +416,7 @@ const resolveRichPosition = (triggerRect, surfaceRect) => {
     },
     centeredBelow,
     {
-      left: triggerRect.left + ((triggerRect.width - surfaceRect.width) / 2),
+      left: triggerRect.left + (triggerRect.width - surfaceRect.width) / 2,
       top: triggerRect.top - surfaceRect.height - RICH_GAP,
     },
   ];
@@ -423,6 +464,8 @@ const handleEscapeKeydown = (event) => {
     return;
   }
 
+  event.preventDefault();
+  event.stopPropagation();
   closeTooltip('escape');
 };
 
@@ -439,6 +482,7 @@ function addGlobalListeners() {
 }
 
 const openTooltip = async (source = 'programmatic') => {
+  syncTeleportTarget();
   if (props.disabled) {
     return;
   }
@@ -486,6 +530,8 @@ const handleTriggerMouseLeave = () => {
 };
 
 const handleTriggerFocusIn = () => {
+  if (restoringFocus) return;
+  syncTriggerDescriptions();
   hoveredTrigger.value = true;
   clearCloseTimer();
   if (!isPersistentRich.value) {
@@ -582,6 +628,7 @@ const handleTriggerClick = (event) => {
 };
 
 const handleActionClick = () => {
+  if (props.disabled) return;
   emit('action');
   if (isPersistentRich.value) {
     closeTooltip('action');
@@ -589,13 +636,20 @@ const handleActionClick = () => {
 };
 
 onMounted(() => {
+  syncTeleportTarget();
+  if (isOpen.value) nextTick(updatePosition);
+  syncTriggerDescriptions();
   getTooltipRegistry().set(instanceId, closeTooltip);
   if (isOpen.value) closeOtherTooltips();
 });
 
 watch(
-  () => props.modelValue,
-  async (nextValue) => {
+  [() => props.modelValue, () => props.disabled],
+  async ([nextValue, disabled]) => {
+    if (disabled) {
+      closeTooltip('disabled');
+      return;
+    }
     if (nextValue === undefined) {
       return;
     }
@@ -615,6 +669,7 @@ watch(
     isOpen.value = !!nextValue;
 
     if (nextValue) {
+      syncTeleportTarget();
       closeOtherTooltips();
       addGlobalListeners();
       await nextTick();
@@ -628,7 +683,10 @@ watch(
   { immediate: true }
 );
 
+onUpdated(syncTriggerDescriptions);
+
 onBeforeUnmount(() => {
+  clearTriggerDescriptions();
   clearCloseTimer();
   clearLongPressTimer();
   removeGlobalListeners();

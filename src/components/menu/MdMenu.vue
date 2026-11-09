@@ -1,9 +1,19 @@
 <template>
-  <div class="md-menu" :class="{ 'md-menu--open': isOpen, 'md-menu--nested': nested }">
+  <div ref="menuEl" class="md-menu" :class="{ 'md-menu--open': isOpen, 'md-menu--nested': nested }">
     <div v-if="hasActivator" ref="activatorEl" class="md-menu__activator">
       <slot name="activator" :onClick="onActivatorClick" :onKeydown="onActivatorKeydown" :open="open" :close="close" :toggle="toggle" :ariaExpanded="`${isOpen}`" :ariaHaspopup="'menu'" />
     </div>
-    <div v-show="isOpen" ref="contentEl" class="md-menu__content" :role="contentRole" tabindex="-1" @keydown="onMenuKeydown">
+    <div
+      v-show="isOpen"
+      :id="contentId"
+      ref="contentEl"
+      :popover="usePopover ? 'manual' : undefined"
+      :style="surfaceStyle"
+      class="md-menu__content"
+      :role="contentRole"
+      tabindex="-1"
+      @keydown="onMenuKeydown"
+    >
       <div class="md-menu__surface"></div>
       <slot />
     </div>
@@ -14,6 +24,7 @@
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, useSlots, watch } from 'vue';
 
 const props = defineProps({
+  contentId: { type: String, default: undefined },
   contentRole: { type: String, default: 'menu' },
   modelValue: {
     type: Boolean,
@@ -46,6 +57,10 @@ const props = defineProps({
 });
 
 const slots = useSlots();
+const menuEl = ref(null);
+const modalSurface = ref(false);
+const usePopover = ref(false);
+const surfaceStyle = ref({});
 const activatorEl = ref(null);
 const contentEl = ref(null);
 const isOpen = ref(!!props.modelValue);
@@ -53,6 +68,7 @@ const openSubMenuId = ref(null);
 const subMenuRegistry = new Map();
 const mdMenuContextKey = 'mdMenuContext';
 const mdSubMenuContextKey = 'mdSubMenuContext';
+const dialogOpen = inject('mdDialogOpen', null);
 const parentMenuContext = inject(mdMenuContextKey, null);
 const parentSubMenuContext = inject(mdSubMenuContextKey, null);
 const hasActivator = computed(() => !!slots.activator);
@@ -60,10 +76,18 @@ const emit = defineEmits(['update:modelValue', 'open', 'close', 'select']);
 
 onMounted(() => {
   document.addEventListener('mousedown', handleOutsideClick);
+  modalSurface.value = !!menuEl.value.closest('dialog');
+  usePopover.value = modalSurface.value && typeof contentEl.value?.showPopover === 'function';
+  nextTick(() => {
+    if (isOpen.value) showSurface();
+    if (isOpen.value && props.focusFirstItemOnOpen) focusFirstItem();
+  });
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('mousedown', handleOutsideClick);
+  isOpen.value = false;
+  hideSurface();
   closeAllSubMenus();
 });
 
@@ -153,6 +177,46 @@ const closeAllSubMenus = () => {
   });
 };
 
+const positionSurface = () => {
+  if (!modalSurface.value || !isOpen.value || !contentEl.value) return;
+  const anchor = props.nested ? menuEl.value.parentElement : activatorEl.value || menuEl.value;
+  const rect = anchor.getBoundingClientRect();
+  const isListbox = props.contentRole === 'listbox' || !!contentEl.value.querySelector('[role="listbox"]');
+  if (isListbox) contentEl.value.style.width = `${rect.width}px`;
+  const surface = contentEl.value.getBoundingClientRect();
+  surfaceStyle.value = {
+    ...(isListbox ? { width: `${rect.width}px` } : {}),
+    position: 'fixed',
+    inset: 'auto',
+    margin: '0',
+    border: '0',
+    padding: '0',
+    left: `${Math.max(0, Math.min(props.nested ? rect.right - 8 : rect.left, window.innerWidth - surface.width))}px`,
+    top: `${Math.max(0, Math.min(props.nested ? rect.top : rect.bottom + 4, window.innerHeight - surface.height))}px`,
+  };
+};
+const showSurface = () => {
+  if (!modalSurface.value || !isOpen.value || !contentEl.value?.isConnected) return;
+  if (usePopover.value && !contentEl.value.matches(':popover-open')) contentEl.value.showPopover();
+  positionSurface();
+  window.addEventListener('resize', positionSurface);
+  window.addEventListener('scroll', positionSurface, true);
+};
+const hideSurface = () => {
+  if (typeof window === 'undefined') return;
+  window.removeEventListener('resize', positionSurface);
+  window.removeEventListener('scroll', positionSurface, true);
+  if (usePopover.value && contentEl.value?.matches(':popover-open')) contentEl.value.hidePopover();
+};
+
+watch(
+  isOpen,
+  (opened) => {
+    if (opened) showSurface();
+  },
+  { flush: 'post' }
+);
+
 const setOpen = (nextOpen, options = {}) => {
   const { emitModelUpdate = true, source = 'programmatic', restoreFocus = props.restoreFocusOnClose } = options;
 
@@ -160,6 +224,7 @@ const setOpen = (nextOpen, options = {}) => {
     return;
   }
 
+  if (!nextOpen) hideSurface();
   isOpen.value = nextOpen;
 
   if (emitModelUpdate) {
@@ -167,12 +232,14 @@ const setOpen = (nextOpen, options = {}) => {
   }
 
   if (nextOpen) {
-    emit('open', { source });
     nextTick(() => {
+      if (!isOpen.value) return;
+      showSurface();
       if (props.focusFirstItemOnOpen) {
         focusFirstItem();
       }
     });
+    emit('open', { source });
     return;
   }
 
@@ -184,6 +251,16 @@ const setOpen = (nextOpen, options = {}) => {
     });
   }
 };
+
+if (dialogOpen) {
+  watch(
+    dialogOpen,
+    (opened) => {
+      if (!opened) setOpen(false, { source: 'dialog', restoreFocus: false });
+    },
+    { immediate: true, flush: 'sync' }
+  );
+}
 
 const open = (options = {}) => {
   setOpen(true, options);
@@ -227,6 +304,7 @@ const onActivatorKeydown = (event) => {
 };
 
 const onMenuKeydown = (event) => {
+  if (event.defaultPrevented) return;
   if (event.key === 'ArrowDown') {
     event.preventDefault();
     moveFocus(1);

@@ -1,10 +1,60 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { h, nextTick, ref } from 'vue';
 import MdTabs from '@/components/tabs/MdTabs.vue';
 import MdPrimaryTab from '@/components/tabs/MdPrimaryTab.vue';
 import MdSecondaryTab from '@/components/tabs/MdSecondaryTab.vue';
 
 describe('MdTabs', () => {
+  it('preserves an initial parent model until all children finish registering', async () => {
+    const selected = ref(2);
+    const wrapper = mount({
+      setup: () => () =>
+        h(
+          MdTabs,
+          { modelValue: selected.value, 'onUpdate:modelValue': (value) => (selected.value = value) },
+          { default: () => ['A', 'B', 'C'].map((label) => h(MdPrimaryTab, { key: label, label })) }
+        ),
+    });
+    await nextTick();
+    await nextTick();
+    expect(selected.value).toBe(2);
+    expect(wrapper.findAll('[role="tab"]').map((tab) => tab.attributes('aria-selected'))).toEqual(['false', 'false', 'true']);
+    wrapper.unmount();
+  });
+
+  it('traverses reordered keyed tabs in DOM order and preserves uncontrolled selected identity', async () => {
+    const labels = ref(['A', 'B', 'C']);
+    const wrapper = mount({ setup: () => () => h(MdTabs, {}, { default: () => labels.value.map((label) => h(MdPrimaryTab, { key: label, label })) }) }, { attachTo: document.body });
+    await nextTick();
+    labels.value = ['C', 'B', 'A'];
+    await nextTick();
+    await nextTick();
+    const tabs = wrapper.findAll('[role="tab"]');
+    expect(tabs.map((tab) => tab.attributes('aria-selected'))).toEqual(['false', 'false', 'true']);
+    tabs[0].element.focus();
+    await tabs[0].trigger('keydown', { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(tabs[1].element);
+    expect(tabs[1].attributes('aria-selected')).toBe('true');
+    wrapper.unmount();
+  });
+
+  it('corrects a removed controlled tab only after the complete update', async () => {
+    const selected = ref(2);
+    const labels = ref(['A', 'B', 'C']);
+    const wrapper = mount({
+      setup: () => () =>
+        h(MdTabs, { modelValue: selected.value, 'onUpdate:modelValue': (value) => (selected.value = value) }, { default: () => labels.value.map((label) => h(MdPrimaryTab, { key: label, label })) }),
+    });
+    await nextTick();
+    labels.value = ['A', 'B'];
+    await nextTick();
+    await nextTick();
+    expect(selected.value).toBe(1);
+    expect(wrapper.findAll('[role="tab"]')[1].attributes('aria-selected')).toBe('true');
+    wrapper.unmount();
+  });
+
   it('syncs selected tab from modelValue', async () => {
     const wrapper = mount(MdTabs, {
       props: {

@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import MdFilledAutoComplete from '../../../src/components/autocomplete/MdFilledAutoComplete.vue';
 
 export default {
@@ -15,11 +15,33 @@ const Template = (args) => ({
   components: { MdFilledAutoComplete },
   setup() {
     const value = ref(args.modelValue);
+    watch(
+      () => args.modelValue,
+      (next) => {
+        value.value = next;
+      }
+    );
     return { args, value };
   },
   template: `<div style="max-width: 320px;">
-    <MdFilledAutoComplete v-model="value" :label="args.label" :items="args.items" />
+    <MdFilledAutoComplete v-bind="args" v-model="value" />
+    <output aria-live="polite">{{ value }}</output>
   </div>`,
 });
 
 export const FilledAutoComplete = Template.bind({});
+
+export const FilledObjectOptions = Template.bind({});
+FilledObjectOptions.args = {
+  label: 'User',
+  modelValue: 2,
+  clearable: true,
+  items: [
+    { value: 1, label: 'Alex' },
+    { value: 2, label: 'Alex' },
+    { value: 3, label: 'Unavailable', disabled: true },
+  ],
+};
+
+export const FilledModal = Template.bind({});
+FilledModal.args = { ...FilledObjectOptions.args, mode: 'modal', debounce: 150, noResultsText: 'No users found' };

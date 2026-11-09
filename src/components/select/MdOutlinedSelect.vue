@@ -61,7 +61,8 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRaw, watch } from 'vue';
+import { useFormReset } from '../../composables/useFormReset';
+import { computed, nextTick, onMounted, provide, ref, toRaw, watch } from 'vue';
 import MdOutlinedField from '../field/MdOutlinedField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdList from '../list/MdList.vue';
@@ -72,7 +73,7 @@ const mdSelectContextKey = 'mdSelectContext';
 const props = defineProps({
   modelValue: {
     type: [String, Number, Boolean, Object],
-    default: '',
+    default: undefined,
   },
   value: {
     type: [String, Number, Boolean, Object],
@@ -129,9 +130,9 @@ const restoreFormValue = (event) => {
 const triggerEl = ref(null);
 const listEl = ref(null);
 const menuOpened = ref(false);
-const internalValue = ref(props.modelValue ?? props.value ?? '');
+const internalValue = ref(props.modelValue !== undefined ? props.modelValue : props.value ?? '');
 const displayLabel = ref('');
-const initialValue = ref(props.modelValue ?? props.value ?? '');
+const initialValue = ref(props.modelValue !== undefined ? props.modelValue : props.value ?? '');
 const registeredOptions = ref(new Map());
 const initializedFromOption = ref(false);
 const activeOptionId = ref('');
@@ -261,6 +262,7 @@ const selectValue = (nextValue, emitInteraction = false, closeAfterSelect = fals
 };
 
 const selectActiveOption = () => {
+  if (props.disabled) return;
   const selectedOption = getOptions().find((option) => option.id === activeOptionId.value);
   if (!selectedOption || selectedOption.disabled) {
     return;
@@ -308,7 +310,7 @@ const onOptionSelectedStateChange = (option, selected) => {
 const registerOption = (option) => {
   registeredOptions.value.set(option.id, option);
 
-  if (!initializedFromOption.value && !normalizeValue(internalValue.value) && option.selected && !option.disabled) {
+  if (props.modelValue === undefined && !initializedFromOption.value && !normalizeValue(internalValue.value) && option.selected && !option.disabled) {
     initializedFromOption.value = true;
     internalValue.value = option.value;
     emit('update:modelValue', option.value);
@@ -406,7 +408,15 @@ const onActivatorKeydown = (event) => {
   }
 };
 
+watch(
+  () => props.disabled,
+  (disabled) => {
+    if (disabled) closeMenu();
+  }
+);
+
 const onListKeydown = (event) => {
+  if (props.disabled) return;
   if (event.key === 'ArrowDown') {
     event.preventDefault();
     moveActiveOption(1);
@@ -421,7 +431,7 @@ const onListKeydown = (event) => {
 
   if (event.key === 'Home') {
     event.preventDefault();
-    setInitialActiveOption(1);
+    activeOptionId.value = getOptions().filter((option) => !option.disabled)[0]?.id || '';
     nextTick(() => {
       focusActiveOptionElement();
     });
@@ -430,7 +440,10 @@ const onListKeydown = (event) => {
 
   if (event.key === 'End') {
     event.preventDefault();
-    setInitialActiveOption(-1);
+    activeOptionId.value =
+      getOptions()
+        .filter((option) => !option.disabled)
+        .at(-1)?.id || '';
     nextTick(() => {
       focusActiveOptionElement();
     });
@@ -458,13 +471,11 @@ const onBlur = (event) => {
 
 const handleFormReset = () => {
   validationInvalid.value = false;
-  nextTick(() => {
-    internalValue.value = initialValue.value ?? '';
-    emit('update:modelValue', internalValue.value);
-    emit('input', internalValue.value);
-    emit('change', internalValue.value);
-    syncDisplayLabel();
-  });
+  internalValue.value = initialValue.value ?? '';
+  emit('update:modelValue', internalValue.value);
+  emit('input', internalValue.value);
+  emit('change', internalValue.value);
+  syncDisplayLabel();
 };
 
 watch(
@@ -500,12 +511,9 @@ watch(
 
 onMounted(() => {
   syncDisplayLabel();
-  triggerEl.value?.closest('form')?.addEventListener('reset', handleFormReset);
 });
 
-onBeforeUnmount(() => {
-  triggerEl.value?.closest('form')?.removeEventListener('reset', handleFormReset);
-});
+useFormReset(() => triggerEl.value, handleFormReset);
 </script>
 
 <style lang="scss">

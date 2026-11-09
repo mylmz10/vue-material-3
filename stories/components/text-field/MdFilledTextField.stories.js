@@ -1,3 +1,4 @@
+import { ref, watch } from 'vue';
 import MdFilledTextField from '../../../src/components/text-field/MdFilledTextField.vue';
 
 export default {
@@ -9,9 +10,16 @@ export default {
 const Template = (args) => ({
   components: { MdFilledTextField },
   setup() {
-    return { args };
+    const value = ref(args.modelValue);
+    watch(
+      () => args.modelValue,
+      (next) => {
+        value.value = next;
+      }
+    );
+    return { args, value };
   },
-  template: '<md-filled-text-field v-bind="args" />',
+  template: '<md-filled-text-field v-bind="args" v-model="value" />',
 });
 
 export const FilledTextField = Template.bind({});
