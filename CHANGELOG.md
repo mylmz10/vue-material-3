@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## [0.15.0](https://github.com/mylmz10/vue-material-3/compare/v0.14.4...v0.15.0) (2026-11-09)
+
+
+### Features
+
+* **carousel:** implement M3 multi-browse and resolve audit regressions ([8954f4a](https://github.com/mylmz10/vue-material-3/commit/8954f4a71943e089c3c6c54b07fbe7d469f13f44))
+* **components:** add remaining Material components and audit regressions ([a2d75a6](https://github.com/mylmz10/vue-material-3/commit/a2d75a6e412cb30ddaa5389c20b693988c489d2f))
+* **components:** refine autocomplete and carousel interactions ([7cfb7a6](https://github.com/mylmz10/vue-material-3/commit/7cfb7a6d2d14a62354e6fdd3046ac037baa4e3b2))
+
+
+### Bug Fixes
+
+* address audit findings and refresh component documentation ([1c6befc](https://github.com/mylmz10/vue-material-3/commit/1c6befcec4ed2fcde0f125c1e7b39a6a8b21cfa1))
+* **autocomplete:** capture reset value without lint error ([ef1651d](https://github.com/mylmz10/vue-material-3/commit/ef1651dab7f49aab39a8636b2c99ccf262891bad))
+* **chips:** keep soft-disabled chips keyboard discoverable ([adad733](https://github.com/mylmz10/vue-material-3/commit/adad733bd0bcee9601f43aba270cd36606ebd7a9))
+* **date-picker:** align focus states with Material 3 ([71bb633](https://github.com/mylmz10/vue-material-3/commit/71bb633f82ec84610941023a407bea85006d5d01))
+* **date-picker:** align locale-relative calendar weeks ([9d17498](https://github.com/mylmz10/vue-material-3/commit/9d17498555036248b8b4b50aead7109de34a8065))
+* **date-picker:** give grid cells weekly row ownership ([1825e69](https://github.com/mylmz10/vue-material-3/commit/1825e69e0a9705c546ba8a20fd7ac7be7e86607f))
+* **menu:** expose submenu state and isolate handled keys ([6e48344](https://github.com/mylmz10/vue-material-3/commit/6e48344f5ed9845200677440b86cc94423bd8fbe))
+* **progress:** add determinate linear endpoint marker ([63e0160](https://github.com/mylmz10/vue-material-3/commit/63e016013acc88dbe74f7964f51de72df5da5e4d))
+* **select:** honor value-only initialization ([538ec39](https://github.com/mylmz10/vue-material-3/commit/538ec39561889ed4513fef1bfb94fa77e204b3e2))
+* **snackbar:** announce messages through a persistent status region ([77e68b8](https://github.com/mylmz10/vue-material-3/commit/77e68b89b161d9a0a251a603d05b4767055fed9d))
+* **snackbar:** keep actionable messages persistent ([67fbad7](https://github.com/mylmz10/vue-material-3/commit/67fbad7c6833e67898e60b5ea63c2c85ab0c9e02))
+* **text-field:** preserve explicitly empty controlled values ([960a8c7](https://github.com/mylmz10/vue-material-3/commit/960a8c71b377c92d910d56c32fdd3667a72ec966))
+* **text-field:** respect canceled form resets ([3bdfaa4](https://github.com/mylmz10/vue-material-3/commit/3bdfaa4a197a2be2f866431a3c6d425739f00abd))
+* **time-picker:** complete hour gestures before advancing ([acef4a3](https://github.com/mylmz10/vue-material-3/commit/acef4a3e5955feac58af6f66aef08503ff48b09d))
+* **tooltip:** describe the actual trigger control ([021228e](https://github.com/mylmz10/vue-material-3/commit/021228e66a8e6704fdbfdf47b955b185919b8928))
+
 ## [0.14.4](https://github.com/mylmz10/vue-material-3/compare/v0.14.3...v0.14.4) (2026-10-26)
 
 
