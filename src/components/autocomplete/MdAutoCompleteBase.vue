@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-import { computed, h, inject, nextTick, onBeforeUnmount, ref, toRaw, useAttrs, useId, watch } from 'vue';
+import { computed, h, inject, nextTick, onBeforeUnmount, ref, shallowRef, toRaw, useAttrs, useId, watch } from 'vue';
 import { autocompleteProps } from './autocompleteProps';
 import { getControlAttrs } from '../field/fieldAttrs';
 import { useFormReset } from '../../composables/useFormReset';
@@ -95,7 +95,7 @@ const modalFieldEl = ref(null);
 const listEl = ref(null);
 const opened = ref(false);
 const activeIndex = ref(-1);
-const initialValue = props.modelValue;
+const initialValue = shallowRef(props.modelValue);
 const selectedValue = ref(props.modelValue);
 const dirty = ref(false);
 let filterTimer;
@@ -264,10 +264,10 @@ if (parentDialog)
 useFormReset(
   () => textFieldEl.value?.getInputEl(),
   () => {
-    selectedValue.value = initialValue;
+    selectedValue.value = initialValue.value;
     close();
     resetQuery();
-    emit('update:modelValue', toRaw(initialValue));
+    emit('update:modelValue', toRaw(initialValue.value));
     emit('update:search', displayValue.value);
   }
 );
