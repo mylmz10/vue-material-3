@@ -436,6 +436,8 @@ try {
       assert.notEqual(await ev('document.body.style.overflow'), 'hidden');
     });
   } else {
+    // Keep the visual fixture width independent of the platform scrollbar gutter.
+    await ev('document.documentElement.style.scrollbarWidth = "none"');
     const samples = {};
     for (const [name, width, dark, rtl, reduced, scale] of [
       ['light', 1000, false, false, false, 1],
