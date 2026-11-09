@@ -30,3 +30,18 @@ const Template = (args) => ({
 });
 
 export const OutlinedAutoComplete = Template.bind({});
+
+export const OutlinedObjectOptions = Template.bind({});
+OutlinedObjectOptions.args = {
+  label: 'User',
+  modelValue: 2,
+  clearable: true,
+  items: [
+    { value: 1, label: 'Alex' },
+    { value: 2, label: 'Alex' },
+    { value: 3, label: 'Unavailable', disabled: true },
+  ],
+};
+
+export const OutlinedModal = Template.bind({});
+OutlinedModal.args = { ...OutlinedObjectOptions.args, mode: 'modal', debounce: 150, noResultsText: 'No users found' };

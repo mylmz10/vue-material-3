@@ -52,6 +52,8 @@ const state = reactive({
   drawer: false,
   menu: false,
   text: '',
+  autocompleteId: 2,
+  modalAutocompleteId: 1,
   selected: 'b',
   tab: 0,
   slider: 20,
@@ -105,6 +107,17 @@ window.fixture = { state, mounted, components };
     </MdDialog>
     <MdDialog v-model="state.auditShort" keep-mounted aria-label="Audit short dialog">
       <MdOutlinedSelect label="Modal select"><MdSelectOption value="a">Alpha</MdSelectOption><MdSelectOption value="b">Beta</MdSelectOption></MdOutlinedSelect>
+      <div id="nested-autocomplete">
+        <MdOutlinedAutoComplete
+          v-model="state.modalAutocompleteId"
+          label="Nested assignee"
+          mode="modal"
+          :items="[
+            { value: 1, label: 'Alex' },
+            { value: 2, label: 'Banana' },
+          ]"
+        />
+      </div>
       <template #footer><button @click="state.auditShort = false">Close short dialog</button></template>
     </MdDialog>
     <section id="new-components">
@@ -159,6 +172,34 @@ window.fixture = { state, mounted, components };
         ><template #activator="{ onClick, onKeydown }"><button id="menu-open" @click="onClick" @keydown="onKeydown">Menu</button></template><MdMenuItem label="First action" /><MdSubMenu label="More"
           ><MdMenuItem label="Nested action" /></MdSubMenu
       ></MdMenu>
+      <section id="autocomplete-options">
+        <MdOutlinedAutoComplete
+          v-model="state.autocompleteId"
+          label="Assignee"
+          clearable
+          :debounce="80"
+          no-results-text="No people found"
+          :items="[
+            { value: 1, label: 'Alex' },
+            { value: 2, label: 'Alex' },
+            { value: 3, label: 'Unavailable', disabled: true },
+            { value: 4, label: 'Banana' },
+          ]"
+        />
+      </section>
+      <section id="autocomplete-modal">
+        <MdOutlinedAutoComplete
+          v-model="state.modalAutocompleteId"
+          label="Modal assignee"
+          mode="modal"
+          clearable
+          :items="[
+            { value: 1, label: 'Alex' },
+            { value: 2, label: 'Banana' },
+            { value: 3, label: 'Disabled', disabled: true },
+          ]"
+        />
+      </section>
       <section id="autocomplete"><MdOutlinedAutoComplete v-model="state.text" label="City" :items="['Berlin', 'Boston', 'Paris']" :readonly="state.readonly" :disabled="state.disabled" /></section>
       <section id="select">
         <MdOutlinedSelect v-model="state.selected" label="Selection" required

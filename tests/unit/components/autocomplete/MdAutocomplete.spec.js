@@ -23,7 +23,7 @@ describe('autocomplete components', () => {
 
       expect(wrapper.emitted('update:modelValue')).toEqual([[selected]]);
       expect(wrapper.get('input').element.value).toBe(selected);
-      expect(wrapper.get('.md-menu').classes()).not.toContain('md-menu--open');
+      expect(wrapper.get('input').attributes('aria-expanded')).toBe('false');
       wrapper.unmount();
     });
   });
@@ -73,7 +73,7 @@ describe('autocomplete components', () => {
       await input.trigger('keydown', { key: 'ArrowUp' });
       expect(document.getElementById(input.attributes('aria-activedescendant')).textContent.trim()).toBe('Papaya');
       await input.trigger('keydown', { key: 'ArrowUp' });
-      expect(document.getElementById(input.attributes('aria-activedescendant')).textContent.trim()).toBe('Banana');
+      expect(document.getElementById(input.attributes('aria-activedescendant')).querySelector('.md-list-item__label-text').textContent.trim()).toBe('Banana');
     });
 
     it('dismisses with Escape without replacing the committed value and reopens on typing', async () => {

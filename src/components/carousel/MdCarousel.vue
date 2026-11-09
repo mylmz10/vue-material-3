@@ -5,15 +5,17 @@
       :id="viewportId"
       ref="viewportEl"
       class="md-carousel__viewport"
-      :class="{ 'md-carousel__viewport--all': showAll }"
+      :class="{ 'md-carousel__viewport--all': showAll, 'md-carousel__viewport--dragging': dragging }"
       tabindex="0"
       :aria-label="showAll ? allItemsLabel : viewportLabel"
       @keydown="onKeydown"
       @focusin="onItemFocus"
       @scroll.passive="onScroll"
       @scrollend="finishNavigation"
-      @pointerdown="cancelNavigation"
-      @wheel.passive="cancelNavigation"
+      @pointerdown="onPointerDown"
+      @dragstart="onNativeDrag"
+      @click.capture="onDragClick"
+      @wheel.passive="onWheel"
     >
       <div
         v-for="(item, index) in items"
@@ -61,10 +63,10 @@
 </template>
 
 <script setup>
+import { useCarouselMouseDrag } from './useCarouselMouseDrag';
 import MdIconButton from '../icon-button/MdIconButton.vue';
 import MdTextButton from '../button/MdTextButton.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, useId } from 'vue';
-
 import { createCarouselLayout, getCarouselMask } from './carouselLayout';
 
 const props = defineProps({
@@ -128,6 +130,7 @@ const isRtl = () => viewportEl.value && getComputedStyle(viewportEl.value).direc
 const slideElements = () => Array.from(viewportEl.value?.children || []);
 const scrollOffsetForIndex = (index) => Math.min(Math.max(0, viewportEl.value.scrollWidth - viewportEl.value.clientWidth), index * (geometry.large + geometry.gap));
 const scrollToIndex = (index, animate = false) => {
+  endDrag();
   if (showAll.value) return;
   const viewport = viewportEl.value;
   const slide = slideElements()[index];
@@ -202,6 +205,39 @@ const updateMasks = () => {
     surface.style.setProperty('--md-carousel-parallax', `${motionQuery?.matches ? 0 : Math.max(-16, Math.min(16, (mask.center - geometry.available / 2) * 0.08 * (rtl ? -1 : 1)))}px`);
   }
 };
+const { dragging, moving, onPointerDown, endDrag, focusAfterPress, onNativeDrag, onDragClick } = useCarouselMouseDrag({
+  viewportEl,
+  showAll,
+  cancelNavigation,
+  updateMasks,
+  reducedMotion: () => motionQuery?.matches,
+  onSettled: (index) => {
+    updateSelection(index);
+    nextTick(() => {
+      if (!moving.value && props.modelValue !== undefined && selectedIndex.value !== index) scrollToIndex(selectedIndex.value, true);
+    });
+  },
+  snapTarget: (projectedLeft) => {
+    const direction = isRtl() ? -1 : 1;
+    const max = viewportEl.value.scrollWidth - viewportEl.value.clientWidth;
+    const projected = Math.max(0, Math.min(max, projectedLeft * direction));
+    const last = props.items.length - 1;
+    let index = last;
+    let distance = Math.abs(scrollOffsetForIndex(last) - projected);
+    for (let i = 0; i < last; i++) {
+      const nextDistance = Math.abs(scrollOffsetForIndex(i) - projected);
+      if (nextDistance < distance) {
+        distance = nextDistance;
+        index = i;
+      }
+    }
+    return { index, left: direction * scrollOffsetForIndex(index) };
+  },
+});
+const onWheel = () => {
+  endDrag();
+  cancelNavigation();
+};
 const reflow = () => {
   const viewport = viewportEl.value;
   if (!viewport) return;
@@ -219,16 +255,16 @@ const reflow = () => {
 const onItemFocus = (event) => {
   if (showAll.value || event.target === viewportEl.value) return;
   const index = slideElements().indexOf(event.target.closest('.md-carousel__item'));
-  if (index >= 0) select(index);
+  if (index >= 0) focusAfterPress(() => select(index));
 };
 const onScroll = () => {
-  if (showAll.value) return;
+  if (showAll.value || moving.value) return;
   if (navigationTarget !== undefined) waitForScrollEnd();
   if (scrollFrame) cancelAnimationFrame(scrollFrame);
   scrollFrame = requestAnimationFrame(() => {
     scrollFrame = null;
     const viewport = viewportEl.value;
-    if (showAll.value || !viewport || !props.items.length) return;
+    if (showAll.value || moving.value || !viewport || !props.items.length) return;
     updateMasks();
     if (navigationTarget !== undefined) return;
     const bounds = viewport.getBoundingClientRect();
@@ -274,7 +310,7 @@ watch(
   }
 );
 watch(showAll, () => {
-  cancelNavigation();
+  onWheel();
   nextTick(() => {
     if (!showAll.value) reflow();
     else
@@ -301,6 +337,7 @@ onMounted(() => {
   }
 });
 onBeforeUnmount(() => {
+  endDrag();
   clearNavigation();
   motionQuery?.removeEventListener('change', onMotionChange);
   resizeObserver?.disconnect();
@@ -345,6 +382,10 @@ $carousel: tokens.md-comp-carousel-item-values();
   &--uncontained &__viewport::after {
     content: '';
     flex: 0 0 max(0px, calc(100% - var(--md-carousel-large-width, var(--md-carousel-item-width)) - var(--md-carousel-gap)));
+  }
+  &__viewport--dragging {
+    cursor: grabbing;
+    user-select: none;
   }
   &__viewport--all {
     display: grid;

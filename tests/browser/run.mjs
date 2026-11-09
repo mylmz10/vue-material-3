@@ -176,9 +176,14 @@ try {
           image: v.querySelector('img').getBoundingClientRect().width,
           content: v.querySelector('.md-carousel__content').getBoundingClientRect().width };
       })()`);
-      for (const width of [1000, 360]) {
+      // Leave room for classic scrollbars in the multi-browse case; test the narrow fallback separately.
+      for (const width of [1000, 390, 345]) {
         await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
-        await ev('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+        await waitFor(`(() => {
+          const v=document.querySelector('.md-carousel__viewport'),b=v.getBoundingClientRect();
+          const masks=Array.from(v.querySelectorAll('.md-carousel__mask')).map(el=>el.getBoundingClientRect()).filter(r=>r.width>1);
+          return ${width === 345 ? 'masks.length === 1' : 'masks.length >= 3'} && Math.abs(masks[0].left-b.left-16)<1 && Math.abs(masks.at(-1).right-b.right+16)<1;
+        })()`);
         const start = await snapshot();
         assert.ok(
           await ev(
@@ -186,7 +191,12 @@ try {
           )
         );
 
-        assert.ok(start.masks.length >= 3);
+        if (width === 345) {
+          assert.equal(start.masks.length, 1);
+          assert.ok(Math.abs(start.masks[0].width - (start.right - start.left - 32)) < 1);
+          continue;
+        }
+        assert.ok(start.masks.length >= 3, JSON.stringify({ width, ...start }));
         assert.ok(start.masks[0].width > start.masks.at(-2).width);
         assert.ok(start.masks.at(-2).width > start.masks.at(-1).width);
         assert.ok(start.masks.at(-1).width >= 40 && start.masks.at(-1).width <= 56);
@@ -207,6 +217,8 @@ try {
         await key('Home');
         await waitFor('document.querySelector(".md-carousel__viewport").scrollLeft === 0');
       }
+      await command('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: false });
+      await waitFor('Array.from(document.querySelectorAll(".md-carousel__mask")).filter(el=>el.getBoundingClientRect().width>1).length>=3');
       await ev('document.querySelector(".md-carousel").style.setProperty("--md-carousel-gap", "16px")');
       await waitFor(
         '(() => {const m=Array.from(document.querySelectorAll(".md-carousel__mask")).filter(e=>e.getBoundingClientRect().width>1);return Math.abs(m[1].getBoundingClientRect().left-m[0].getBoundingClientRect().right-16)<1;})()'
@@ -257,6 +269,27 @@ try {
       await key('Tab');
       await key(' ');
       await waitFor('window.fixture.state.segment === 1');
+    });
+    await check('mouse drag follows reversals and settles before committing selection', async () => {
+      const point = await ev(`(() => {
+        const viewport = document.querySelector('.md-carousel__viewport');
+        viewport.scrollIntoView({ block: 'center' });
+        const rect = viewport.getBoundingClientRect();
+        return { x: rect.left + rect.width * 0.7, y: rect.top + 40 };
+      })()`);
+      await command('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', buttons: 1, clickCount: 1 });
+      const move = (distance) => command('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x - distance, y: point.y, buttons: 1 });
+      const offset = 'document.querySelector(".md-carousel__viewport").scrollLeft';
+      await move(250);
+      await waitFor(offset + ' > 200');
+      await move(45);
+      await waitFor(offset + ' < 50');
+      assert.equal(await ev('window.fixture.state.carousel'), 0);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await command('Input.dispatchMouseEvent', { type: 'mouseReleased', x: point.x - 45, y: point.y, button: 'left', buttons: 0, clickCount: 1 });
+      await waitFor('!document.querySelector(".md-carousel__viewport").style.scrollSnapType');
+      assert.ok((await ev(offset)) < 2);
+      assert.equal(await ev('window.fixture.state.carousel'), 0);
     });
     await check('carousel moves through intermediate frames without model bounce and respects reduced motion', async () => {
       await ev('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
