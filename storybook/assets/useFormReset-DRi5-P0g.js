@@ -1,0 +1,1 @@
+import{a,b as u,A as f}from"./iframe-Lp-48d2J.js";function d(o,n){let e,t=!1;const s=r=>{o()?.form===r.target&&f(()=>{t&&!r.defaultPrevented&&n(r)})};a(()=>{t=!0,e=o()?.getRootNode(),e?.addEventListener("reset",s,!0)}),u(()=>{t=!1,e?.removeEventListener("reset",s,!0)})}export{d as u};

@@ -1,0 +1,3 @@
+import{M as s}from"./MdList-C6LrGBkR.js";import{_ as t}from"./MdListItem-DP-O_SiG.js";import"./iframe-Lp-48d2J.js";import"./preload-helper-PPVm8Dsz.js";import"./_plugin-vue_export-helper-DlAUqK2U.js";import"./MdIcon-LZTi8h9T.js";import"./MdRipple-CmO0qzPD.js";const c={title:"Components/List",component:t,args:{headline:"Account",supportingText:"Personal profile and security",icon:"person",trailingText:"Edit",selected:!1}},i=e=>({components:{MdList:s,MdListItem:t},setup(){return{args:e}},template:`<MdList>
+    <MdListItem v-bind="args" />
+  </MdList>`}),l=i.bind({}),L=["ListItem"];export{l as ListItem,L as __namedExportsOrder,c as default};

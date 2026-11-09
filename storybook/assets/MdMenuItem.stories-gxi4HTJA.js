@@ -1,0 +1,3 @@
+import{_ as e}from"./MdMenuItem-zSFZk7On.js";import"./iframe-Lp-48d2J.js";import"./preload-helper-PPVm8Dsz.js";import"./MdIcon-LZTi8h9T.js";import"./_plugin-vue_export-helper-DlAUqK2U.js";import"./MdRipple-CmO0qzPD.js";const p={title:"Components/Menu",component:e,args:{label:"Menu Item",icon:"person",selected:!1,disabled:!1}},o=t=>({components:{MdMenuItem:e},setup(){return{args:t}},template:`<div style="max-width: 320px; border-radius: 12px; border: 1px solid #ddd; overflow: hidden;">
+    <MdMenuItem v-bind="args" />
+  </div>`}),a=o.bind({}),l=["MenuItem"];export{a as MenuItem,l as __namedExportsOrder,p as default};
