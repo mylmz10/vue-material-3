@@ -321,7 +321,7 @@ try {
       await click('#open-dialog');
       await waitFor('document.querySelector("dialog[open]")?.matches(":modal")');
       assert.equal(await active(), 'nested-open');
-      await key('Tab', 'Tab', 1);
+      await key('Tab', 'Tab', 8); // CDP Shift modifier
       assert.equal(await active(), 'outer-last');
       await key('Tab');
       assert.equal(await active(), 'nested-open');
