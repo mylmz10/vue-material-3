@@ -46,7 +46,7 @@ defineProps({
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
-$theme: tokens.md-comp-filled-button-values();
+$theme: tokens.md-comp-filled-button-values(theme.dependencies());
 
 .md-filled-button {
   height: map.get($theme, container-height);

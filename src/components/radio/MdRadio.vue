@@ -149,7 +149,7 @@ useFormReset(() => inputEl.value, onFormReset);
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
-$theme: tokens.md-comp-radio-button-values();
+$theme: tokens.md-comp-radio-button-values(theme.dependencies());
 $sys-color: theme.values();
 
 .md-radio {

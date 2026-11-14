@@ -26,7 +26,7 @@ defineProps({
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-outlined-text-field-values();
+$theme: tokens.md-comp-outlined-text-field-values(theme.dependencies());
 
 .md-field {
   position: relative;

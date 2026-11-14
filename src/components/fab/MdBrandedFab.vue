@@ -87,7 +87,7 @@ defineProps({
   --md-branded-fab-label-text-color: #{theme.value('on-surface')};
 
   &:not(.md-branded-fab--extended) {
-    $theme: tokens.md-comp-fab-branded-values();
+    $theme: tokens.md-comp-fab-branded-values(theme.dependencies());
     @include root-static-styles($theme);
 
     --surface-tint-layer-color: #{theme.value('surface-container-high')};
@@ -103,7 +103,7 @@ defineProps({
 }
 
 .md-branded-fab--large.md-branded-fab {
-  @include root-static-styles(tokens.md-comp-fab-branded-large-values());
+  @include root-static-styles(tokens.md-comp-fab-branded-large-values(theme.dependencies()));
 
   .md-branded-fab__icon {
     width: 36px;
@@ -114,7 +114,7 @@ defineProps({
 }
 
 .md-branded-fab--extended {
-  $theme: tokens.md-comp-extended-fab-branded-values();
+  $theme: tokens.md-comp-extended-fab-branded-values(theme.dependencies());
   @include surface.root-static-styles;
   display: inline-flex;
   border: none;

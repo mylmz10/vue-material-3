@@ -126,8 +126,9 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-date-picker-docked-values();
+$theme: tokens.md-comp-date-picker-docked-values(theme.dependencies());
 
 .md-date-picker-list {
   display: flex;

@@ -130,7 +130,7 @@ const getAriaLabel = (day) => {
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-date-picker-docked-values();
+$theme: tokens.md-comp-date-picker-docked-values(theme.dependencies());
 
 .md-date-picker-date-table {
   width: 100%;

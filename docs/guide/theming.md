@@ -2,6 +2,8 @@
 
 Vue Material 3 uses the Material Design 3 color, typography, and component token model. Load `vue-material-3/style.css` once before applying theme overrides.
 
+Use **Color palette** in the documentation header to preview primary, secondary, tertiary, and surface colors in light and dark mode. The selection is saved in your browser. Choose **Original** to restore the default colors.
+
 ## Load styles and typography
 
 ```js
