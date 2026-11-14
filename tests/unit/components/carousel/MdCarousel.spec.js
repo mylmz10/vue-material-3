@@ -54,6 +54,23 @@ describe('MdCarousel', () => {
     expect(wrapper.get('.md-carousel__position').text()).toBe('2 / 3');
   });
 
+  it('uses the vertical scroll axis and keyboard navigation in full-screen layout', async () => {
+    const wrapper = render({ props: { items: ['One', 'Two', 'Three'], layout: 'full-screen' } });
+    const viewport = wrapper.get('.md-carousel__viewport');
+    const scroll = vi.fn();
+    viewport.element.scrollBy = scroll;
+    viewport.element.getBoundingClientRect = () => ({ top: 20 });
+    wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
+      slide.element.getBoundingClientRect = () => ({ top: 20 + index * 248 });
+    });
+    expect(viewport.attributes('aria-label')).toContain('up and down');
+    await viewport.trigger('keydown', { key: 'ArrowRight' });
+    expect(scroll).not.toHaveBeenCalled();
+    await viewport.trigger('keydown', { key: 'ArrowDown' });
+    expect(scroll).toHaveBeenLastCalledWith({ top: 248, behavior: 'smooth' });
+    expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
+  });
+
   it('reverses horizontal keyboard navigation for RTL and leaves child controls alone', async () => {
     vi.spyOn(window, 'getComputedStyle').mockReturnValue({ direction: 'rtl' });
     const wrapper = render({ slots: { item: '<input aria-label="Edit item" />' } });
@@ -63,18 +80,13 @@ describe('MdCarousel', () => {
     expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
   });
 
-  it('brings a focused custom item into view without stealing focus or selecting in Show all', async () => {
+  it('brings a focused custom item into view without stealing focus', async () => {
     const wrapper = render({ attachTo: document.body, slots: { item: '<button>Open item</button>' } });
     const buttons = wrapper.findAll('.md-carousel__item button');
     buttons[1].element.focus();
     await nextTick();
     expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
     expect(document.activeElement).toBe(buttons[1].element);
-    await wrapper.get('.md-carousel__show-all').trigger('click');
-    buttons[2].element.focus();
-    await nextTick();
-    expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
-    expect(document.activeElement).toBe(buttons[2].element);
   });
 
   it('updates selection from native scrolling and cancels queued work on unmount', async () => {
@@ -140,31 +152,6 @@ describe('MdCarousel', () => {
     await nextTick();
     expect(scroll).toHaveBeenCalledOnce();
     expect(scroll.mock.calls[0][0].behavior).toBe('smooth');
-  });
-
-  it('provides a vertical show-all alternative and restores the carousel', async () => {
-    const wrapper = render();
-    const button = wrapper.get('.md-carousel__show-all');
-    await button.trigger('click');
-    expect(button.attributes('aria-expanded')).toBe('true');
-    expect(wrapper.get('.md-carousel__viewport').classes()).toContain('md-carousel__viewport--all');
-    expect(wrapper.find('.md-carousel__controls').exists()).toBe(false);
-    await button.trigger('click');
-    expect(wrapper.find('.md-carousel__controls').exists()).toBe(true);
-  });
-
-  it('does not reset selection from a pending scroll frame when showing all items', async () => {
-    let frame;
-    vi.stubGlobal('requestAnimationFrame', (callback) => {
-      frame = callback;
-      return 1;
-    });
-    vi.stubGlobal('cancelAnimationFrame', vi.fn());
-    const wrapper = render({ props: { items: ['One', 'Two', 'Three'], modelValue: 2 } });
-    await wrapper.get('.md-carousel__viewport').trigger('scroll');
-    await wrapper.get('.md-carousel__show-all').trigger('click');
-    frame();
-    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   });
 
   it('keeps the requested controlled index through intermediate animation frames', async () => {

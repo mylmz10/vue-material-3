@@ -2,12 +2,11 @@
   <section class="md-carousel" :class="`md-carousel--${layout}`" role="region" aria-roledescription="carousel" :aria-label="ariaLabel">
     <span ref="sizerEl" class="md-carousel__sizer" aria-hidden="true"></span>
     <div
-      :id="viewportId"
       ref="viewportEl"
       class="md-carousel__viewport"
-      :class="{ 'md-carousel__viewport--all': showAll, 'md-carousel__viewport--dragging': dragging }"
+      :class="{ 'md-carousel__viewport--dragging': dragging }"
       tabindex="0"
-      :aria-label="showAll ? allItemsLabel : viewportLabel"
+      :aria-label="viewportLabel ?? (vertical ? 'Items; use up and down arrow keys to browse' : 'Items; use left and right arrow keys to browse')"
       @keydown="onKeydown"
       @focusin="onItemFocus"
       @scroll.passive="onScroll"
@@ -37,11 +36,11 @@
         </div>
       </div>
     </div>
-    <div v-if="items.length > 1 && !showAll" class="md-carousel__controls">
+    <div v-if="items.length > 1" class="md-carousel__controls">
       <MdIconButton
         type="button"
         tonal
-        :icon="isRtl() ? 'arrow_forward' : 'arrow_back'"
+        :icon="vertical ? 'arrow_upward' : isRtl() ? 'arrow_forward' : 'arrow_back'"
         :aria-label="previousLabel"
         :disabled="selectedIndex <= 0"
         @click="select((navigationTarget ?? selectedIndex) - 1)"
@@ -50,34 +49,27 @@
       <MdIconButton
         type="button"
         tonal
-        :icon="isRtl() ? 'arrow_back' : 'arrow_forward'"
+        :icon="vertical ? 'arrow_downward' : isRtl() ? 'arrow_back' : 'arrow_forward'"
         :aria-label="nextLabel"
         :disabled="selectedIndex >= items.length - 1"
         @click="select((navigationTarget ?? selectedIndex) + 1)"
       />
     </div>
-    <MdTextButton v-if="items.length > 1" type="button" class="md-carousel__show-all" :aria-expanded="showAll" :aria-controls="viewportId" @click="showAll = !showAll">
-      {{ showAll ? showCarouselLabel : showAllLabel }}
-    </MdTextButton>
   </section>
 </template>
 
 <script setup>
 import { useCarouselMouseDrag } from './useCarouselMouseDrag';
 import MdIconButton from '../icon-button/MdIconButton.vue';
-import MdTextButton from '../button/MdTextButton.vue';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, useId } from 'vue';
-import { createCarouselLayout, getCarouselMask } from './carouselLayout';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { createCarouselLayout, createHeroLayout, getCarouselMask } from './carouselLayout';
 
 const props = defineProps({
-  layout: { type: String, default: 'multi-browse', validator: (value) => ['multi-browse', 'uncontained'].includes(value) },
+  layout: { type: String, default: 'multi-browse', validator: (value) => ['multi-browse', 'uncontained', 'hero', 'full-screen'].includes(value) },
   items: { type: Array, default: () => [] },
   modelValue: { type: Number, default: undefined },
   ariaLabel: { type: String, default: 'Carousel' },
-  viewportLabel: { type: String, default: 'Items; use left and right arrow keys to browse' },
-  showAllLabel: { type: String, default: 'Show all' },
-  showCarouselLabel: { type: String, default: 'Show carousel' },
-  allItemsLabel: { type: String, default: 'All items' },
+  viewportLabel: String,
   previousLabel: { type: String, default: 'Previous item' },
   nextLabel: { type: String, default: 'Next item' },
 });
@@ -85,9 +77,13 @@ const emit = defineEmits(['update:modelValue', 'change']);
 const viewportEl = ref(null);
 const sizerEl = ref(null);
 let geometry;
-const viewportId = `md-carousel-${useId()}`;
 const internalIndex = ref(0);
-const showAll = ref(false);
+const vertical = computed(() => props.layout === 'full-screen');
+const scrollAxis = computed(() => (vertical.value ? 'scrollTop' : 'scrollLeft'));
+const scrollOffset = () => viewportEl.value[scrollAxis.value];
+const scrollOptions = (offset, behavior) => (vertical.value ? { top: offset, behavior } : { left: offset, behavior });
+const viewportSize = () => (vertical.value ? viewportEl.value.clientHeight : viewportEl.value.clientWidth);
+const scrollRange = () => Math.max(0, (vertical.value ? viewportEl.value.scrollHeight : viewportEl.value.scrollWidth) - viewportSize());
 let resizeObserver;
 let scrollFrame;
 let requestedIndex;
@@ -103,12 +99,12 @@ const cancelNavigation = () => {
   const navigating = navigationTarget !== undefined;
   if (navigating) requestedIndex = undefined;
   clearNavigation();
-  if (navigating) viewportEl.value?.scrollTo?.({ left: viewportEl.value.scrollLeft, behavior: 'instant' });
+  if (navigating) viewportEl.value?.scrollTo?.(scrollOptions(scrollOffset(), 'instant'));
 };
 const finishNavigation = () => {
   if (navigationTarget === undefined) return;
   const target = navigationTarget;
-  if (geometry && Math.abs(Math.abs(viewportEl.value.scrollLeft) - scrollOffsetForIndex(target)) > 1) {
+  if (geometry && Math.abs(Math.abs(scrollOffset()) - scrollOffsetForIndex(target)) > 1) {
     waitForScrollEnd();
     return;
   }
@@ -126,18 +122,17 @@ const waitForScrollEnd = () => {
 };
 const clamp = (index) => Math.max(0, Math.min(Number.isFinite(index) ? Math.trunc(index) : 0, props.items.length - 1));
 const selectedIndex = computed(() => clamp(props.modelValue ?? internalIndex.value));
-const isRtl = () => viewportEl.value && getComputedStyle(viewportEl.value).direction === 'rtl';
+const isRtl = () => !vertical.value && viewportEl.value && getComputedStyle(viewportEl.value).direction === 'rtl';
 const slideElements = () => Array.from(viewportEl.value?.children || []);
-const scrollOffsetForIndex = (index) => Math.min(Math.max(0, viewportEl.value.scrollWidth - viewportEl.value.clientWidth), index * (geometry.large + geometry.gap));
+const scrollOffsetForIndex = (index) => Math.min(scrollRange(), index * (geometry.large + geometry.gap));
 const scrollToIndex = (index, animate = false) => {
   endDrag();
-  if (showAll.value) return;
   const viewport = viewportEl.value;
   const slide = slideElements()[index];
   if (!viewport || !slide) return;
   const bounds = viewport.getBoundingClientRect();
   const target = slide.getBoundingClientRect();
-  const delta = isRtl() ? target.right - bounds.right + 16 : target.left - bounds.left - 16;
+  const delta = vertical.value ? target.top - bounds.top : isRtl() ? target.right - bounds.right + 16 : target.left - bounds.left - 16;
   if (!animate) requestedIndex = undefined;
   clearNavigation();
   const smooth = animate && !motionQuery?.matches && Math.abs(delta) > 1;
@@ -145,7 +140,7 @@ const scrollToIndex = (index, animate = false) => {
     navigationTarget = index;
     waitForScrollEnd();
   }
-  viewport.scrollBy?.({ left: geometry?.fits ? 0 : delta, behavior: smooth ? 'smooth' : 'instant' });
+  viewport.scrollBy?.(scrollOptions(geometry?.fits ? 0 : delta, smooth ? 'smooth' : 'instant'));
   if (!smooth) updateMasks();
 };
 const updateSelection = (index) => {
@@ -162,11 +157,11 @@ const select = (index) => {
   scrollToIndex(nextIndex, true);
 };
 const onKeydown = (event) => {
-  if (showAll.value || event.target !== viewportEl.value || event.altKey || event.ctrlKey || event.metaKey || event.isComposing) return;
+  if (event.target !== viewportEl.value || event.altKey || event.ctrlKey || event.metaKey || event.isComposing) return;
   const currentIndex = navigationTarget ?? selectedIndex.value;
   let index;
-  if (event.key === 'ArrowRight') index = currentIndex + (isRtl() ? -1 : 1);
-  else if (event.key === 'ArrowLeft') index = currentIndex + (isRtl() ? 1 : -1);
+  if (event.key === (vertical.value ? 'ArrowDown' : 'ArrowRight')) index = currentIndex + (isRtl() ? -1 : 1);
+  else if (event.key === (vertical.value ? 'ArrowUp' : 'ArrowLeft')) index = currentIndex + (isRtl() ? 1 : -1);
   else if (event.key === 'Home') index = 0;
   else if (event.key === 'End') index = props.items.length - 1;
   else return;
@@ -175,21 +170,28 @@ const onKeydown = (event) => {
 };
 const updateMasks = () => {
   const viewport = viewportEl.value;
-  if (!viewport || !geometry || showAll.value) return;
+  if (!viewport || !geometry) return;
   const bounds = viewport.getBoundingClientRect();
   const rtl = isRtl();
-  const offset = Math.abs(viewport.scrollLeft);
-  const maxOffset = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+  const offset = Math.abs(scrollOffset());
+  const maxOffset = scrollRange();
   const slides = slideElements().map((slide) => ({ slide, rect: slide.getBoundingClientRect() }));
+  const masked = geometry.keylines?.length > 0;
   for (const { slide, rect } of slides) {
+    const surface = slide.querySelector('.md-carousel__mask');
+    if (vertical.value) {
+      const hidden = rect.bottom <= bounds.top || rect.top >= bounds.bottom;
+      surface.inert = hidden;
+      surface.style.visibility = hidden ? 'hidden' : '';
+      continue;
+    }
     const rawCenter = (rtl ? bounds.right - rect.right : rect.left - bounds.left) - 16 + geometry.large / 2;
-    const mask = props.layout === 'multi-browse' ? getCarouselMask(geometry, rawCenter, offset, maxOffset) : { center: rawCenter, width: geometry.large };
+    const mask = masked ? getCarouselMask(geometry, rawCenter, offset, maxOffset) : { center: rawCenter, width: geometry.large };
     const left = props.layout === 'uncontained' ? mask.center - mask.width / 2 : Math.max(0, mask.center - mask.width / 2);
     const right = props.layout === 'uncontained' ? mask.center + mask.width / 2 : Math.min(geometry.available, mask.center + mask.width / 2);
     const width = Math.max(0, right - left);
     const physicalLeft = rtl ? bounds.right - 16 - right : bounds.left + 16 + left;
     const contentLeft = (rtl ? bounds.right - 16 - mask.center : bounds.left + 16 + mask.center) - geometry.large / 2;
-    const surface = slide.querySelector('.md-carousel__mask');
     surface.style.width = `${width}px`;
     surface.style.transform = `translateX(${physicalLeft - rect.left}px)`;
     const hidden = width < 1 || physicalLeft + width <= bounds.left || physicalLeft >= bounds.right;
@@ -198,16 +200,15 @@ const updateMasks = () => {
     surface.style.setProperty('--md-carousel-content-offset', `${contentLeft - physicalLeft}px`);
     surface.style.setProperty('--md-carousel-label-left', `${physicalLeft - contentLeft}px`);
     surface.style.setProperty('--md-carousel-label-right', `${geometry.large + contentLeft - physicalLeft - width}px`);
-    surface.style.setProperty(
-      '--md-carousel-label-opacity',
-      `${props.layout === 'uncontained' || geometry.fits || showAll.value ? 1 : Math.max(0, Math.min(1, (width - geometry.small) / Math.max(1, geometry.medium - geometry.small)))}`
-    );
+    surface.style.setProperty('--md-carousel-label-opacity', `${masked ? Math.max(0, Math.min(1, (width - geometry.small) / Math.max(1, geometry.medium - geometry.small))) : 1}`);
     surface.style.setProperty('--md-carousel-parallax', `${motionQuery?.matches ? 0 : Math.max(-16, Math.min(16, (mask.center - geometry.available / 2) * 0.08 * (rtl ? -1 : 1)))}px`);
   }
 };
 const { dragging, moving, onPointerDown, endDrag, focusAfterPress, onNativeDrag, onDragClick } = useCarouselMouseDrag({
   viewportEl,
-  showAll,
+  vertical,
+  scrollAxis,
+  scrollRange,
   cancelNavigation,
   updateMasks,
   reducedMotion: () => motionQuery?.matches,
@@ -217,10 +218,10 @@ const { dragging, moving, onPointerDown, endDrag, focusAfterPress, onNativeDrag,
       if (!moving.value && props.modelValue !== undefined && selectedIndex.value !== index) scrollToIndex(selectedIndex.value, true);
     });
   },
-  snapTarget: (projectedLeft) => {
+  snapTarget: (projectedOffset) => {
     const direction = isRtl() ? -1 : 1;
-    const max = viewportEl.value.scrollWidth - viewportEl.value.clientWidth;
-    const projected = Math.max(0, Math.min(max, projectedLeft * direction));
+    const max = scrollRange();
+    const projected = Math.max(0, Math.min(max, projectedOffset * direction));
     const last = props.items.length - 1;
     let index = last;
     let distance = Math.abs(scrollOffsetForIndex(last) - projected);
@@ -231,7 +232,7 @@ const { dragging, moving, onPointerDown, endDrag, focusAfterPress, onNativeDrag,
         index = i;
       }
     }
-    return { index, left: direction * scrollOffsetForIndex(index) };
+    return { index, offset: direction * scrollOffsetForIndex(index) };
   },
 });
 const onWheel = () => {
@@ -241,42 +242,44 @@ const onWheel = () => {
 const reflow = () => {
   const viewport = viewportEl.value;
   if (!viewport) return;
-  const available = Math.max(1, viewport.clientWidth - 32);
-  if (viewport.clientWidth) {
+  const available = Math.max(1, viewportSize() - (vertical.value ? 0 : 32));
+  if (viewportSize()) {
     const width = sizerEl.value.getBoundingClientRect().width || 360;
-    const measuredGap = parseFloat(getComputedStyle(viewport).columnGap);
+    const measuredGap = parseFloat(getComputedStyle(viewport)[vertical.value ? 'rowGap' : 'columnGap']);
     const gap = Number.isFinite(measuredGap) ? Math.max(0, measuredGap) : 8;
-    geometry = props.layout === 'multi-browse' ? createCarouselLayout(available, width, gap, props.items.length) : { available, large: Math.min(width, available), gap, fits: false };
-    viewport.style.setProperty('--md-carousel-large-width', `${geometry.large}px`);
+    if (props.layout === 'multi-browse') geometry = createCarouselLayout(available, width, gap, props.items.length);
+    else if (props.layout === 'hero') geometry = createHeroLayout(available, gap, props.items.length);
+    else geometry = { available, large: vertical.value ? available : Math.min(width, available), gap };
+    viewport.style.setProperty('--md-carousel-large-width', vertical.value ? '100%' : `${geometry.large}px`);
   }
   scrollToIndex(selectedIndex.value);
   updateMasks();
 };
 const onItemFocus = (event) => {
-  if (showAll.value || event.target === viewportEl.value) return;
+  if (event.target === viewportEl.value) return;
   const index = slideElements().indexOf(event.target.closest('.md-carousel__item'));
   if (index >= 0) focusAfterPress(() => select(index));
 };
 const onScroll = () => {
-  if (showAll.value || moving.value) return;
+  if (moving.value) return;
   if (navigationTarget !== undefined) waitForScrollEnd();
   if (scrollFrame) cancelAnimationFrame(scrollFrame);
   scrollFrame = requestAnimationFrame(() => {
     scrollFrame = null;
     const viewport = viewportEl.value;
-    if (showAll.value || moving.value || !viewport || !props.items.length) return;
+    if (moving.value || !viewport || !props.items.length) return;
     updateMasks();
     if (navigationTarget !== undefined) return;
     const bounds = viewport.getBoundingClientRect();
     const rtl = isRtl();
-    const edge = rtl ? bounds.right - 16 : bounds.left + 16;
+    const edge = vertical.value ? bounds.top : rtl ? bounds.right - 16 : bounds.left + 16;
     const distances = slideElements().map((slide) => {
       const rect = slide.getBoundingClientRect();
-      return Math.abs((rtl ? rect.right : rect.left) - edge);
+      return Math.abs((vertical.value ? rect.top : rtl ? rect.right : rect.left) - edge);
     });
     if (geometry) {
-      const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-      const offset = Math.abs(viewport.scrollLeft);
+      const max = scrollRange();
+      const offset = Math.abs(scrollOffset());
       const currentOffset = scrollOffsetForIndex(selectedIndex.value);
       if (Math.abs(currentOffset - offset) < 1) return;
       if (max > 0 && offset >= max - 1) {
@@ -304,22 +307,14 @@ watch(
   (keys, previous) => {
     if (previous && keys.length === previous.length && keys.every((key, index) => key === previous[index])) return;
     nextTick(() => {
+      if (previous && keys[0] !== previous[0]) {
+        for (const surface of viewportEl.value?.querySelectorAll('.md-carousel__mask') || []) surface.removeAttribute('style');
+      }
       internalIndex.value = clamp(props.modelValue ?? internalIndex.value);
       reflow();
     });
   }
 );
-watch(showAll, () => {
-  onWheel();
-  nextTick(() => {
-    if (!showAll.value) reflow();
-    else
-      for (const surface of viewportEl.value?.querySelectorAll('.md-carousel__mask') || []) {
-        surface.removeAttribute('style');
-        surface.inert = false;
-      }
-  });
-});
 const onMotionChange = () => {
   if (motionQuery.matches) {
     cancelNavigation();
@@ -375,30 +370,31 @@ $carousel: tokens.md-comp-carousel-item-values();
     overflow-x: auto;
     overscroll-behavior-inline: contain;
     scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     padding: 8px 16px;
     scroll-padding-inline: 16px;
   }
-  &--uncontained &__viewport::after {
-    content: '';
-    flex: 0 0 max(0px, calc(100% - var(--md-carousel-large-width, var(--md-carousel-item-width)) - var(--md-carousel-gap)));
+  &--full-screen &__viewport {
+    flex-direction: column;
+    block-size: var(--md-carousel-item-height);
+    overflow: hidden auto;
+    padding: 0;
+    scroll-padding: 0;
+    scroll-snap-type: y mandatory;
+    overscroll-behavior-inline: auto;
+  }
+  &--full-screen &__item {
+    flex-basis: 100%;
+  }
+  &--full-screen &__mask {
+    border-radius: 0;
+  }
+  &--uncontained &__viewport > &__item:last-child:not(:only-child) {
+    margin-inline-end: max(0px, calc(100% - var(--md-carousel-large-width, var(--md-carousel-item-width))));
   }
   &__viewport--dragging {
     cursor: grabbing;
     user-select: none;
-  }
-  &__viewport--all {
-    display: grid;
-    overflow: visible;
-    scroll-snap-type: none;
-    &::after {
-      display: none;
-    }
-  }
-  &__show-all {
-    display: flex;
-    margin-inline-start: auto;
-    min-block-size: 48px;
   }
   &__item {
     flex: 0 0 var(--md-carousel-large-width, min(var(--md-carousel-item-width), calc(100% - 32px)));
@@ -479,17 +475,6 @@ $carousel: tokens.md-comp-carousel-item-values();
     &__image {
       transform: none;
     }
-  }
-  &__viewport--all &__mask {
-    inline-size: 100%;
-    transform: none;
-  }
-  &__viewport--all &__content {
-    inline-size: 100%;
-    transform: none;
-  }
-  &__viewport--all &__image {
-    transform: none;
   }
 }
 </style>

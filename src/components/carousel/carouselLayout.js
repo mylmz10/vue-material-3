@@ -28,8 +28,9 @@ export function createCarouselLayout(available, preferredWidth, gap, count) {
 export function getCarouselMask(layout, rawCenter, offset, maxOffset) {
   const { available, large, small, gap, preview, keylines } = layout;
   if (!keylines.length) return { center: rawCenter, width: large };
-  const shift = between(preview - (maxOffset - offset), 0, preview);
-  const position = rawCenter - shift;
+  const endShift = between(preview - (maxOffset - offset), 0, preview);
+  const shift = layout.centered ? endShift / 2 - between(preview / 2 - offset, 0, preview / 2) : endShift;
+  const position = rawCenter - endShift;
   let before = keylines[0];
   let after = keylines[keylines.length - 1];
   if (position < before.offset) return { center: before.center + ((position - before.offset) / (large + gap)) * (small + gap) + shift, width: small };
@@ -46,4 +47,23 @@ export function getCarouselMask(layout, rawCenter, offset, maxOffset) {
     center: before.center + (after.center - before.center) * progress + shift,
     width: Math.min(available, before.width + (after.width - before.width) * progress),
   };
+}
+
+export function createHeroLayout(available, gap, count) {
+  const small = 48;
+  const preview = small + gap;
+  const previewCount = Math.min(2, count - 1);
+  const large = available - previewCount * preview;
+  if (count < 2 || large < 2 * small + gap) return { available, large: available, gap, keylines: [] };
+
+  const centered = count > 2;
+  const focalCenter = large / 2;
+  const center = focalCenter + (centered ? preview : 0);
+  const step = large + gap;
+  const keylines = [-2, -1, 0, 1, 2].map((index) => ({
+    offset: focalCenter + index * step,
+    center: index === 0 ? center : center + Math.sign(index) * ((large - small) / 2 + Math.abs(index) * preview),
+    width: index === 0 ? large : small,
+  }));
+  return { available, large, medium: large, small, gap, keylines, preview: previewCount * preview, centered };
 }

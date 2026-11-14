@@ -4,15 +4,15 @@ const DRAG_THRESHOLD = 5;
 const VELOCITY_WINDOW = 100;
 const SPRING_RATE = 20;
 
-export function useCarouselMouseDrag({ viewportEl, showAll, cancelNavigation, updateMasks, snapTarget, onSettled, reducedMotion }) {
+export function useCarouselMouseDrag({ viewportEl, vertical, scrollAxis, scrollRange, cancelNavigation, updateMasks, snapTarget, onSettled, reducedMotion }) {
   const dragging = ref(false);
   const moving = ref(false);
   let press;
   let frame;
   let suppressClick = false;
 
-  const writeOffset = (left) => {
-    viewportEl.value.scrollLeft = left;
+  const writeOffset = (offset) => {
+    viewportEl.value[scrollAxis.value] = offset;
     updateMasks();
   };
   const startMotion = () => {
@@ -43,9 +43,15 @@ export function useCarouselMouseDrag({ viewportEl, showAll, cancelNavigation, up
     suppressClick = false;
     cancelNavigation();
     const viewport = viewportEl.value;
-    if (event.pointerType !== 'mouse' || event.button !== 0 || showAll.value || viewport.scrollWidth <= viewport.clientWidth) return;
+    if (event.pointerType !== 'mouse' || event.button !== 0 || scrollRange() <= 0) return;
     if (event.target.closest('input, textarea, select, [contenteditable]')) return;
-    if (event.clientY >= viewport.getBoundingClientRect().top + viewport.clientTop + viewport.clientHeight) return;
+    const bounds = viewport.getBoundingClientRect();
+    if (
+      event.clientY >= bounds.top + viewport.clientTop + viewport.clientHeight ||
+      event.clientX < bounds.left + viewport.clientLeft ||
+      event.clientX >= bounds.left + viewport.clientLeft + viewport.clientWidth
+    )
+      return;
     const interrupted = moving.value;
     if (frame !== undefined) cancelAnimationFrame(frame);
     frame = undefined;
@@ -58,52 +64,53 @@ export function useCarouselMouseDrag({ viewportEl, showAll, cancelNavigation, up
 
   const onPointerMove = (event) => {
     if (event.pointerId !== press?.id) return;
-    const dx = event.clientX - press.x;
+    const main = vertical.value ? event.clientY : event.clientX;
+    const delta = main - (vertical.value ? press.y : press.x);
     if (!dragging.value) {
-      const dy = event.clientY - press.y;
-      if (Math.abs(dy) > DRAG_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
+      const crossDelta = vertical.value ? event.clientX - press.x : event.clientY - press.y;
+      if (Math.abs(crossDelta) > DRAG_THRESHOLD && Math.abs(crossDelta) > Math.abs(delta)) {
         finishDrag(event);
         return;
       }
-      if (Math.abs(dx) <= DRAG_THRESHOLD) return;
+      if (Math.abs(delta) <= DRAG_THRESHOLD) return;
       cancelNavigation();
       startMotion();
       dragging.value = true;
       suppressClick = true;
-      press.anchorX = press.x + Math.sign(dx) * DRAG_THRESHOLD;
+      press.anchor = main - delta + Math.sign(delta) * DRAG_THRESHOLD;
       const viewport = viewportEl.value;
-      press.anchorLeft = viewport.scrollLeft;
-      const max = viewport.scrollWidth - viewport.clientWidth;
-      const rtl = getComputedStyle(viewport).direction === 'rtl';
+      press.anchorOffset = viewport[scrollAxis.value];
+      const max = scrollRange();
+      const rtl = !vertical.value && getComputedStyle(viewport).direction === 'rtl';
       press.min = rtl ? -max : 0;
       press.max = rtl ? 0 : max;
     }
     event.preventDefault();
-    press.left = Math.max(press.min, Math.min(press.max, press.anchorLeft - (event.clientX - press.anchorX)));
+    press.offset = Math.max(press.min, Math.min(press.max, press.anchorOffset - (main - press.anchor)));
     const time = performance.now();
-    press.samples.push({ time, left: press.left });
+    press.samples.push({ time, offset: press.offset });
     while (press.samples.length > 1 && time - press.samples[0].time > VELOCITY_WINDOW) press.samples.shift();
     if (frame !== undefined) return;
     frame = requestAnimationFrame(() => {
       frame = undefined;
-      writeOffset(press.left);
+      writeOffset(press.offset);
     });
   };
 
   const settle = (velocity) => {
-    const start = viewportEl.value.scrollLeft;
-    const { index, left } = snapTarget(start + velocity * 0.18);
+    const start = viewportEl.value[scrollAxis.value];
+    const { index, offset: target } = snapTarget(start + velocity * 0.18);
     const finish = () => {
-      writeOffset(left);
+      writeOffset(target);
       stopMotion();
       onSettled(index);
     };
-    if (reducedMotion() || (Math.abs(start - left) < 1 && Math.abs(velocity) < 20)) {
+    if (reducedMotion() || (Math.abs(start - target) < 1 && Math.abs(velocity) < 20)) {
       finish();
       return;
     }
     const startedAt = performance.now();
-    const distance = start - left;
+    const distance = start - target;
     const step = (now) => {
       const elapsed = (now - startedAt) / 1000;
       // A critically damped spring carries release velocity into the snap.
@@ -115,7 +122,7 @@ export function useCarouselMouseDrag({ viewportEl, showAll, cancelNavigation, up
         finish();
         return;
       }
-      writeOffset(left + offset);
+      writeOffset(target + offset);
       frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
@@ -123,7 +130,7 @@ export function useCarouselMouseDrag({ viewportEl, showAll, cancelNavigation, up
 
   const finishDrag = (event) => {
     if (event.pointerId !== press?.id) return;
-    const { left, interrupted, samples, onTap } = press;
+    const { offset, interrupted, samples, onTap } = press;
     const wasDragging = dragging.value;
     releasePointer();
     if (!wasDragging && event.type === 'pointerup' && onTap) {
@@ -133,12 +140,12 @@ export function useCarouselMouseDrag({ viewportEl, showAll, cancelNavigation, up
     if (!wasDragging && !interrupted) return;
     if (frame !== undefined) cancelAnimationFrame(frame);
     frame = undefined;
-    if (wasDragging) writeOffset(left);
+    if (wasDragging) writeOffset(offset);
     const first = samples[0];
     const last = samples.at(-1);
     let velocity = 0;
     if (event.type === 'pointerup' && first && last.time - first.time > 1 && performance.now() - last.time < 80) {
-      velocity = Math.max(-2400, Math.min(2400, ((last.left - first.left) * 1000) / (last.time - first.time)));
+      velocity = Math.max(-2400, Math.min(2400, ((last.offset - first.offset) * 1000) / (last.time - first.time)));
     }
     settle(velocity);
   };
