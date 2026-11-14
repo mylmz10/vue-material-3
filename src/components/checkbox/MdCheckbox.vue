@@ -178,7 +178,7 @@ useFormReset(() => inputEl.value, onFormReset);
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 
-$theme: tokens.md-comp-checkbox-values();
+$theme: tokens.md-comp-checkbox-values(theme.dependencies());
 
 .md-checkbox {
   $this: &;

@@ -1,133 +1,60 @@
 # Vue Material 3
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/vue-material-3">
-    <img src="https://img.shields.io/npm/v/vue-material-3.svg" alt="npm version">
-  </a>
-  <a href="https://www.npmjs.com/package/vue-material-3">
-    <img src="https://img.shields.io/npm/dt/vue-material-3.svg" alt="npm downloads">
-  </a>
-  <a href="https://www.npmjs.com/package/vue-material-3">
-    <img src="https://img.shields.io/bundlephobia/min/vue-material-3.svg" alt="bundle size">
-  </a>
-  <a href="https://www.npmjs.com/package/vue-material-3">
-    <img src="https://img.shields.io/npm/l/vue-material-3.svg" alt="license">
-  </a>
-  <a href="https://mylmz10.github.io/vue-material-3">
-    <img src="https://img.shields.io/badge/storybook-live-ff4785.svg" alt="storybook">
-  </a>
-</p>
+Material Design 3 components for Vue 3, with light and dark color schemes and customizable CSS tokens.
 
-Vue Material 3 is a Vue 3 component library inspired by [Material Design 3 (Material You)](https://m3.material.io/blog/announcing-material-you).
-It focuses on practical, composable UI primitives with a clean API and Storybook-first workflow.
+[![npm version](https://img.shields.io/npm/v/vue-material-3.svg)](https://www.npmjs.com/package/vue-material-3)
+[![License](https://img.shields.io/npm/l/vue-material-3.svg)](LICENSE)
+[![PR validation](https://github.com/mylmz10/vue-material-3/actions/workflows/pr-validation.yml/badge.svg?branch=develop)](https://github.com/mylmz10/vue-material-3/actions/workflows/pr-validation.yml)
 
-> Note: The project is still evolving and may include breaking changes before `1.0.0`.
+[Documentation](https://mylmz10.github.io/vue-material-3/) · [Component reference](https://mylmz10.github.io/vue-material-3/components/) · [Storybook](https://mylmz10.github.io/vue-material-3/storybook/)
 
-## Highlights
+## Getting started
 
-- Vue 3 component set with Material 3 visual language
-- Live Storybook documentation and examples
-- Unit test setup with Vitest + Vue Test Utils
-- Pre-commit quality gate via Husky (`npm test`)
+Install the package in a project using Vue 3.5 or later within Vue 3.
 
-## Installation
-
-```bash
+```sh
 npm install vue-material-3
 ```
 
-## Quick Start
+Import the package stylesheet once in your application, then import the components you use.
 
 ```vue
-<template>
-  <MdElevatedButton label="Get Started" />
-</template>
-
 <script setup>
+import { MdFilledButton } from 'vue-material-3';
 import 'vue-material-3/style.css';
-import { MdElevatedButton } from 'vue-material-3';
 </script>
+
+<template>
+  <MdFilledButton label="Get started" />
+</template>
 ```
 
-## Available Components
+Load Roboto and Material Symbols Outlined in your app to use the default typography and icons. [Font setup](docs/guide/installation.md#load-fonts)
 
-- `Avatar`
-- `Badge`
-- `Button` (`ElevatedButton`, `FilledButton`, `FilledTonalButton`, `OutlinedButton`, `TextButton`)
-- `Card`
-- `Checkbox`
-- `Chip` (`ChipSet`, `FilterChip`)
-- `DatePicker` (`DatePicker`, `FilledDatePickerField`, `OutlinedDatePickerField`)
-- `Dialog`
-- `Divider`
-- `Fab` (`Fab`, `BrandedFab`, `FabExtended`)
-- `AutoComplete` (`FilledAutoComplete`, `OutlinedAutoComplete`)
-- `Icon`
-- `IconButton`
-- `List` (`List`, `ListItem`, `ListDivider`)
-- `Menu`
-- `NavigationBar`
-- `NavigationDrawer`
-- `NavigationTab`
-- `ProgressIndicator` (`LinearProgressIndicator`, `CircularProgressIndicator`)
-- `Radio`
-- `Search`
-- `SegmentedButton` (`SegmentedButton`, `SegmentedButtonSet`)
-- `Select` (`FilledSelect`, `OutlinedSelect`, `SelectOption`)
-- `Slider`
-- `Snackbar`
-- `Switch`
-- `Tabs` (`Tabs`, `PrimaryTab`, `SecondaryTab`)
-- `TextField` (`FilledTextField`, `OutlinedTextField`)
-- `TimePicker` (`TimePicker`, `FilledTimePickerField`, `OutlinedTimePickerField`)
-- `Tooltip`
+## Components and theming
 
-## Additional Components
+The library includes buttons, form controls, navigation, menus, dialogs, sheets, carousels, and date and time pickers. Each component reference lists its imports, props, events, and slots. [Component index](docs/components/index.md)
 
-The working source also includes these standard M3 components (available in the next release):
+- **Autocomplete** accepts strings, numbers, and labeled options. It offers docked and modal suggestions, filters locally as you type, and preserves the current selection when you leave an unconfirmed search. Use the optional debounced event for external searches. [Autocomplete](docs/components/autocomplete.md)
+- **Carousel** offers multi-browse and uncontained layouts with mouse dragging, velocity-based settling, keyboard navigation, and a show-all view. [Carousel](docs/components/carousel.md)
 
-- [x] BottomSheet
-- [x] Carousel
-- [x] NavigationRail
-- [x] SideSheet
-- [x] TopAppBar
+Apply `.dark` or `data-theme="dark"` to an ancestor to switch its color scheme. Override CSS custom properties to adapt the theme to your application. [Theming guide](docs/guide/theming.md)
 
-## Storybook
+## Contributing
 
-- Live docs: `https://mylmz10.github.io/vue-material-3`
-- Local:
+Use Node.js 22 as specified in [`.nvmrc`](.nvmrc), then run `npm install`.
 
-```bash
-npm run storybook
-```
+| Task | Command |
+| --- | --- |
+| Run the documentation site | `npm run docs:dev` |
+| Develop components in Storybook | `npm run storybook` |
+| Check lint and run unit tests | `npm run lint:check`, `npm test` |
+| Build the library, docs, and Storybook | `npm run build`, `npm run docs:build`, `npm run build-storybook` |
+| Verify the packed package in a consumer app | `npm run test:package` |
+| Check browser behavior and visual geometry | `npm run test:browser`, `npm run test:visual` |
 
-## Development
-
-Recommended local runtime:
-
-- Node.js `22+`
-- npm `10+`
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run tests:
-
-```bash
-npm test
-```
-
-Build Storybook:
-
-```bash
-npm run build-storybook
-```
+The browser, visual, and package checks use a local Chrome or Chromium installation. [Browser and package checks](docs/testing/browser.md)
 
 ## License
 
-MIT
-
-See [browser and package checks](docs/testing/browser.md) and the [Material baseline](docs/guide/material-baseline.md). Vue 3.5 or newer within Vue 3 is required.
+[MIT](LICENSE)

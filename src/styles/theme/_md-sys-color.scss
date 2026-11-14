@@ -17,6 +17,17 @@
   @return $result;
 }
 
+@function dependencies() {
+  @return (
+    'md-sys-color': values(),
+    'md-sys-elevation': tokens.md-sys-elevation-values(),
+    'md-sys-motion': tokens.md-sys-motion-values(),
+    'md-sys-shape': tokens.md-sys-shape-values(),
+    'md-sys-state': tokens.md-sys-state-values(),
+    'md-sys-typescale': tokens.md-sys-typescale-values()
+  );
+}
+
 @mixin emit-theme($values) {
   @each $token, $color in $values {
     @if $color != null {

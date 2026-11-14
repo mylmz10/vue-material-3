@@ -130,8 +130,9 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-date-picker-modal-values();
+$theme: tokens.md-comp-date-picker-modal-values(theme.dependencies());
 
 .md-date-picker-year-grid {
   align-content: start;

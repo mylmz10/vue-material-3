@@ -200,8 +200,9 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-filled-select-values();
+$theme: tokens.md-comp-filled-select-values(theme.dependencies());
 
 .md-select-option {
   align-items: center;

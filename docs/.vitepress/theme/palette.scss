@@ -1,0 +1,79 @@
+@use 'sass:map';
+@use '../../../src/styles/tokens';
+@use '../../../src/styles/theme/md-sys-color' as theme;
+
+// Map the documentation palette to the same tonal roles used by the library.
+$lightness: (
+  4: 16%,
+  6: 19%,
+  10: 23%,
+  12: 25%,
+  17: 29%,
+  20: 32%,
+  22: 34%,
+  24: 36%,
+  30: 40%,
+  40: 48%,
+  50: 56%,
+  60: 66%,
+  80: 83%,
+  87: 89%,
+  90: 93%,
+  92: 94%,
+  94: 95%,
+  95: 96%,
+  96: 97%,
+  98: 98.5%,
+);
+$families: ('primary', 1, 0deg), ('secondary', 0.56, 0deg), ('tertiary', 0.73, 55deg), ('neutral', 0.13, 0deg), ('neutral-variant', 0.24, 0deg);
+$palette: tokens.md-ref-palette-values();
+
+@each $family, $scale, $shift in $families {
+  $palette: map.merge(
+    $palette,
+    (
+      '#{$family}0': black,
+      '#{$family}100': white,
+    )
+  );
+  @each $tone, $light in $lightness {
+    $chroma: $scale;
+    @if $tone >= 80 or $tone <= 20 {
+      $chroma: $chroma * 0.55;
+    }
+    $palette: map.set($palette, '#{$family}#{$tone}', oklch($light calc(var(--docs-palette-chroma) * $chroma) calc(var(--docs-palette-hue) * 1deg + $shift)));
+  }
+}
+
+:root[data-docs-palette] {
+  @include theme.emit-theme(
+    tokens.md-sys-color-values-light(
+      (
+        'md-ref-palette': $palette,
+      )
+    )
+  );
+
+  --docs-accent-mid: #{map.get($palette, 'primary40')};
+  --docs-accent-deep: #{map.get($palette, 'primary30')};
+  --docs-accent-ink: #{map.get($palette, 'primary10')};
+  --vp-c-brand-1: var(--md-sys-color-primary);
+  --vp-c-brand-2: var(--docs-accent-deep);
+  --vp-c-brand-3: var(--md-sys-color-primary-container);
+  --vp-c-brand-soft: color-mix(in oklab, var(--vp-c-brand-1) 16%, transparent);
+  --vp-button-brand-bg: var(--docs-accent-mid);
+  --vp-button-brand-hover-bg: var(--docs-accent-deep);
+  --vp-button-brand-active-bg: var(--docs-accent-ink);
+  --vp-home-hero-name-color: var(--vp-c-brand-1);
+}
+
+:root.dark[data-docs-palette] {
+  @include theme.emit-theme(
+    tokens.md-sys-color-values-dark(
+      (
+        'md-ref-palette': $palette,
+      )
+    )
+  );
+  --vp-c-brand-2: var(--md-sys-color-primary-fixed);
+}

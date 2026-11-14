@@ -15,7 +15,7 @@ export default {
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-list-values();
+$theme: tokens.md-comp-list-values(theme.dependencies());
 
 .md-list {
   --md-list-container-color: #{theme.value('surface')};

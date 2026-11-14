@@ -17,6 +17,7 @@ defineProps({
 </script>
 
 <style lang="scss">
+@use '../../styles/theme/md-sys-color' as theme;
 .md-avatar {
   width: 40px;
   height: 40px;
@@ -24,9 +25,6 @@ defineProps({
   display: flex;
   justify-content: center;
   align-items: center;
-
-  --md-avatar-container-color: #6750a4;
-  --md-avatar-text-color: #ffffff;
 
   img {
     width: 100%;
@@ -42,8 +40,8 @@ defineProps({
     font-weight: 400;
     width: 100%;
     height: 100%;
-    background-color: var(--md-avatar-container-color);
-    color: var(--md-avatar-text-color);
+    background-color: var(--md-avatar-container-color, #{theme.value('primary')});
+    color: var(--md-avatar-text-color, #{theme.value('on-primary')});
     border-radius: 50%;
   }
 }

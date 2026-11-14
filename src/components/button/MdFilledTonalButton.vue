@@ -47,7 +47,7 @@ defineProps({
 @use '../ripple/ripple';
 @use '../elevation/elevation';
 
-$theme: tokens.md-comp-filled-tonal-button-values();
+$theme: tokens.md-comp-filled-tonal-button-values(theme.dependencies());
 
 .md-filled-tonal-button {
   height: map.get($theme, container-height);

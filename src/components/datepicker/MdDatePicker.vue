@@ -823,10 +823,10 @@ watch(
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 
-$docked-theme: tokens.md-comp-date-picker-docked-values();
-$modal-theme: tokens.md-comp-date-picker-modal-values();
-$date-input-theme: tokens.md-comp-date-input-modal-values();
-$divider-theme: tokens.md-comp-divider-values();
+$docked-theme: tokens.md-comp-date-picker-docked-values(theme.dependencies());
+$modal-theme: tokens.md-comp-date-picker-modal-values(theme.dependencies());
+$date-input-theme: tokens.md-comp-date-input-modal-values(theme.dependencies());
+$divider-theme: tokens.md-comp-divider-values(theme.dependencies());
 $sys-color: theme.values();
 $motion: tokens.md-sys-motion-values();
 

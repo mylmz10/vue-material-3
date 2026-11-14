@@ -70,7 +70,7 @@ defineProps({
 }
 
 .md-fab--extended {
-  $theme: tokens.md-comp-extended-fab-surface-values();
+  $theme: tokens.md-comp-extended-fab-surface-values(theme.dependencies());
   @include root-static-styles($theme);
 
   padding: 16px;

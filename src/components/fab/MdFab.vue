@@ -70,7 +70,7 @@ defineProps({
 }
 
 .md-fab {
-$theme: tokens.md-comp-fab-surface-values();
+$theme: tokens.md-comp-fab-surface-values(theme.dependencies());
   @include root-static-styles($theme);
 
   --md-fab-container-color: #{theme.value('surface-container-high')};
@@ -88,10 +88,10 @@ $theme: tokens.md-comp-fab-surface-values();
   }
 }
 .md-fab--small.md-fab {
-  @include root-static-styles(tokens.md-comp-fab-surface-small-values());
+  @include root-static-styles(tokens.md-comp-fab-surface-small-values(theme.dependencies()));
 }
 .md-fab--large.md-fab {
-  @include root-static-styles(tokens.md-comp-fab-surface-large-values());
+  @include root-static-styles(tokens.md-comp-fab-surface-large-values(theme.dependencies()));
 
   .md-fab__icon {
     width: 36px;

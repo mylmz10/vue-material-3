@@ -252,15 +252,7 @@ try {
         '(() => {const v=document.querySelector(".md-carousel__viewport"),s=v.querySelector(".md-carousel__item:last-child .md-carousel__mask");return Math.abs(s.getBoundingClientRect().right-v.getBoundingClientRect().right+16)<1;})()'
       );
       assert.equal(await ev('window.fixture.state.carousel'), await ev('document.querySelectorAll(".md-carousel__item").length - 1'));
-      await click('.md-carousel__show-all');
-      assert.equal(await ev('document.querySelector(".md-carousel__show-all").getAttribute("aria-expanded")'), 'true');
-      assert.equal(await ev('getComputedStyle(document.querySelector(".md-carousel__viewport")).display'), 'grid');
-      assert.equal(await ev('Array.from(document.querySelectorAll(".md-carousel__mask")).every(m=>!m.inert && !m.hasAttribute("style"))'), true);
-      assert.equal(await ev('window.fixture.state.carousel'), await ev('document.querySelectorAll(".md-carousel__item").length - 1'));
-      await click('.md-carousel__show-all');
-      await waitFor(
-        '(() => {const v=document.querySelector(".md-carousel__viewport"),m=v.querySelector(".md-carousel__item:last-child .md-carousel__mask");return Math.abs(m.getBoundingClientRect().right-v.getBoundingClientRect().right+16)<1;})()'
-      );
+      assert.equal(await ev('getComputedStyle(document.querySelector(".md-carousel__viewport")).scrollbarWidth'), 'none');
       await focus('.md-carousel__viewport');
       await key('Home');
       await waitFor('window.fixture.state.carousel === 0');

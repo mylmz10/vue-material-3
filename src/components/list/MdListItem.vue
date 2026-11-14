@@ -102,7 +102,7 @@ const renderSupportingText = computed(() => {
 @use '../ripple/ripple';
 @use '../elevation/surface';
 
-$theme: tokens.md-comp-list-values();
+$theme: tokens.md-comp-list-values(theme.dependencies());
 
 .md-list-item {
   --md-list-item-label-text-color: #{theme.value('on-surface')};

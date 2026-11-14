@@ -236,10 +236,10 @@ const handleKeydown = (event) => {
 @use '../elevation/elevation';
 @use '../ripple/ripple';
 
-$assist-theme: tokens.md-comp-assist-chip-values();
-$filter-theme: tokens.md-comp-filter-chip-values();
-$input-theme: tokens.md-comp-input-chip-values();
-$suggestion-theme: tokens.md-comp-suggestion-chip-values();
+$assist-theme: tokens.md-comp-assist-chip-values(theme.dependencies());
+$filter-theme: tokens.md-comp-filter-chip-values(theme.dependencies());
+$input-theme: tokens.md-comp-input-chip-values(theme.dependencies());
+$suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
 
 .md-chip {
   $this: &;

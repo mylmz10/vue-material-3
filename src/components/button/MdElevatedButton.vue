@@ -48,7 +48,7 @@ defineProps({
 @use '../elevation/elevation';
 @use '../ripple/ripple';
 
-$theme: tokens.md-comp-elevated-button-values();
+$theme: tokens.md-comp-elevated-button-values(theme.dependencies());
 
 .md-elevated-button {
   @include surface.root-static-styles;

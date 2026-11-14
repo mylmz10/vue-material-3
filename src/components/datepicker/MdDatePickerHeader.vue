@@ -92,9 +92,10 @@ const combinedMonthYearLabel = computed(() => getCombinedMonthYearLabel(props.ye
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
 
-$docked-theme: tokens.md-comp-date-picker-docked-values();
-$modal-theme: tokens.md-comp-date-picker-modal-values();
+$docked-theme: tokens.md-comp-date-picker-docked-values(theme.dependencies());
+$modal-theme: tokens.md-comp-date-picker-modal-values(theme.dependencies());
 
 .md-date-picker-header {
   align-items: center;

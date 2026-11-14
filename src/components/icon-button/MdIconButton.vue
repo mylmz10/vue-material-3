@@ -215,10 +215,10 @@ const handleClick = (event) => {
 @use '../elevation/surface';
 @use '../ripple/ripple';
 
-$theme: tokens.md-comp-icon-button-values();
-$filled-theme: tokens.md-comp-filled-icon-button-values();
-$tonal-theme: tokens.md-comp-filled-tonal-icon-button-values();
-$outlined-theme: tokens.md-comp-outlined-icon-button-values();
+$theme: tokens.md-comp-icon-button-values(theme.dependencies());
+$filled-theme: tokens.md-comp-filled-icon-button-values(theme.dependencies());
+$tonal-theme: tokens.md-comp-filled-tonal-icon-button-values(theme.dependencies());
+$outlined-theme: tokens.md-comp-outlined-icon-button-values(theme.dependencies());
 
 @mixin icon-static-styles($width-key, $height-key, $shape-key, $color-key) {
   width: map.get($theme, $width-key);
@@ -561,7 +561,7 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values();
   &:disabled,
   &.md-icon-button--disabled,
   &.md-icon-button--soft-disabled {
-    color: rgba(map.get($theme, disabled-icon-color), map.get($theme, disabled-icon-opacity));
+    color: color-mix(in srgb, #{map.get($theme, disabled-icon-color)} #{map.get($theme, disabled-icon-opacity) * 100%}, transparent);
     cursor: default;
 
     .md-ripple {
@@ -613,27 +613,5 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values();
     }
   }
 
-  & {
-    color: #{theme.value('on-surface-variant')};
-  }
-
-  &--filled {
-    color: #{theme.value('on-primary')};
-    background-color: #{theme.value('primary')};
-  }
-
-  &--tonal {
-    color: #{theme.value('on-secondary-container')};
-    background-color: #{theme.value('secondary-container')};
-  }
-
-  &--outlined {
-    color: #{theme.value('on-surface-variant')};
-    border-color: #{theme.value('outline')};
-  }
-
-  &--selected:not(&--filled):not(&--tonal) {
-    color: #{theme.value('primary')};
-  }
 }
 </style>

@@ -535,7 +535,7 @@ defineExpose({
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
 
-$theme: tokens.md-comp-slider-values();
+$theme: tokens.md-comp-slider-values(theme.dependencies());
 
 .md-slider {
   --md-slider-track-height: #{map.get($theme, active-track-height)};
