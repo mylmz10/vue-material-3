@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [0.16.0](https://github.com/mylmz10/vue-material-3/compare/v0.15.0...v0.16.0) (2026-11-14)
+
+
+### Features
+
+* **carousel:** add hero and full-screen layouts ([e5499b7](https://github.com/mylmz10/vue-material-3/commit/e5499b767090304f01e0138c064f1cef812d417b))
+* **theme:** extend docs palettes across components ([6a89e36](https://github.com/mylmz10/vue-material-3/commit/6a89e3633ec6ad3e6ea188024ddd755e83b5efcd))
+
 ## [0.15.0](https://github.com/mylmz10/vue-material-3/compare/v0.14.4...v0.15.0) (2026-11-09)
 
 
