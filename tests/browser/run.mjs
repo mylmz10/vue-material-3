@@ -270,17 +270,18 @@ try {
       await key(' ');
       await waitFor('window.fixture.state.segment === 1');
     });
-    await check('a rejected carousel wheel selection returns to the controlled slide', async () => {
-      const wheel = await ev(`(() => {
+    await check('a rejected native carousel scroll returns to the controlled slide', async () => {
+      await ev(`(async () => {
+        window.fixture.state.carouselKey++;
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      })()`);
+      await ev(`(() => {
         const { state } = window.fixture;
         state.rejectCarouselSelection = true;
         const viewport = document.querySelector('.md-carousel__viewport');
-        viewport.scrollIntoView({ block: 'center' });
-        const rect = viewport.getBoundingClientRect();
-        const slide = viewport.firstElementChild.getBoundingClientRect();
-        return { x: rect.left + rect.width / 2, y: rect.top + 40, deltaX: slide.width + 8, deltaY: 0 };
+        const [first, second] = viewport.children;
+        viewport.scrollTo({ left: second.offsetLeft - first.offsetLeft, behavior: 'instant' });
       })()`);
-      await command('Input.dispatchMouseEvent', { type: 'mouseWheel', ...wheel });
       await waitFor('window.fixture.state.carouselRequests.length > 0');
       await waitFor('document.querySelector(".md-carousel__viewport").scrollLeft === 0');
       assert.deepEqual(await ev('Array.from(window.fixture.state.carouselRequests)'), [1]);

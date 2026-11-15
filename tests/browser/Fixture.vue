@@ -39,6 +39,7 @@ const state = reactive({
   side: false,
   rail: 0,
   carousel: 0,
+  carouselKey: 0,
   rejectCarouselSelection: false,
   carouselRequests: [],
   segment: 0,
@@ -148,6 +149,7 @@ window.fixture = { state, mounted, components };
       />
       <div class="carousel-docs-layout" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; min-width: 0">
         <MdCarousel
+          :key="state.carouselKey"
           :model-value="state.carousel"
           @update:model-value="onCarouselSelection"
           :items="[
