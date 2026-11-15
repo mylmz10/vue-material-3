@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [0.17.0](https://github.com/mylmz10/vue-material-3/compare/v0.16.0...v0.17.0) (2026-11-15)
+
+
+### Features
+
+* expand component gallery and refine UI controls ([f6bdc7d](https://github.com/mylmz10/vue-material-3/commit/f6bdc7dfdf63da23b4a4b1bd0c24de14f18cb426))
+* expand component gallery and refine UI controls ([3ec01df](https://github.com/mylmz10/vue-material-3/commit/3ec01df98c867d196c61cd513c9f7b3897aea074))
+
 ## [0.16.0](https://github.com/mylmz10/vue-material-3/compare/v0.15.0...v0.16.0) (2026-11-14)
 
 
