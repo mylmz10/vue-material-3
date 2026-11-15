@@ -31,6 +31,8 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
+    outputs:
+      deploy_sha: ${{ steps.deploy-source.outputs.sha }}
     steps:
       - name: Checkout repository
         if: ${{ github.event_name == 'push' }}
@@ -181,15 +183,30 @@ jobs:
       - name: Check npm publication
         id: npm-publication
         if: ${{ steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.ready == 'true' }}
-        run: |
+        env:
+          TAG_NAME: ${{ steps.release-meta.outputs.tag_name || steps.manual-release.outputs.tag_name }}
+        run: &check-npm-publication |
           set -euo pipefail
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
+          if [ -n "${RELEASE_REVISION:-}" ]; then
+            RELEASE_PACKAGE=$(git show "${RELEASE_REVISION}:package.json")
+          else
+            RELEASE_PACKAGE=$(cat package.json)
+          fi
+          PACKAGE_NAME=$(printf '%s' "$RELEASE_PACKAGE" | node -p 'JSON.parse(require("node:fs").readFileSync(0, "utf8")).name')
+          VERSION=$(printf '%s' "$RELEASE_PACKAGE" | node -p 'JSON.parse(require("node:fs").readFileSync(0, "utf8")).version')
+          if [ "$TAG_NAME" != "v$VERSION" ] || [ -z "$PACKAGE_NAME" ] || [ "$PACKAGE_NAME" = undefined ]; then
+            echo "::error::Release package identity does not match tag ${TAG_NAME}."
+            exit 1
+          fi
           RESPONSE=$(mktemp)
           trap 'rm -f "$RESPONSE"' EXIT
-          if npm view "${PACKAGE_NAME}@${VERSION}" version --json --registry=https://registry.npmjs.org > "$RESPONSE" 2>/dev/null; then
+          if npm view "${PACKAGE_NAME}@${VERSION}" version --json --prefer-online --registry=https://registry.npmjs.org > "$RESPONSE" 2>/dev/null; then
             node -e 'const fs = require("node:fs"); const value = JSON.parse(fs.readFileSync(process.argv[2], "utf8")); process.exit(value === process.argv[1] ? 0 : 1)' "$VERSION" "$RESPONSE"
             echo "published=true" >> "$GITHUB_OUTPUT"
+            if [ "${REQUIRE_UNPUBLISHED:-false}" = true ]; then
+              echo "::error::${PACKAGE_NAME}@${VERSION} is already published. Release metadata was preserved."
+              exit 1
+            fi
           elif node -e 'const fs = require("node:fs"); const value = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); process.exit(value.error?.code === "E404" ? 0 : 1)' "$RESPONSE"; then
             echo "published=false" >> "$GITHUB_OUTPUT"
           else
@@ -209,24 +226,21 @@ jobs:
 
           npm publish --access public
 
-      - name: Build docs
+      - name: Resolve Pages deployment source
+        id: deploy-source
         if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.ready == 'true') && (steps.publish.outcome == 'success' || steps.npm-publication.outputs.published == 'true') }}
-        run: npm run docs:build
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Build Storybook under docs
-        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.ready == 'true') && (steps.publish.outcome == 'success' || steps.npm-publication.outputs.published == 'true') }}
-        run: npm run build-storybook -- -o docs/.vitepress/dist/storybook
-
-      - name: Deploy site to gh-pages
-        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.ready == 'true') && (steps.publish.outcome == 'success' || steps.npm-publication.outputs.published == 'true') }}
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./docs/.vitepress/dist
+      - name: Recheck npm publication before rollback
+        id: rollback-publication
+        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.ready == 'true') && steps.publish.outcome == 'failure' }}
+        env:
+          TAG_NAME: ${{ steps.release-meta.outputs.tag_name || steps.manual-release.outputs.tag_name }}
+          REQUIRE_UNPUBLISHED: 'true'
+        run: *check-npm-publication
 
       - name: Roll back failed release by opening PR
-        if: ${{ (steps.release-meta.outputs.release_created == 'true' || steps.manual-release.outputs.ready == 'true') && steps.publish.outcome == 'failure' }}
+        if: ${{ steps.publish.outcome == 'failure' && steps.rollback-publication.outputs.published == 'false' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.release-meta.outputs.tag_name || steps.manual-release.outputs.tag_name }}
@@ -297,6 +311,15 @@ jobs:
           echo "Publish failed. Rollback PR was created."
           exit 1
 
+  deploy-release:
+    needs: release-please-pr
+    if: ${{ needs.release-please-pr.outputs.deploy_sha != '' }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/deploy-storybook.yml
+    with:
+      release_sha: ${{ needs.release-please-pr.outputs.deploy_sha }}
+
   reconcile-release:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.reconcile_tag != '' }}
     runs-on: ubuntu-latest
@@ -326,7 +349,16 @@ jobs:
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
           echo "release_sha=${RELEASE_SHA}" >> "$GITHUB_OUTPUT"
 
+      - name: Check npm publication before reconciliation
+        id: reconcile-publication
+        env:
+          TAG_NAME: ${{ steps.resolve.outputs.tag_name }}
+          RELEASE_REVISION: ${{ steps.resolve.outputs.release_sha }}
+          REQUIRE_UNPUBLISHED: 'true'
+        run: *check-npm-publication
+
       - name: Reconcile release by opening rollback PR
+        if: ${{ steps.reconcile-publication.outputs.published == 'false' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.resolve.outputs.tag_name }}

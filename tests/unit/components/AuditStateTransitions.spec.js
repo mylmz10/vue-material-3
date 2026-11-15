@@ -95,13 +95,19 @@ it.each(['auto', 'manual'])('emits only one selection per tab activation in %s m
   expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
 });
 
-it.each([DateField, TimeField])('resets outer picker values and current display format for %s', async (Field) => {
+it.each([DateField, TimeField])('formats the accepted picker reset value using the current format for %s', async (Field) => {
   const date = Field === DateField;
   const initial = date ? '2026-03-14' : '07:00';
   const later = date ? '2026-03-18' : '09:30';
   const form = document.createElement('form');
   document.body.append(form);
-  const wrapper = mount(Field, { attachTo: form, props: { modelValue: initial } });
+  const wrapper = mount(Field, {
+    attachTo: form,
+    props: {
+      modelValue: initial,
+      'onUpdate:modelValue': (value) => wrapper.setProps({ modelValue: value }),
+    },
+  });
   await wrapper.setProps({ modelValue: later, ...(date ? { displayFormat: 'DD/MM/YYYY' } : { hourCycle: 24 }) });
   form.reset();
   await settle();

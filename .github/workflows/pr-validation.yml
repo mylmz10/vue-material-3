@@ -30,9 +30,6 @@ jobs:
       - name: Run lint checks
         run: npm run lint:check
 
-      - name: Build library
-        run: npm run build
-
       - name: Build documentation
         run: npm run docs:build
 

@@ -1,6 +1,6 @@
 <template>
-  <nav class="md-navigation-rail" :aria-label="ariaLabel">
-    <div v-if="$slots.header" class="md-navigation-rail__header"><slot name="header" /></div>
+  <nav class="md-navigation-rail" :class="{ 'md-navigation-rail--expressive': variant === 'expressive', 'md-navigation-rail--expanded': isExpanded }" :aria-label="ariaLabel">
+    <div v-if="$slots.header" class="md-navigation-rail__header"><slot name="header" :expanded="isExpanded" /></div>
     <div class="md-navigation-rail__destinations" @keydown="onKeydown">
       <button
         v-for="(item, index) in items"
@@ -18,9 +18,10 @@
         <MdRipple class="md-navigation-rail__ripple" />
         <span class="md-navigation-rail__indicator">
           <MdIcon aria-hidden="true">{{ modelValue === index ? item.activeIcon || item.icon : item.icon || item.activeIcon }}</MdIcon>
-          <MdBadge v-if="item.badge !== undefined && item.badge !== false" :value="item.badge === true ? undefined : item.badge" aria-hidden="true" />
+          <span v-if="isExpanded" class="md-navigation-rail__expanded-label">{{ item.label }}</span>
+          <MdBadge v-if="item.badge !== undefined && item.badge !== false" :value="item.badge === true ? undefined : item.badge" :absolute="!isExpanded" aria-hidden="true" />
         </span>
-        <span v-if="labels === 'all' || (labels === 'selected' && modelValue === index)" class="md-navigation-rail__label">{{ item.label }}</span>
+        <span v-if="!isExpanded && (labels === 'all' || (labels === 'selected' && modelValue === index))" class="md-navigation-rail__label">{{ item.label }}</span>
         <span v-if="item.badgeLabel" class="md-navigation-rail__badge-label">{{ item.badgeLabel }}</span>
       </button>
     </div>
@@ -35,12 +36,15 @@ import MdBadge from '../badge/MdBadge.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 
 const props = defineProps({
+  variant: { type: String, default: 'baseline', validator: (value) => ['baseline', 'expressive'].includes(value) },
+  expanded: { type: Boolean, default: false },
   items: { type: Array, default: () => [] },
   modelValue: { type: Number, default: undefined },
   ariaLabel: { type: String, default: 'Primary navigation' },
   labels: { type: String, default: 'all', validator: (value) => ['all', 'selected', 'none'].includes(value) },
 });
 const emit = defineEmits(['update:modelValue']);
+const isExpanded = computed(() => props.variant === 'expressive' && props.expanded);
 const focusedIndex = ref(-1);
 const enabled = computed(() => props.items.map((item, index) => (item.disabled ? -1 : index)).filter((index) => index !== -1));
 const tabStop = computed(() => (enabled.value.includes(focusedIndex.value) ? focusedIndex.value : enabled.value.includes(props.modelValue) ? props.modelValue : enabled.value[0]));
@@ -160,6 +164,99 @@ $theme: tokens.md-comp-navigation-rail-values();
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+  }
+}
+
+.md-navigation-rail--expressive {
+  --md-navigation-rail-collapsed-width: 96px;
+  --md-navigation-rail-expanded-width: 220px;
+  inline-size: var(--md-navigation-rail-collapsed-width);
+  flex: none;
+  max-inline-size: 100%;
+  transition: inline-size 250ms cubic-bezier(0.2, 0, 0, 1);
+
+  .md-navigation-rail__destination--selected .md-navigation-rail__label {
+    color: #{theme.value('secondary')};
+  }
+}
+
+.md-navigation-rail--expanded {
+  inline-size: var(--md-navigation-rail-expanded-width);
+  align-items: stretch;
+  background: #{theme.value('surface-container')};
+
+  .md-navigation-rail__header {
+    padding-inline: 12px;
+  }
+
+  .md-navigation-rail__destination {
+    display: grid;
+    grid-template-columns: minmax(0, max-content) 1fr;
+    min-block-size: 60px;
+    padding: 2px 12px;
+    text-align: start;
+  }
+
+  .md-navigation-rail__indicator {
+    grid-area: 1 / 1;
+    inline-size: auto;
+    min-inline-size: 0;
+    block-size: auto;
+    min-block-size: 56px;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+  }
+
+  .md-navigation-rail__ripple {
+    position: relative;
+    grid-area: 1 / 1;
+    align-self: stretch;
+    inset: auto;
+    inline-size: auto;
+    block-size: auto;
+  }
+
+  .md-navigation-rail__expanded-label {
+    position: relative;
+    z-index: 2;
+    font-size: 14px;
+    line-height: 20px;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    animation: md-navigation-rail-label-in 160ms 90ms both;
+  }
+
+  &:dir(rtl) .md-navigation-rail__expanded-label {
+    --md-navigation-rail-label-clip: inset(0 0 0 100%);
+  }
+
+  .md-icon,
+  .md-badge {
+    flex: none;
+  }
+}
+
+@keyframes md-navigation-rail-label-in {
+  from {
+    clip-path: var(--md-navigation-rail-label-clip, inset(0 100% 0 0));
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-navigation-rail--expressive {
+    transition: none;
+  }
+
+  .md-navigation-rail__expanded-label {
+    animation: none;
   }
 }
 </style>

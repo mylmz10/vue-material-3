@@ -1,8 +1,5 @@
-<script setup>
-import { onMounted, shallowRef } from 'vue';
-import MdMenu from '../../../src/components/menu/MdMenu.vue';
-import MdMenuItem from '../../../src/components/menu/MdMenuItem.vue';
-
+<script>
+import { shallowRef } from 'vue';
 const palettes = [
   { name: 'Original', color: '#6750a4' },
   { name: 'Mulberry', hue: 335, chroma: 0.15 },
@@ -28,6 +25,15 @@ const palettes = [
 const storageKey = 'vue-material-3-docs-palette';
 const selected = shallowRef(palettes[0]);
 const swatch = ({ color, hue, chroma }) => color ?? `oklch(58% ${chroma} ${hue})`;
+const quickPalettes = [0, 2, 6, 11, 15, 17].map((index) => palettes[index]);
+</script>
+
+<script setup>
+import { onMounted } from 'vue';
+import MdMenu from '../../../src/components/menu/MdMenu.vue';
+import MdMenuItem from '../../../src/components/menu/MdMenuItem.vue';
+
+defineProps({ inline: Boolean });
 
 function applyPalette(palette) {
   selected.value = palette;
@@ -62,7 +68,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <MdMenu class="docs-palette">
+  <div v-if="inline" class="palette-preview" role="group" aria-label="Gallery color palette">
+    <button
+      v-for="palette in quickPalettes"
+      :key="palette.name"
+      type="button"
+      :aria-label="palette.name"
+      :title="palette.name"
+      :aria-pressed="palette === selected"
+      :style="{ backgroundColor: swatch(palette) }"
+      @click="selectPalette(palette)"
+    >
+      <span v-if="palette === selected" class="material-symbols-outlined" aria-hidden="true">check</span>
+    </button>
+  </div>
+  <MdMenu v-else class="docs-palette">
     <template #activator="{ onClick, onKeydown, ariaExpanded, ariaHaspopup }">
       <button
         class="docs-palette__trigger"
@@ -94,6 +114,23 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.palette-preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.palette-preview button {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  color: white;
+  border-radius: 50%;
+}
+.palette-preview button[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 2px white, 0 0 0 1px var(--md-sys-color-outline);
+}
 .docs-palette {
   margin-inline: 4px;
   pointer-events: auto;

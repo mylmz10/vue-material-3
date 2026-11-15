@@ -31,6 +31,14 @@ try {
   await waitFor('!!window.fixture && !!document.querySelector("#select [role=combobox]")');
   const focus = (selector) => ev(`document.querySelector(${JSON.stringify(selector)}).focus()`);
   const active = () => ev('document.activeElement.id');
+  const hover = async (selector) => {
+    const point = await ev(`(() => {
+      const item = document.querySelector(${JSON.stringify(selector)});
+      const bounds = item.getBoundingClientRect();
+      return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
+    })()`);
+    await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+  };
   const check = async (name, test) => {
     await test();
     console.log(`PASS ${name}`);
@@ -262,6 +270,23 @@ try {
       await key(' ');
       await waitFor('window.fixture.state.segment === 1');
     });
+    await check('a rejected carousel wheel selection returns to the controlled slide', async () => {
+      const wheel = await ev(`(() => {
+        const { state } = window.fixture;
+        state.rejectCarouselSelection = true;
+        const viewport = document.querySelector('.md-carousel__viewport');
+        viewport.scrollIntoView({ block: 'center' });
+        const rect = viewport.getBoundingClientRect();
+        const slide = viewport.firstElementChild.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + 40, deltaX: slide.width + 8, deltaY: 0 };
+      })()`);
+      await command('Input.dispatchMouseEvent', { type: 'mouseWheel', ...wheel });
+      await waitFor('window.fixture.state.carouselRequests.length > 0');
+      await waitFor('document.querySelector(".md-carousel__viewport").scrollLeft === 0');
+      assert.deepEqual(await ev('Array.from(window.fixture.state.carouselRequests)'), [1]);
+      assert.equal(await ev('window.fixture.state.carousel'), 0);
+      await ev('window.fixture.state.rejectCarouselSelection = false');
+    });
     await check('mouse drag follows reversals and settles before committing selection', async () => {
       const point = await ev(`(() => {
         const viewport = document.querySelector('.md-carousel__viewport');
@@ -337,6 +362,11 @@ try {
     });
     await check('autocomplete keeps input focus and resolves active descendant', async () => {
       await click('#autocomplete input');
+      await waitFor('document.querySelector("#autocomplete [role=option]")?.getBoundingClientRect().height > 0');
+      await hover('#autocomplete [role=option]');
+      await waitFor(
+        'document.querySelector("#autocomplete [role=option]:hover > .md-list-item__state-layer") && Number(getComputedStyle(document.querySelector("#autocomplete [role=option]:hover > .md-list-item__state-layer")).opacity) < 1'
+      );
       await command('Input.insertText', { text: 'Bo' });
       await key('ArrowDown');
       await waitFor('document.querySelector("#autocomplete input").hasAttribute("aria-activedescendant")');
@@ -345,15 +375,37 @@ try {
       await key('Enter');
       await waitFor('window.fixture.state.text === "Boston"');
     });
-    await check('select Home/End boundaries override selected middle option', async () => {
-      await click('#select [role=combobox]');
+    await check('required modal autocomplete blocks empty submission and focuses its launcher', async () => {
+      await ev('window.fixture.state.modalAutocompleteId = null');
+      await waitFor('document.querySelector("#autocomplete-modal [role=combobox]").value === ""');
+      assert.equal(await ev('document.querySelector("#autocomplete-modal").reportValidity()'), false);
+      await waitFor('document.activeElement === document.querySelector("#autocomplete-modal [role=combobox]")');
+      await key('Enter');
+      await waitFor('!!document.querySelector("#autocomplete-modal dialog[open] [role=option]")');
+      await key('ArrowDown');
+      await key('Enter');
+      await waitFor('window.fixture.state.modalAutocompleteId === 1');
+      assert.equal(await ev('document.querySelector("#autocomplete-modal").checkValidity()'), true);
+      assert.deepEqual(await ev('new FormData(document.querySelector("#autocomplete-modal")).getAll("assignee")'), ['Alex']);
+    });
+    await check('select keyboard navigation shows active and hover states and restores focus on Escape', async () => {
+      await focus('#select [role=combobox]');
+      await key('ArrowDown');
       await waitFor('document.activeElement.getAttribute("role") === "option"');
+      assert.equal(await ev('document.activeElement.textContent.trim()'), 'Beta');
+      await hover('#select [role=option]:first-child');
+      await waitFor('document.querySelector("#select [role=option]:first-child:hover") && getComputedStyle(document.querySelector("#select [role=option]:first-child"), "::after").content !== "none"');
+      await key('ArrowDown');
+      assert.equal(await ev('document.activeElement.textContent.trim()'), 'Gamma');
+      await key('ArrowUp');
+      assert.equal(await ev('document.activeElement.textContent.trim()'), 'Beta');
       await key('End');
       assert.equal(await ev('document.activeElement.textContent.trim()'), 'Gamma');
       await key('Home');
       assert.equal(await ev('document.activeElement.textContent.trim()'), 'Alpha');
       assert.equal(await ev('!!document.getElementById(document.querySelector("#select [role=combobox]").getAttribute("aria-activedescendant"))'), true);
       await key('Escape');
+      await waitFor('document.activeElement === document.querySelector("#select [role=combobox]")');
     });
     await check('menu and submenu native keyboard flow', async () => {
       await click('#menu-open');

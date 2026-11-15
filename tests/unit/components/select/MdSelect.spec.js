@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { h, nextTick, toRaw } from 'vue';
+import { createSSRApp, h, nextTick, ref, toRaw } from 'vue';
+import { renderToString } from 'vue/server-renderer';
 import MdFilledSelect from '@/components/select/MdFilledSelect.vue';
 import MdOutlinedSelect from '@/components/select/MdOutlinedSelect.vue';
 import MdSelectOption from '@/components/select/MdSelectOption.vue';
@@ -10,6 +11,105 @@ describe('select components', () => {
     ['filled', MdFilledSelect],
     ['outlined', MdOutlinedSelect],
   ])('%s object values', (_, component) => {
+    it('validates, submits, and resets with an external form owner', async () => {
+      const firstForm = document.createElement('form');
+      firstForm.id = 'first-select-owner';
+      const secondForm = document.createElement('form');
+      secondForm.id = 'second-select-owner';
+      document.body.append(firstForm, secondForm);
+      const wrapper = mount(component, {
+        attachTo: document.body,
+        props: { form: firstForm.id, name: 'city', required: true },
+        slots: { default: () => h(MdSelectOption, { value: 'istanbul', displayText: 'Istanbul' }) },
+      });
+      try {
+        const trigger = wrapper.get('[role="combobox"]');
+        expect(firstForm.checkValidity()).toBe(false);
+        await trigger.trigger('click');
+        await wrapper.get('[role="option"]').trigger('click');
+        expect(firstForm.checkValidity()).toBe(true);
+        expect(new FormData(firstForm).get('city')).toBe('istanbul');
+
+        await wrapper.setProps({ form: secondForm.id });
+        firstForm.reset();
+        await nextTick();
+        expect(new FormData(firstForm).has('city')).toBe(false);
+        expect(new FormData(secondForm).get('city')).toBe('istanbul');
+
+        secondForm.reset();
+        await nextTick();
+        await nextTick();
+        expect(trigger.text()).toBe('');
+        expect(new FormData(secondForm).get('city')).toBe('');
+        expect(secondForm.checkValidity()).toBe(false);
+        expect(wrapper.emitted('update:modelValue')).toEqual([['istanbul'], ['']]);
+      } finally {
+        wrapper.unmount();
+        firstForm.remove();
+        secondForm.remove();
+      }
+    });
+
+    it('moves through keyed options in their current DOM order', async () => {
+      const values = ref(['A', 'B', 'C']);
+      const wrapper = mount(
+        {
+          setup: () => () => h(component, {}, () => values.value.map((value) => h(MdSelectOption, { key: value, value }))),
+        },
+        { attachTo: document.body }
+      );
+      try {
+        await wrapper.get('[role="combobox"]').trigger('keydown', { key: 'ArrowDown' });
+        await nextTick();
+        const first = wrapper.findAll('[role="option"]')[0].element;
+        expect(document.activeElement).toBe(first);
+
+        values.value = ['C', 'A', 'B'];
+        await nextTick();
+        const options = wrapper.findAll('[role="option"]');
+        expect(options[1].element).toBe(first);
+        await options[1].trigger('keydown', { key: 'ArrowUp' });
+        await nextTick();
+        expect(document.activeElement).toBe(options[0].element);
+
+        await options[0].trigger('keydown', { key: 'End' });
+        await nextTick();
+        expect(document.activeElement).toBe(options[2].element);
+        await options[2].trigger('keydown', { key: 'Home' });
+        await nextTick();
+        expect(document.activeElement).toBe(options[0].element);
+      } finally {
+        wrapper.unmount();
+      }
+    });
+
+    it('resolves the keyboard-active option after hydration', async () => {
+      const createSelect = () =>
+        createSSRApp({
+          render: () => h(component, { label: 'City' }, () => [h(MdSelectOption, { value: 'A' }), h(MdSelectOption, { id: 'explicit-city-option', value: 'B' })]),
+        });
+      const container = document.createElement('div');
+      container.innerHTML = await renderToString(createSelect());
+      document.body.append(container);
+      const app = createSelect();
+      try {
+        app.mount(container);
+        const trigger = container.querySelector('[role="combobox"]');
+        const listbox = container.querySelector('[role="listbox"]');
+        const options = listbox.querySelectorAll('[role="option"]');
+        expect(trigger.getAttribute('aria-controls')).toBe(listbox.id);
+        expect(options[1].id).toBe('explicit-city-option');
+
+        trigger.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }));
+        await nextTick();
+        expect(trigger.getAttribute('aria-activedescendant')).toBe(options[0].id);
+        expect(document.getElementById(trigger.getAttribute('aria-activedescendant'))).toBe(options[0]);
+      } finally {
+        app.unmount();
+        container.remove();
+      }
+    });
+
     it.each(['a', 0, false, { id: 1 }])('initializes from legacy value %s only when the model is absent', async (value) => {
       const wrapper = mount(component, {
         props: { value },

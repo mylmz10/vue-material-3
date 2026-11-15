@@ -142,6 +142,42 @@ describe('MdCarousel', () => {
     expect(scroll).toHaveBeenCalledOnce();
   });
 
+  it.each(['scrollend', 'idle'])('restores a rejected native scroll after %s without repeating its request', async (settle) => {
+    vi.useFakeTimers();
+    let frame;
+    vi.stubGlobal('requestAnimationFrame', (callback) => {
+      frame = callback;
+      return 1;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+    const wrapper = render({ props: { items: ['One', 'Two', 'Three'], modelValue: 0 } });
+    const viewport = wrapper.get('.md-carousel__viewport');
+    const element = viewport.element;
+    element.getBoundingClientRect = () => ({ left: 0, right: 320 });
+    wrapper.findAll('.md-carousel__item').forEach((slide, index) => {
+      slide.element.getBoundingClientRect = () => ({ left: index * 320 + 16 - element.scrollLeft, right: index * 320 + 336 - element.scrollLeft });
+    });
+    element.scrollBy = vi.fn(({ left }) => {
+      element.scrollLeft += left;
+    });
+    element.scrollLeft = 320;
+    for (let i = 0; i < 3; i++) {
+      await viewport.trigger('wheel');
+      await viewport.trigger('scroll');
+      frame();
+    }
+    if (settle === 'scrollend') await viewport.trigger('scrollend');
+    else vi.advanceTimersByTime(160);
+    await nextTick();
+    expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
+    expect(wrapper.get('.md-carousel__position').text()).toBe('1 / 3');
+    expect(element.scrollLeft).toBe(0);
+    expect(element.scrollBy).toHaveBeenCalledWith({ left: -320, behavior: 'instant' });
+    await wrapper.setProps({ modelValue: 1 });
+    await nextTick();
+    expect(element.scrollLeft).toBe(320);
+  });
+
   it('does not restart navigation when an inline item array is recreated during acknowledgement', async () => {
     const items = () => [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
     const wrapper = render({ props: { items: items(), modelValue: 0 } });

@@ -15,7 +15,6 @@ export default defineConfig({
   ignoreDeadLinks: [/^\/storybook\//],
   lastUpdated: true,
   themeConfig: {
-    logo: '/logo.svg',
     nav: [
       { text: 'Guide', link: '/guide/installation' },
       { text: 'Components', link: '/components/' },

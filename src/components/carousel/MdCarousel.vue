@@ -87,6 +87,7 @@ const scrollRange = () => Math.max(0, (vertical.value ? viewportEl.value.scrollH
 let resizeObserver;
 let scrollFrame;
 let requestedIndex;
+let nativeIndex;
 let navigationTarget;
 let navigationIdleTimer;
 let motionQuery;
@@ -94,15 +95,31 @@ const clearNavigation = () => {
   clearTimeout(navigationIdleTimer);
   navigationIdleTimer = undefined;
   navigationTarget = undefined;
+  nativeIndex = undefined;
 };
 const cancelNavigation = () => {
-  const navigating = navigationTarget !== undefined;
-  if (navigating) requestedIndex = undefined;
+  if (navigationTarget === undefined) return;
+  requestedIndex = undefined;
   clearNavigation();
-  if (navigating) viewportEl.value?.scrollTo?.(scrollOptions(scrollOffset(), 'instant'));
+  viewportEl.value?.scrollTo?.(scrollOptions(scrollOffset(), 'instant'));
 };
 const finishNavigation = () => {
-  if (navigationTarget === undefined) return;
+  if (navigationTarget === undefined) {
+    if (moving.value || props.modelValue === undefined) return;
+    if (scrollFrame) {
+      cancelAnimationFrame(scrollFrame);
+      syncScrollSelection();
+    }
+    const target = nativeIndex;
+    clearNavigation();
+    if (target === undefined) return;
+    nextTick(() => {
+      if (navigationTarget !== undefined || scrollFrame || moving.value) return;
+      requestedIndex = undefined;
+      if (selectedIndex.value !== target) scrollToIndex(selectedIndex.value);
+    });
+    return;
+  }
   const target = navigationTarget;
   if (geometry && Math.abs(Math.abs(scrollOffset()) - scrollOffsetForIndex(target)) > 1) {
     waitForScrollEnd();
@@ -262,33 +279,42 @@ const onItemFocus = (event) => {
 };
 const onScroll = () => {
   if (moving.value) return;
-  if (navigationTarget !== undefined) waitForScrollEnd();
+  if (navigationTarget !== undefined || props.modelValue !== undefined) waitForScrollEnd();
   if (scrollFrame) cancelAnimationFrame(scrollFrame);
-  scrollFrame = requestAnimationFrame(() => {
-    scrollFrame = null;
-    const viewport = viewportEl.value;
-    if (moving.value || !viewport || !props.items.length) return;
-    updateMasks();
-    if (navigationTarget !== undefined) return;
-    const bounds = viewport.getBoundingClientRect();
-    const rtl = isRtl();
-    const edge = vertical.value ? bounds.top : rtl ? bounds.right - 16 : bounds.left + 16;
-    const distances = slideElements().map((slide) => {
-      const rect = slide.getBoundingClientRect();
-      return Math.abs((vertical.value ? rect.top : rtl ? rect.right : rect.left) - edge);
-    });
-    if (geometry) {
-      const max = scrollRange();
-      const offset = Math.abs(scrollOffset());
-      const currentOffset = scrollOffsetForIndex(selectedIndex.value);
-      if (Math.abs(currentOffset - offset) < 1) return;
-      if (max > 0 && offset >= max - 1) {
-        updateSelection(props.items.length - 1);
-        return;
-      }
-    }
-    updateSelection(distances.indexOf(Math.min(...distances)));
+  scrollFrame = requestAnimationFrame(syncScrollSelection);
+};
+const syncScrollSelection = () => {
+  scrollFrame = null;
+  const viewport = viewportEl.value;
+  if (moving.value || !viewport || !props.items.length) return;
+  updateMasks();
+  if (navigationTarget !== undefined) return;
+  const bounds = viewport.getBoundingClientRect();
+  const rtl = isRtl();
+  const edge = vertical.value ? bounds.top : rtl ? bounds.right - 16 : bounds.left + 16;
+  const distances = slideElements().map((slide) => {
+    const rect = slide.getBoundingClientRect();
+    return Math.abs((vertical.value ? rect.top : rtl ? rect.right : rect.left) - edge);
   });
+  if (geometry) {
+    const max = scrollRange();
+    const offset = Math.abs(scrollOffset());
+    const currentOffset = scrollOffsetForIndex(selectedIndex.value);
+    if (Math.abs(currentOffset - offset) < 1) {
+      nativeIndex = selectedIndex.value;
+      return;
+    }
+    if (max > 0 && offset >= max - 1) {
+      requestNativeSelection(props.items.length - 1);
+      return;
+    }
+  }
+  requestNativeSelection(distances.indexOf(Math.min(...distances)));
+};
+const requestNativeSelection = (index) => {
+  if (index === nativeIndex) return;
+  nativeIndex = index;
+  updateSelection(index);
 };
 watch(
   () => props.modelValue,

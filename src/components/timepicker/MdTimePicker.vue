@@ -237,11 +237,7 @@ const syncInputSegments = () => {
 };
 
 const syncFromModel = () => {
-  const parsedValue = parseModelValue(props.modelValue) || getDefaultTime();
-  draftTime.value = {
-    hour24: parsedValue.hour(),
-    minute: parsedValue.minute(),
-  };
+  draftTime.value = parseModelValue(props.modelValue) || getDefaultTime();
   syncInputSegments();
 };
 

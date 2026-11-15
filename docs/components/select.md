@@ -56,6 +56,7 @@ const city = ref('istanbul');
 | ----------------------------- | ----------- | ------------------------------------------------------------------------------ |
 | `modelValue / value`          | `undefined` | Controlled value or initial selection; strings, numbers, booleans, or objects. |
 | `label / supportingText`      | `''`        | Field label and help text.                                                     |
+| `form`                        | `undefined` | ID of the owning form, including when the select is outside it.                |
 | `disabled / required / error` | `false`     | Field state and validation.                                                    |
 | `MdSelectOption.value`        | `''`        | Option value.                                                                  |
 | `MdSelectOption.displayText`  | `''`        | Selected field text; falls back to option text.                                |

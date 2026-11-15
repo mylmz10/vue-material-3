@@ -9,7 +9,8 @@ import { load } from 'js-yaml';
 
 const workflow = load(readFileSync(new URL('../../../.github/workflows/release-please.yml', import.meta.url), 'utf8'));
 const steps = workflow.jobs['release-please-pr'].steps;
-const reconcile = workflow.jobs['reconcile-release'].steps.find((step) => step.id === 'resolve');
+const reconcileSteps = workflow.jobs['reconcile-release'].steps;
+const reconcile = reconcileSteps.find((step) => step.id === 'resolve');
 const tagSha = 'a'.repeat(40);
 const headSha = 'b'.repeat(40);
 let fixture;
@@ -23,12 +24,13 @@ beforeEach(() => {
 case "$1" in
   fetch) exit 0 ;;
   rev-parse) if [ "$2" = --verify ] && [ "$3" = 'refs/tags/v1.2.3^{commit}' ] && [ "$TEST_TAG_EXISTS" = true ]; then printf '%s\\n' "$TEST_TAG_SHA"; else exit 1; fi ;;
+  show) [ "$2" = "$TEST_TAG_SHA:package.json" ] && printf '%s\\n' "$TEST_RELEASE_PACKAGE" ;;
   *) exit 1 ;;
 esac
 `,
     { mode: 0o755 }
   );
-  writeFileSync(path.join(fixture, 'npm'), '#!/bin/sh\nprintf "%s\\n" "$TEST_NPM_RESPONSE"\nexit "$TEST_NPM_STATUS"\n', { mode: 0o755 });
+  writeFileSync(path.join(fixture, 'npm'), '#!/bin/sh\nprintf "%s\\n" "$*" > npm-query\nprintf "%s\\n" "$TEST_NPM_RESPONSE"\nexit "$TEST_NPM_STATUS"\n', { mode: 0o755 });
 });
 afterEach(() => rmSync(fixture, { recursive: true, force: true }));
 const run = (step, env = {}) => {
@@ -46,6 +48,7 @@ const run = (step, env = {}) => {
       TEST_RELEASE_EXISTS: 'true',
       TEST_TAG_EXISTS: 'true',
       TEST_TAG_SHA: tagSha,
+      TAG_NAME: 'v1.2.3',
       ...env,
     },
   });
@@ -87,7 +90,7 @@ describe('release recovery', () => {
     expect(steps.find((step) => step.name === 'Create GitHub release for manual release').if).toContain('steps.manual-release.outputs.created');
     expect(steps.find((step) => step.name === 'Checkout release commit').if).toContain('steps.manual-release.outputs.ready');
     expect(steps.find((step) => step.id === 'publish').if).toContain("steps.npm-publication.outputs.published == 'false'");
-    expect(steps.find((step) => step.name === 'Build docs').if).toContain("steps.npm-publication.outputs.published == 'true'");
+    expect(steps.find((step) => step.id === 'deploy-source').if).toContain("steps.npm-publication.outputs.published == 'true'");
     expect(steps.find((step) => step.name === 'Roll back failed release by opening PR').if).toContain("steps.publish.outcome == 'failure'");
   });
 });
@@ -112,6 +115,48 @@ describe('npm publication status', () => {
     const result = run(check, { TEST_NPM_STATUS, TEST_NPM_RESPONSE });
     expect(result.status).not.toBe(0);
     expect(result.outputs.published).toBeUndefined();
+  });
+});
+
+describe('publication status before release rollback', () => {
+  const rollbackCheck = steps.find((step) => step.id === 'rollback-publication');
+  const reconcileCheck = reconcileSteps.find((step) => step.id === 'reconcile-publication');
+  const destructiveSteps = [
+    [steps, rollbackCheck, 'Roll back failed release by opening PR', {}],
+    [reconcileSteps, reconcileCheck, 'Reconcile release by opening rollback PR', { RELEASE_REVISION: tagSha }],
+  ];
+
+  it.each(destructiveSteps)('requires a fresh confirmation of absence before %s', (jobSteps, check, operation, env) => {
+    const cleanup = jobSteps.find((step) => step.name === operation);
+    expect(jobSteps.indexOf(cleanup)).toBe(jobSteps.indexOf(check) + 1);
+    expect(cleanup.if).toContain(`steps.${check.id}.outputs.published == 'false'`);
+    expect(check.env.REQUIRE_UNPUBLISHED).toBe('true');
+    expect(check.run).toBe(steps.find((step) => step.id === 'npm-publication').run);
+    const guards = { ...check.env, TAG_NAME: 'v1.2.3', ...env, TEST_RELEASE_PACKAGE: JSON.stringify({ name: 'vue-material-3', version: '1.2.3' }) };
+    const published = run(check, { ...guards, TEST_NPM_STATUS: '0', TEST_NPM_RESPONSE: '"1.2.3"' });
+    expect(published.status).toBe(1);
+    expect(published.outputs.published).toBe('true');
+    expect(published.stdout).toContain('Release metadata was preserved.');
+    const unknown = run(check, { ...guards, TEST_NPM_STATUS: '1', TEST_NPM_RESPONSE: '{"error":{"code":"ETIMEDOUT"}}' });
+    expect(unknown.status).toBe(1);
+    expect(unknown.outputs).toEqual({});
+    const unpublished = run(check, { ...guards, TEST_NPM_STATUS: '1', TEST_NPM_RESPONSE: '{"error":{"code":"E404"}}' });
+    expect(unpublished.status, unpublished.stderr).toBe(0);
+    expect(unpublished.outputs.published).toBe('false');
+  });
+
+  it('queries the package from the resolved tag instead of master', () => {
+    writeFileSync(path.join(fixture, 'package.json'), JSON.stringify({ name: 'new-package', version: '2.0.0' }));
+    const result = run(reconcileCheck, {
+      RELEASE_REVISION: tagSha,
+      REQUIRE_UNPUBLISHED: 'true',
+      TEST_RELEASE_PACKAGE: JSON.stringify({ name: 'old-package', version: '1.2.3' }),
+      TEST_NPM_STATUS: '1',
+      TEST_NPM_RESPONSE: '{"error":{"code":"E404"}}',
+    });
+    expect(reconcileCheck.env.RELEASE_REVISION).toBe('${{ steps.resolve.outputs.release_sha }}');
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(path.join(fixture, 'npm-query'), 'utf8')).toContain('view old-package@1.2.3 version');
   });
 });
 

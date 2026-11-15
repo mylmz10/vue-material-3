@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: Vue Material 3
-  text: Material Design 3 components for Vue 3.
+  text: "Material Design 3 components for Vue\u00a03."
   tagline: Practical, composable UI primitives with live examples, component references, and setup guides.
   actions:
     - theme: brand
@@ -25,6 +25,12 @@ features:
   - title: Live Examples
     details: Explore live examples in each component reference and additional variants and Controls in Storybook.
 ---
+
+<script setup>
+import ComponentGalleryFrame from './.vitepress/theme/ComponentGalleryFrame.vue';
+</script>
+
+<ComponentGalleryFrame />
 
 ## Storybook
 

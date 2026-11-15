@@ -8,22 +8,26 @@ Floating action buttons represent the primary action on a screen.
   <MdFab aria-label="Create" icon="add" size="small" />
   <MdFab aria-label="Create" icon="add" />
   <MdFab aria-label="Create" icon="add" size="large" />
-  <MdBrandedFab aria-label="Book a taxi" icon="local_taxi" />
-  <MdBrandedFab aria-label="Book a taxi" icon="local_taxi" size="large" />
+  <MdBrandedFab aria-label="Book a taxi">
+    <template #icon><MdIcon style="color: var(--md-sys-color-primary); font-size: inherit">local_taxi</MdIcon></template>
+  </MdBrandedFab>
+  <MdBrandedFab aria-label="Book a taxi" size="large">
+    <template #icon><MdIcon style="color: var(--md-sys-color-primary); font-size: inherit">local_taxi</MdIcon></template>
+  </MdBrandedFab>
   <MdFabExtended icon="add" label="Create" />
 </div>
 
 ## Import
 
 ```js
-import { MdFab, MdBrandedFab, MdFabExtended } from 'vue-material-3';
+import { MdFab, MdBrandedFab, MdFabExtended, MdIcon } from 'vue-material-3';
 ```
 
 ## Usage
 
 ```vue
 <script setup>
-import { MdFab, MdBrandedFab, MdFabExtended } from 'vue-material-3';
+import { MdFab, MdBrandedFab, MdFabExtended, MdIcon } from 'vue-material-3';
 </script>
 
 <template>
@@ -31,8 +35,11 @@ import { MdFab, MdBrandedFab, MdFabExtended } from 'vue-material-3';
   <MdFab aria-label="Create" icon="add" />
   <MdFab aria-label="Create" icon="add" size="large" />
 
-  <MdBrandedFab aria-label="Book a taxi" icon="local_taxi" />
-  <MdBrandedFab aria-label="Book a taxi" icon="local_taxi" size="large" />
+  <MdBrandedFab aria-label="Book a taxi">
+    <template #icon>
+      <MdIcon style="color: var(--md-sys-color-primary); font-size: inherit">local_taxi</MdIcon>
+    </template>
+  </MdBrandedFab>
 
   <MdFabExtended icon="add" label="Create" />
 </template>
@@ -56,7 +63,7 @@ Use native `@click` to handle the action.
 
 ### Slots
 
-`MdBrandedFab` provides an `icon` slot. `MdFab` and `MdFabExtended` have no public slots.
+`MdBrandedFab` provides an `icon` slot. The taxi icon in the example uses the primary color token, so it follows the selected palette. `MdFab` and `MdFabExtended` have no public slots.
 
 ### Sizes
 

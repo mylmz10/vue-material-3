@@ -5,18 +5,40 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { load } from 'js-yaml';
 
 const workflow = load(readFileSync(new URL('../../../.github/workflows/release-please.yml', import.meta.url), 'utf8'));
+const deployment = load(readFileSync(new URL('../../../.github/workflows/deploy-storybook.yml', import.meta.url), 'utf8'));
 const steps = workflow.jobs['release-please-pr'].steps;
+const deploySteps = deployment.jobs.deploy.steps;
 const releaseRef = '${{ steps.release-meta.outputs.sha || steps.manual-release.outputs.sha }}';
 const releaseTag = '${{ steps.release-meta.outputs.tag_name || steps.manual-release.outputs.tag_name }}';
 const sha = 'a'.repeat(40);
+const require = createRequire(import.meta.url);
+const semverModules = path.dirname(path.dirname(require.resolve('semver/package.json')));
 let fixture;
 
 beforeEach(() => {
   fixture = mkdtempSync(path.join(tmpdir(), 'release-check-'));
   writeFileSync(path.join(fixture, 'package.json'), JSON.stringify({ version: '1.2.3' }));
+  writeFileSync(
+    path.join(fixture, 'npm'),
+    `#!/bin/sh
+[ "$1 $2 $3" = "view vue-material-3@latest version" ] || exit 1
+attempt=1
+if [ -f npm-attempt ]; then attempt=$(($(cat npm-attempt) + 1)); fi
+echo "$attempt" > npm-attempt
+if [ "$attempt" -lt "$TEST_NPM_SETTLES_AT" ]; then
+  echo '"1.2.2"'
+else
+  printf '%s\\n' "$TEST_NPM_RESPONSE"
+fi
+exit "$TEST_NPM_STATUS"
+`,
+    { mode: 0o755 }
+  );
+  writeFileSync(path.join(fixture, 'sleep'), '#!/bin/sh\n[ "$1" = 5 ]\n', { mode: 0o755 });
   writeFileSync(
     path.join(fixture, 'git'),
     '#!/bin/sh\ncase "$*" in\n  "rev-parse HEAD") echo "$TEST_HEAD_SHA" ;;\n  "rev-parse --verify refs/tags/"*) test -n "$TEST_TAG_SHA" && echo "$TEST_TAG_SHA" ;;\n  *) exit 1 ;;\nesac\n',
@@ -85,5 +107,54 @@ describe('release publication source', () => {
     expect(validateStep.if).toBe(steps.find((step) => step.name === 'Checkout release commit').if);
     expect(index('Validate release')).toBeGreaterThan(index('Install dependencies'));
     expect(index('Validate release')).toBeLessThan(index('Publish package on NPM 📦'));
+  });
+});
+
+describe('Pages deployment source', () => {
+  const check = deploySteps.find((step) => step.id === 'deployment-version');
+
+  it('sends the verified release checkout to the shared serialized Pages job', () => {
+    const resolve = steps.find((step) => step.id === 'deploy-source');
+    const releaseJob = workflow.jobs['release-please-pr'];
+    const deployJob = workflow.jobs['deploy-release'];
+    expect(resolve.run).toContain('git rev-parse HEAD');
+    expect(releaseJob.outputs.deploy_sha).toBe('${{ steps.deploy-source.outputs.sha }}');
+    expect(deployJob.uses).toBe('./.github/workflows/deploy-storybook.yml');
+    expect(deployJob.with.release_sha).toBe('${{ needs.release-please-pr.outputs.deploy_sha }}');
+    expect(deployment.jobs.deploy.concurrency).toEqual({ group: 'deploy-site', queue: 'max' });
+    expect(deploySteps.find((step) => step.uses === 'actions/checkout@v4').with.ref).toContain('inputs.release_sha ||');
+    expect(deploySteps.at(-2)).toBe(check);
+    expect(deploySteps.at(-1).if).toContain("steps.deployment-version.outputs.current == 'true'");
+    expect(deploySteps.at(-1).if).toContain("github.event_name == 'workflow_dispatch' && inputs.release_sha == ''");
+  });
+
+  it.each([
+    ['exact version', '"1.2.3"', '0', '1', 0, 'current=true\n', '1'],
+    ['newer version', '"1.2.10"', '0', '1', 0, '', '1'],
+    ['older version then exact', '"1.2.3"', '0', '3', 0, 'current=true\n', '3'],
+    ['older version then newer', '"1.2.4"', '0', '3', 0, '', '3'],
+    ['persistently older version', '"1.2.2"', '0', '1', 1, '', '4'],
+    ['registry failure', '{"error":"E503"}', '1', '1', 1, '', '1'],
+    ['unexpected response', '["1.2.3"]', '0', '1', 1, '', '1'],
+  ])('handles npm latest showing %s', (_, response, npmStatus, settlesAt, status, output, attempts) => {
+    writeFileSync(path.join(fixture, 'package.json'), JSON.stringify({ name: 'vue-material-3', version: '1.2.3' }));
+    const githubOutput = path.join(fixture, 'output');
+    writeFileSync(githubOutput, '');
+    const result = spawnSync('bash', ['-c', check.run], {
+      cwd: fixture,
+      env: {
+        ...process.env,
+        PATH: `${fixture}${path.delimiter}${process.env.PATH}`,
+        NODE_PATH: semverModules,
+        GITHUB_OUTPUT: githubOutput,
+        TEST_NPM_RESPONSE: response,
+        TEST_NPM_STATUS: npmStatus,
+        TEST_NPM_SETTLES_AT: settlesAt,
+      },
+      encoding: 'utf8',
+    });
+    expect(result.status, result.stderr).toBe(status);
+    expect(readFileSync(githubOutput, 'utf8')).toBe(output);
+    expect(readFileSync(path.join(fixture, 'npm-attempt'), 'utf8').trim()).toBe(attempts);
   });
 });

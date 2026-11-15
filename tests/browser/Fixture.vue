@@ -39,6 +39,8 @@ const state = reactive({
   side: false,
   rail: 0,
   carousel: 0,
+  rejectCarouselSelection: false,
+  carouselRequests: [],
   segment: 0,
   dialog: false,
   auditDialog: false,
@@ -68,6 +70,11 @@ const state = reactive({
   progress: 40,
   loading: false,
 });
+
+function onCarouselSelection(index) {
+  if (state.rejectCarouselSelection) state.carouselRequests.push(index);
+  else state.carousel = index;
+}
 const mounted = ref(true);
 window.fixture = { state, mounted, components };
 </script>
@@ -141,7 +148,8 @@ window.fixture = { state, mounted, components };
       />
       <div class="carousel-docs-layout" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; min-width: 0">
         <MdCarousel
-          v-model="state.carousel"
+          :model-value="state.carousel"
+          @update:model-value="onCarouselSelection"
           :items="[
             { label: 'First', image: coast },
             { label: 'Second', image: coast },
@@ -187,11 +195,13 @@ window.fixture = { state, mounted, components };
           ]"
         />
       </section>
-      <section id="autocomplete-modal">
+      <form id="autocomplete-modal">
         <MdOutlinedAutoComplete
           v-model="state.modalAutocompleteId"
           label="Modal assignee"
           mode="modal"
+          name="assignee"
+          required
           clearable
           :items="[
             { value: 1, label: 'Alex' },
@@ -199,7 +209,7 @@ window.fixture = { state, mounted, components };
             { value: 3, label: 'Disabled', disabled: true },
           ]"
         />
-      </section>
+      </form>
       <section id="autocomplete"><MdOutlinedAutoComplete v-model="state.text" label="City" :items="['Berlin', 'Boston', 'Paris']" :readonly="state.readonly" :disabled="state.disabled" /></section>
       <section id="select">
         <MdOutlinedSelect v-model="state.selected" label="Selection" required
