@@ -36,7 +36,7 @@ Load Roboto and Material Symbols Outlined in your app to use the default typogra
 The library includes buttons, form controls, navigation, menus, dialogs, sheets, carousels, and date and time pickers. Each component reference lists its imports, props, events, and slots. [Component index](docs/components/index.md)
 
 - **Autocomplete** accepts strings, numbers, and labeled options. It offers docked and modal suggestions, filters locally as you type, and preserves the current selection when you leave an unconfirmed search. Use the optional debounced event for external searches. [Autocomplete](docs/components/autocomplete.md)
-- **Carousel** offers multi-browse and uncontained layouts with mouse dragging, velocity-based settling, keyboard navigation, and a show-all view. [Carousel](docs/components/carousel.md)
+- **Carousel** offers multi-browse, uncontained, hero, and full-screen layouts with mouse dragging, velocity-based settling, keyboard navigation, and controlled selection. [Carousel](docs/components/carousel.md)
 
 Apply `.dark` or `data-theme="dark"` to an ancestor to switch its color scheme. Override CSS custom properties to adapt the theme to your application. [Theming guide](docs/guide/theming.md)
 

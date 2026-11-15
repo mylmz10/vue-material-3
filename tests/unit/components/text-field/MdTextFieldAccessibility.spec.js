@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { h } from 'vue';
+import { createSSRApp, h, nextTick } from 'vue';
+import { renderToString } from 'vue/server-renderer';
 import { computeAccessibleDescription, computeAccessibleName } from 'dom-accessibility-api';
 import MdFilledTextField from '@/components/text-field/MdFilledTextField.vue';
 import MdOutlinedTextField from '@/components/text-field/MdOutlinedTextField.vue';
@@ -71,6 +72,32 @@ describe.each([
     expect(inputs[0].getAttribute('aria-describedby')).not.toBe(inputs[1].getAttribute('aria-describedby'));
     expect(inputs.map((input) => computeAccessibleName(input))).toEqual(['First', 'Second']);
     expect(computeAccessibleDescription(inputs[1])).toBe('Slot help 5/10');
+  });
+
+  it('preserves the native input ID and exposed control methods through hydration', async () => {
+    const container = document.createElement('div');
+    document.body.append(container);
+    const createField = () => createSSRApp(component, { label: 'Email', supportingText: 'Use your work email' });
+    container.innerHTML = await renderToString(createField());
+    const serverInput = container.querySelector('input');
+    const app = createField();
+    const field = app.mount(container);
+    try {
+      expect(field.getInputEl()).toBe(serverInput);
+      expect(computeAccessibleName(serverInput)).toBe('Email');
+      expect(computeAccessibleDescription(serverInput)).toBe('Use your work email');
+      field.focus();
+      expect(document.activeElement).toBe(serverInput);
+      field.setCustomValidity('Invalid email');
+      expect(field.checkValidity()).toBe(false);
+      field.setCustomValidity('');
+      expect(field.reportValidity()).toBe(true);
+      field.blur();
+      await nextTick();
+      expect(document.activeElement).not.toBe(serverInput);
+    } finally {
+      app.unmount();
+    }
   });
 });
 

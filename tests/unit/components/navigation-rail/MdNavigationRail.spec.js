@@ -52,4 +52,25 @@ describe('MdNavigationRail', () => {
     await wrapper.setProps({ items });
     expect(wrapper.findAll('[tabindex="0"]')).toHaveLength(1);
   });
+
+  it('keeps focus and the active destination when expanding an icon-only Expressive rail', async () => {
+    const wrapper = mount(MdNavigationRail, {
+      attachTo: document.body,
+      props: { items, modelValue: 2, labels: 'none', variant: 'expressive' },
+    });
+    const inbox = wrapper.findAll('button')[2];
+    inbox.element.focus();
+    expect(inbox.get('.md-badge').classes()).toContain('md-badge--absolute');
+
+    await wrapper.setProps({ expanded: true });
+    expect(document.activeElement).toBe(inbox.element);
+    expect(inbox.attributes('aria-current')).toBe('page');
+    expect(inbox.get('.md-navigation-rail__expanded-label').text()).toBe('Inbox');
+    expect(inbox.get('.md-badge').classes()).not.toContain('md-badge--absolute');
+
+    await wrapper.setProps({ expanded: false });
+    expect(document.activeElement).toBe(inbox.element);
+    expect(inbox.find('.md-navigation-rail__expanded-label').exists()).toBe(false);
+    wrapper.unmount();
+  });
 });

@@ -8,6 +8,8 @@
       :label="label"
       :disabled="disabled"
       :readonly="readonly || mode === 'modal'"
+      :required="required"
+      :invalid="validationInvalid || $attrs.invalid"
       role="combobox"
       aria-autocomplete="list"
       :aria-haspopup="mode === 'modal' ? 'dialog' : 'listbox'"
@@ -26,6 +28,21 @@
         </button>
       </template>
     </component>
+    <input
+      v-if="mode === 'modal' && required && !readonly"
+      class="md-autocomplete__validation"
+      type="text"
+      :form="$attrs.form"
+      :value="validationValue"
+      :disabled="disabled"
+      required
+      tabindex="-1"
+      aria-hidden="true"
+      @invalid.prevent="onInvalid"
+      @focus="textFieldEl?.focus()"
+      @beforeinput.prevent
+      @input="(event) => (event.target.value = validationValue)"
+    />
     <MdAutocompletePopup v-if="mode === 'docked'" :open="opened" :anchor="() => textFieldEl?.getInputEl()?.closest('.md-field')" @dismiss="close()">
       <AutocompleteList />
     </MdAutocompletePopup>
@@ -97,9 +114,16 @@ const opened = ref(false);
 const activeIndex = ref(-1);
 const initialValue = shallowRef(props.modelValue);
 const selectedValue = ref(props.modelValue);
+const validationValue = computed(() => (selectedValue.value == null ? '' : 'selected'));
+const validationInvalid = ref(false);
 const dirty = ref(false);
 let filterTimer;
 let suppressFocus = false;
+
+const onInvalid = () => {
+  validationInvalid.value = true;
+  textFieldEl.value?.focus();
+};
 
 const isValue = (value) =>
   typeof value === 'string' || typeof value === 'boolean' || (typeof value === 'number' && Number.isFinite(value)) || (value != null && typeof value === 'object' && !Array.isArray(value));
@@ -244,6 +268,9 @@ const onKeydown = async (event) => {
 };
 
 watch(filteredItems, () => (activeIndex.value = -1), { deep: true });
+watch([selectedValue, () => props.required, () => props.disabled, () => props.readonly, () => props.mode], () => {
+  validationInvalid.value = false;
+});
 watch(
   () => props.modelValue,
   (value) => {
@@ -264,6 +291,7 @@ if (parentDialog)
 useFormReset(
   () => textFieldEl.value?.getInputEl(),
   () => {
+    validationInvalid.value = false;
     selectedValue.value = initialValue.value;
     close();
     resetQuery();
@@ -281,12 +309,25 @@ onBeforeUnmount(cancelFilter);
   background-color: #{theme.value('secondary-container')};
 }
 
+.md-autocomplete [role='option']:not([aria-disabled='true']):hover > .md-list-item__state-layer {
+  background-color: #{theme.value('on-surface')};
+  opacity: 0.12;
+}
+
 .md-autocomplete {
+  position: relative;
   width: 100%;
   .md-filled-text-field,
   .md-outlined-text-field {
     width: 100%;
   }
+}
+.md-autocomplete__validation {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 .md-autocomplete__clear {
   display: inline-flex;

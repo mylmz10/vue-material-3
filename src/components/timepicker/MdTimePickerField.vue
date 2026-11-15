@@ -11,6 +11,7 @@
         :error="error"
         :error-text="errorText"
         :readonly="true"
+        :required="required"
         :disabled="disabled"
       >
         <template #end>
@@ -21,6 +22,7 @@
       </component>
     </div>
 
+    <MdRequiredSelection v-if="required" :form="$attrs.form" :has-selection="hasSelection" :disabled="disabled" @invalid="fieldEl?.focus()" />
     <MdTimePicker
       :open="isOpen"
       :modelValue="modelValue"
@@ -41,14 +43,16 @@ import { computed, nextTick, onBeforeMount, ref, watch } from 'vue';
 import MdFilledTextField from '../text-field/MdFilledTextField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdOutlinedTextField from '../text-field/MdOutlinedTextField.vue';
+import MdRequiredSelection from '../field/MdRequiredSelection.vue';
 import MdTimePicker from './MdTimePicker.vue';
-import { formatDisplayValue } from './timePickerUtils';
+import { formatDisplayValue, parseModelValue } from './timePickerUtils';
 
 import { getControlAttrs } from '../field/fieldAttrs';
 
 defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
+  required: Boolean,
   cancelText: {
     type: String,
     default: 'Cancel',
@@ -103,6 +107,7 @@ const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
 const fieldEl = ref(null);
+const hasSelection = computed(() => !!parseModelValue(props.modelValue));
 let initialValue;
 onBeforeMount(() => {
   initialValue = props.modelValue;
@@ -127,8 +132,9 @@ useFormReset(
     // Let the nested field apply its reset before restoring the current display format.
     await nextTick();
     if (!fieldEl.value) return;
-    syncDisplayValue(initialValue);
     emit('update:modelValue', initialValue);
+    await nextTick();
+    if (fieldEl.value) syncDisplayValue(props.modelValue);
   }
 );
 

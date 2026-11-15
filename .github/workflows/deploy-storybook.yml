@@ -4,6 +4,11 @@ on:
   release:
     types:
       - published
+  workflow_call:
+    inputs:
+      release_sha:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       ref:
@@ -15,19 +20,18 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: deploy-site
-  cancel-in-progress: true
-
 jobs:
   deploy:
-    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v') }}
+    if: ${{ inputs.release_sha != '' || github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v') }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-site
+      queue: max
     steps:
       - name: Checkout release tag
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.release.tag_name }}
+          ref: ${{ inputs.release_sha || (github.event_name == 'workflow_dispatch' && inputs.ref) || github.event.release.tag_name }}
 
       - name: Setup Node.js 22.x
         uses: actions/setup-node@v4
@@ -44,7 +48,36 @@ jobs:
       - name: Build Storybook under docs
         run: npm run build-storybook -- -o docs/.vitepress/dist/storybook
 
+      - name: Verify deployment matches npm latest
+        id: deployment-version
+        if: ${{ inputs.release_sha != '' || github.event_name != 'workflow_dispatch' }}
+        run: |
+          set -euo pipefail
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          for ATTEMPT in 1 2 3 4; do
+            RESPONSE=$(npm view "${PACKAGE_NAME}@latest" version --json --prefer-online --registry=https://registry.npmjs.org)
+            LATEST=$(node -e 'const version = JSON.parse(process.argv[1]); if (typeof version !== "string" || !require("semver").valid(version)) process.exit(1); console.log(version)' "$RESPONSE")
+            if [ "$LATEST" = "$VERSION" ]; then
+              echo "current=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            ORDER=$(node -p 'require("semver").compare(process.argv[1], process.argv[2])' "$LATEST" "$VERSION")
+            if [ "$ORDER" = 1 ]; then
+              echo "::notice::Skipping Pages deployment for ${VERSION}. npm latest is newer (${LATEST})."
+              exit 0
+            fi
+            if [ "$ORDER" = 0 ] || [ "$ATTEMPT" = 4 ]; then
+              break
+            fi
+            echo "Waiting for npm latest to reach ${VERSION} (currently ${LATEST})."
+            sleep 5
+          done
+          echo "::error::Expected npm latest to be ${VERSION}, found ${LATEST}. Retry the Pages deployment once npm reflects the release."
+          exit 1
+
       - name: Deploy site to gh-pages
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.release_sha == '') || steps.deployment-version.outputs.current == 'true' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

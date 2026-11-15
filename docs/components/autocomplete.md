@@ -53,6 +53,7 @@ const cities = ['Istanbul', 'Ankara', 'Izmir'];
 | `disabled / readonly` | `false`               | Prevent editing, clearing and opening suggestions.                                                                                                                                |
 | `mode`                | `'docked'`            | `'docked'` dropdown or `'modal'` dialog with its own search input.                                                                                                                |
 | `clearable`           | `false`               | Show a clear button when there is a value or search text. Clearing emits `null`.                                                                                                  |
+| `required`            | `false`               | Enables native form validation. In modal mode, the form requires a committed selection. |
 | `clearLabel`          | `'Clear selection'`   | Accessible label for the clear button.                                                                                                                                            |
 | `closeLabel`          | `'Close suggestions'` | Modal close button label.                                                                                                                                                         |
 | `noResultsText`       | `'No data available'` | Message when no options match.                                                                                                                                                    |

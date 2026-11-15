@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import MdDatePickerField from '@/components/datepicker/MdDatePickerField.vue';
 import MdFilledDatePickerField from '@/components/datepicker/MdFilledDatePickerField.vue';
 import MdOutlinedDatePickerField from '@/components/datepicker/MdOutlinedDatePickerField.vue';
@@ -15,6 +16,38 @@ describe('MdDatePickerField', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it('requires a complete committed range in modal mode', async () => {
+    const form = document.createElement('form');
+    document.body.append(form);
+    const wrapper = mount(MdDatePickerField, {
+      attachTo: form,
+      props: { pickerVariant: 'modal', selectionMode: 'range', required: true, name: 'dates' },
+    });
+    try {
+      expect(form.reportValidity()).toBe(false);
+      expect(document.activeElement).toBe(wrapper.get('input[name="dates"]').element);
+      await wrapper.setProps({ modelValue: { start: '2026-03-14', end: null } });
+      expect(form.checkValidity()).toBe(false);
+      await wrapper.setProps({ modelValue: { start: '2026-03-14', end: '2026-03-18' } });
+      expect(form.checkValidity()).toBe(true);
+      expect(new FormData(form).getAll('dates')).toHaveLength(1);
+      const selectedDates = new FormData(form).get('dates');
+      form.reset();
+      await nextTick();
+      await nextTick();
+      await nextTick();
+      await nextTick();
+      expect(wrapper.emitted('update:modelValue')).toEqual([[null]]);
+      expect(form.checkValidity()).toBe(true);
+      expect(new FormData(form).get('dates')).toBe(selectedDates);
+      await wrapper.setProps({ modelValue: null, readonly: true });
+      expect(form.checkValidity()).toBe(true);
+    } finally {
+      wrapper.unmount();
+      form.remove();
+    }
   });
 
   it('opens the docked picker and commits the selected date', async () => {

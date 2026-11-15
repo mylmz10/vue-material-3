@@ -1,7 +1,14 @@
 <script setup>
 import { ref } from 'vue';
-const lastAction = ref('No action yet');
+const drawerOpen = ref(false);
+const destination = ref('Library');
+const lastAction = ref('');
 const actions = [{ icon: 'search', label: 'Search library' }];
+const destinations = ['Library', 'Reading list', 'Favorites'];
+function chooseDestination(item) {
+  destination.value = item;
+  drawerOpen.value = false;
+}
 </script>
 
 # Top App Bar
@@ -12,18 +19,27 @@ const actions = [{ icon: 'search', label: 'Search library' }];
 
 <div class="md-doc-preview md-doc-preview--column">
   <div id="docs-app-bar-scroll" class="md-doc-preview__scroll">
-    <MdTopAppBar title="Library" navigation-icon="menu" navigation-label="Open menu" :actions="actions"
+    <MdTopAppBar :title="destination" navigation-icon="menu" navigation-label="Open library navigation" :actions="actions"
       variant="large" scroll-behavior="collapse" scroll-target="#docs-app-bar-scroll"
-      @navigation="lastAction = 'Menu opened'" @action="lastAction = $event.label" />
+      @navigation="drawerOpen = true" @action="lastAction = $event.label" />
     <div class="md-doc-preview__scroll-content">Scroll this panel to collapse the app bar.</div>
   </div>
-  <p role="status">{{ lastAction }}</p>
+  <MdNavigationDrawer :opened="drawerOpen" modal aria-label="Library destinations" @change="drawerOpen = $event">
+    <nav aria-label="Library">
+      <MdList>
+        <MdListItem v-for="item in destinations" :key="item" :headline="item" :selected="destination === item"
+          :aria-current="destination === item ? 'page' : undefined" interactive @click="chooseDestination(item)" />
+      </MdList>
+      <MdTextButton label="Close menu" @click="drawerOpen = false" />
+    </nav>
+  </MdNavigationDrawer>
+  <p v-if="lastAction" role="status">{{ lastAction }}</p>
 </div>
 
 ## Import
 
 ```js
-import { MdTopAppBar } from 'vue-material-3';
+import { MdTopAppBar, MdNavigationDrawer } from 'vue-material-3';
 ```
 
 ## Usage
@@ -31,14 +47,18 @@ import { MdTopAppBar } from 'vue-material-3';
 ```vue
 <script setup>
 import { ref } from 'vue';
-import { MdTopAppBar } from 'vue-material-3';
-const lastAction = ref('');
-const actions = [{ icon: 'search', label: 'Search library' }];
+import { MdTopAppBar, MdNavigationDrawer, MdTextButton } from 'vue-material-3';
+const drawerOpen = ref(false);
 </script>
 
 <template>
-  <MdTopAppBar title="Library" navigation-icon="menu" navigation-label="Open menu" :actions="actions" @navigation="lastAction = 'Menu opened'" @action="lastAction = $event.label" />
-  <p role="status">{{ lastAction }}</p>
+  <MdTopAppBar title="Library" navigation-icon="menu" navigation-label="Open library navigation" @navigation="drawerOpen = true" />
+  <MdNavigationDrawer :opened="drawerOpen" modal aria-label="Library destinations" @change="drawerOpen = $event">
+    <nav aria-label="Library">
+      <a href="/library">Library</a>
+      <MdTextButton label="Close menu" @click="drawerOpen = false" />
+    </nav>
+  </MdNavigationDrawer>
 </template>
 ```
 

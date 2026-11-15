@@ -1,0 +1,108 @@
+@use 'sass:map';
+@use '../../styles/tokens';
+@use '../../styles/theme/md-sys-color' as theme;
+
+@mixin select-styles($variant, $theme) {
+  $class: '.md-#{$variant}-select';
+
+  #{$class}-menu {
+    --md-select-option-container-height: #{map.get($theme, menu-list-item-container-height)};
+    --md-select-option-label-text-color: #{theme.value('on-surface')};
+    --md-select-option-label-text-font: #{map.get($theme, menu-list-item-label-text-font)};
+    --md-select-option-label-text-line-height: #{map.get($theme, menu-list-item-label-text-line-height)};
+    --md-select-option-label-text-size: #{map.get($theme, menu-list-item-label-text-size)};
+    --md-select-option-label-text-tracking: #{map.get($theme, menu-list-item-label-text-tracking)};
+    --md-select-option-label-text-weight: #{map.get($theme, menu-list-item-label-text-weight)};
+    --md-select-option-selected-container-color: #{theme.value('surface-container-highest')};
+    width: 100%;
+
+    .md-menu__activator {
+      display: block;
+      width: 100%;
+    }
+
+    .md-menu__content {
+      left: 0;
+      right: 0;
+      width: 100%;
+    }
+  }
+
+  #{$class} {
+    display: block;
+    width: 100%;
+
+    .md-field--#{$variant} {
+      width: 100%;
+    }
+
+    &__hidden-input {
+      block-size: 1px;
+      inline-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    &__trigger {
+      align-items: center;
+      appearance: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 0;
+      min-height: 56px;
+      padding: 0;
+      text-align: left;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &__value {
+      align-items: center;
+      color: #{theme.value('on-surface')};
+      display: inline-flex;
+      font-family: map.get($theme, text-field-input-text-font);
+      font-size: map.get($theme, text-field-input-text-size);
+      font-weight: map.get($theme, text-field-input-text-weight);
+      letter-spacing: map.get($theme, text-field-input-text-tracking);
+      line-height: map.get($theme, text-field-input-text-line-height);
+      width: 100%;
+    }
+
+    &__value--placeholder {
+      color: #{theme.value('on-surface-variant')};
+    }
+
+    &__icon {
+      color: #{theme.value('on-surface-variant')};
+      transition: transform 0.2s ease;
+      user-select: none;
+    }
+
+    &--open {
+      #{$class}__icon {
+        transform: rotate(180deg);
+      }
+    }
+
+    &--disabled {
+      #{$class}__trigger {
+        cursor: default;
+      }
+    }
+
+    &__list {
+      max-height: 320px;
+      min-width: 100%;
+      padding-block: 0;
+    }
+  }
+}
+
+@include select-styles('filled', tokens.md-comp-filled-select-values());
+@include select-styles('outlined', tokens.md-comp-outlined-select-values());

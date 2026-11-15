@@ -1,278 +1,40 @@
 <template>
-  <span class="md-outlined-text-field" :class="$attrs.class" :style="$attrs.style" @click="onClick">
-    <MdOutlinedField
-      :input-id="$attrs.id || inputId"
-      :supporting-text-id="supportingTextId"
-      :disabled="disabled"
-      :label="label"
-      :populated="!!inputValue"
-      :error="error"
-      :required="required"
-      :style="{ '--md-field-label-offset': `${labelOffsetWithBase}px` }"
-    >
-      <template v-if="slots.start" #start>
-        <slot name="start" />
-      </template>
-
-      <MdTextFieldBase
-        ref="textFieldEl"
-        v-bind="getControlAttrs($attrs)"
-        :id="$attrs.id || inputId"
-        :aria-describedby="[$attrs['aria-describedby'], hasSupportingText ? supportingTextId : null].filter(Boolean).join(' ') || undefined"
-        :autocomplete="autocomplete"
-        :autofocus="autofocus"
-        :disabled="disabled"
-        :form="form"
-        :inputmode="inputmode"
-        :list="list"
-        :max="max"
-        :maxlength="maxlength"
-        :min="min"
-        :minlength="minlength"
-        :name="name"
-        :pattern="pattern"
-        :placeholder="resolvedPlaceholder"
-        :prefix="resolvedPrefix"
-        :readonly="readonly"
-        :required="required"
-        :step="step"
-        :suffix="suffix"
-        :type="type"
-        :value="inputValue"
-        :aria-invalid="ariaInvalid || $attrs['aria-invalid']"
-        @input="onTextFieldInput"
-        @change="onTextFieldChange"
-        @focus="onTextFieldFocus"
-        @blur="onTextFieldBlur"
-        @select="$emit('select', $event)"
-        @keyup="$emit('keyup', $event)"
-        @keydown="$emit('keydown', $event)"
-        @invalid="$emit('invalid', $event)"
-      >
-        <template v-if="showPrefixSlot" #prefix>
-          <slot name="prefix" />
-        </template>
-        <template v-if="slots.suffix" #suffix>
-          <slot name="suffix" />
-        </template>
-      </MdTextFieldBase>
-
-      <template v-if="slots.end" #end>
-        <slot name="end" />
-      </template>
-
-      <template #supporting-text>
-        <slot name="supporting-text">{{ resolvedSupportingText }}</slot>
-      </template>
-      <template #supporting-text-end>
-        <slot name="supporting-text-end">{{ supportingTextEnd }}</slot>
-      </template>
-    </MdOutlinedField>
-  </span>
+  <MdTextField
+    ref="field"
+    v-bind="{ ...$attrs, ...$props }"
+    variant="outlined"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    @input="$emit('input', $event)"
+    @change="$emit('change', $event)"
+    @focus="$emit('focus', $event)"
+    @blur="$emit('blur', $event)"
+    @select="$emit('select', $event)"
+    @keyup="$emit('keyup', $event)"
+    @keydown="$emit('keydown', $event)"
+    @invalid="$emit('invalid', $event)"
+  >
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps" />
+    </template>
+  </MdTextField>
 </template>
 
 <script setup>
-import { useFormReset } from '../../composables/useFormReset';
-import { computed, nextTick, onMounted, ref, useId, useSlots, watch } from 'vue';
-import MdTextFieldBase from './MdTextFieldBase.vue';
-import MdOutlinedField from '../field/MdOutlinedField.vue';
-import { getControlAttrs } from '../field/fieldAttrs';
+import { ref } from 'vue';
+import MdTextField from './MdTextField.vue';
+import { textFieldEmits, textFieldProps } from './textFieldProps';
 
 defineOptions({ inheritAttrs: false });
+defineProps(textFieldProps);
+defineEmits(textFieldEmits);
 
-const slots = useSlots();
-const inputId = `md-text-field-${useId()}`;
-const supportingTextId = `${inputId}-supporting`;
-
-const props = defineProps({
-  autocomplete: { type: String, default: '' },
-  autofocus: { type: Boolean, default: false },
-  disabled: { type: Boolean, default: false },
-  error: { type: Boolean, default: false },
-  errorText: { type: String, default: '' },
-  form: { type: String, default: '' },
-  focused: { type: Boolean, default: false },
-  inputmode: { type: String, default: '' },
-  invalid: { type: Boolean, default: false },
-  label: { type: String, default: '' },
-  list: { type: String, default: '' },
-  max: { type: String, default: '' },
-  maxlength: { type: Number, default: undefined },
-  min: { type: String, default: '' },
-  minlength: { type: Number, default: undefined },
-  modelValue: { type: [String, Number], default: undefined },
-  name: { type: String, default: '' },
-  pattern: { type: String, default: '' },
-  placeholder: { type: String, default: '' },
-  populated: { type: Boolean, default: false },
-  prefix: { type: String, default: '' },
-  readonly: { type: Boolean, default: false },
-  required: { type: Boolean, default: false },
-  step: { type: String, default: '' },
-  suffix: { type: String, default: '' },
-  supportingText: { type: String, default: '' },
-  supportingTextEnd: { type: String, default: '' },
-  type: { type: String, default: 'text' },
-  value: { type: [String, Number], default: '' },
-});
-
-const emit = defineEmits(['focus', 'blur', 'input', 'change', 'invalid', 'select', 'keyup', 'keydown', 'update:modelValue']);
-
-const normalizeValue = (value) => (value === null || value === undefined ? '' : `${value}`);
-
-const resolveInitialValue = () => (props.modelValue !== undefined ? props.modelValue : props.value);
-const inputValue = ref(normalizeValue(resolveInitialValue()));
-const textFieldEl = ref(null);
-const initialValue = ref(inputValue.value);
-const isInputFocused = ref(false);
-const labelOffset = ref(0);
-
-const hasInputValue = computed(() => inputValue.value !== '');
-
-const resolvedSupportingText = computed(() => {
-  if (props.error && props.errorText) {
-    return props.errorText;
-  }
-
-  return props.supportingText;
-});
-const hasSupportingText = computed(() => !!(resolvedSupportingText.value || props.supportingTextEnd || slots['supporting-text'] || slots['supporting-text-end']));
-const ariaInvalid = computed(() => (props.error || props.invalid ? 'true' : ''));
-const showPrefix = computed(() => hasInputValue.value || isInputFocused.value || props.focused);
-const resolvedPlaceholder = computed(() => {
-  if (!props.label) {
-    return props.placeholder;
-  }
-
-  return isInputFocused.value || props.focused ? props.placeholder : '';
-});
-const showPrefixSlot = computed(() => showPrefix.value && !!slots.prefix);
-const resolvedPrefix = computed(() => (showPrefix.value ? props.prefix : ''));
-const labelOffsetWithBase = computed(() => labelOffset.value + 8);
-
-watch(
-  () => props.modelValue,
-  () => {
-    inputValue.value = normalizeValue(resolveInitialValue());
-  }
-);
-
-watch(
-  () => props.value,
-  (value) => {
-    if (props.modelValue !== undefined) {
-      return;
-    }
-
-    inputValue.value = normalizeValue(value);
-  }
-);
-
-const onTextFieldInput = (ev) => {
-  inputValue.value = ev.target.value;
-  emit('update:modelValue', inputValue.value);
-  emit('input', inputValue.value);
-};
-
-const onTextFieldChange = (ev) => {
-  inputValue.value = ev.target.value;
-  emit('change', inputValue.value);
-};
-
-const onTextFieldFocus = (ev) => {
-  isInputFocused.value = true;
-  emit('focus', ev);
-};
-
-const onTextFieldBlur = (ev) => {
-  isInputFocused.value = false;
-  emit('blur', ev);
-};
-
-const onFormReset = () => {
-  inputValue.value = initialValue.value;
-  emit('update:modelValue', inputValue.value);
-};
-
-const updateLabelOffset = () => {
-  const prefixEl = textFieldEl.value?.getPrefixEl?.();
-  labelOffset.value = showPrefix.value && prefixEl ? prefixEl.offsetWidth : 0;
-};
-
-const onClick = () => {
-  textFieldEl.value?.focus?.();
-};
-
-const focus = () => textFieldEl.value?.focus?.();
-const blur = () => textFieldEl.value?.blur?.();
-const checkValidity = () => textFieldEl.value?.checkValidity?.();
-const reportValidity = () => textFieldEl.value?.reportValidity?.();
-const setCustomValidity = (message) => textFieldEl.value?.setCustomValidity?.(message);
-
+const field = ref(null);
 defineExpose({
-  getInputEl: () => textFieldEl.value?.getInputEl?.(),
-  focus,
-  blur,
-  checkValidity,
-  reportValidity,
-  setCustomValidity,
+  getInputEl: () => field.value?.getInputEl(),
+  focus: () => field.value?.focus(),
+  blur: () => field.value?.blur(),
+  checkValidity: () => field.value?.checkValidity(),
+  reportValidity: () => field.value?.reportValidity(),
+  setCustomValidity: (message) => field.value?.setCustomValidity(message),
 });
-
-onMounted(() => {
-  initialValue.value = normalizeValue(resolveInitialValue());
-  nextTick(updateLabelOffset);
-});
-
-watch([showPrefix, () => props.prefix, inputValue], async () => {
-  await nextTick();
-  updateLabelOffset();
-});
-useFormReset(() => textFieldEl.value?.getInputEl?.(), onFormReset);
 </script>
-
-<style lang="scss">
-@use 'sass:map';
-@use '../../styles/tokens';
-@use '../../styles/theme/md-sys-color' as theme;
-
-$theme: tokens.md-comp-outlined-text-field-values();
-
-.md-outlined-text-field {
-  --md-outlined-text-field-caret-color: #{theme.value('primary')};
-  --md-outlined-text-field-input-text-color: #{theme.value('on-surface')};
-  --md-outlined-text-field-input-text-prefix-color: #{theme.value('on-surface-variant')};
-  --md-outlined-text-field-input-text-suffix-color: #{theme.value('on-surface-variant')};
-  border-radius: map.get($theme, container-shape);
-
-  .md-text-field__input {
-    caret-color: var(--md-outlined-text-field-caret-color);
-    color: var(--md-outlined-text-field-input-text-color);
-    font-family: map.get($theme, input-text-font);
-    line-height: map.get($theme, input-text-line-height);
-    font-size: map.get($theme, input-text-size);
-    font-weight: map.get($theme, input-text-weight);
-    letter-spacing: map.get($theme, input-text-tracking);
-  }
-  .md-field--outlined {
-    width: 100%;
-  }
-
-  .md-text-field__affix {
-    font-family: map.get($theme, input-text-font);
-    font-size: map.get($theme, input-text-size);
-    line-height: map.get($theme, input-text-line-height);
-    font-weight: map.get($theme, input-text-weight);
-    letter-spacing: map.get($theme, input-text-tracking);
-  }
-
-  .md-text-field__affix--prefix {
-    color: var(--md-outlined-text-field-input-text-prefix-color);
-    padding-inline-end: 2px;
-  }
-
-  .md-text-field__affix--suffix {
-    color: var(--md-outlined-text-field-input-text-suffix-color);
-    padding-inline-start: 2px;
-  }
-}
-</style>

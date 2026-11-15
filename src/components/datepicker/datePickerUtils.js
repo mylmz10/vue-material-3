@@ -314,33 +314,17 @@ export const findNearestAllowedDate = (date, direction = 1, constraints = {}, ma
   return null;
 };
 
-export const isMonthAllowed = (year, month, constraints = {}) => {
-  const startOfMonth = dayjs().year(year).month(month).date(1).startOf('day');
-  const totalDays = startOfMonth.daysInMonth();
-
-  for (let day = 1; day <= totalDays; day += 1) {
-    const currentDay = startOfMonth.date(day);
-    if (isDateAllowed(currentDay, constraints)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-export const isYearAllowed = (year, constraints = {}) => {
-  for (let month = 0; month < 12; month += 1) {
-    if (isMonthAllowed(year, month, constraints)) {
-      return true;
-    }
-  }
-
-  return false;
+const isPeriodWithinBounds = (date, unit, constraints) => {
+  const minDate = parseModelValue(constraints.min);
+  const maxDate = parseModelValue(constraints.max);
+  if (minDate && maxDate && minDate.isAfter(maxDate, 'day')) return false;
+  return (!minDate || !date.isBefore(minDate, unit)) && (!maxDate || !date.isAfter(maxDate, unit));
 };
 
 export const getYearRange = (visibleYear, constraints = {}) => {
   const minDate = parseModelValue(constraints.min);
   const maxDate = parseModelValue(constraints.max);
+  if (minDate && maxDate && minDate.isAfter(maxDate, 'day')) return [];
   const minYear = minDate ? minDate.year() : visibleYear - 100;
   const maxYear = maxDate ? maxDate.year() : visibleYear + 100;
 
@@ -351,7 +335,7 @@ export const getMonthOptions = (visibleYear, locale = 'en-US', constraints = {})
   return Array.from({ length: 12 }, (_, month) => ({
     value: month,
     label: formatMonthLabel(visibleYear, month, locale),
-    disabled: !isMonthAllowed(visibleYear, month, constraints),
+    disabled: !isPeriodWithinBounds(dayjs().date(1).year(visibleYear).month(month), 'month', constraints),
   }));
 };
 
@@ -359,7 +343,7 @@ export const getYearOptions = (visibleYear, constraints = {}) => {
   return getYearRange(visibleYear, constraints).map((year) => ({
     value: year,
     label: `${year}`,
-    disabled: !isYearAllowed(year, constraints),
+    disabled: false,
   }));
 };
 
@@ -463,12 +447,13 @@ export const shiftMonth = ({ year, month }, amount) => {
 };
 
 export const canNavigateMonth = ({ year, month }, amount, constraints = {}) => {
-  const next = shiftMonth({ year, month }, amount);
-  return isMonthAllowed(next.year, next.month, constraints);
+  const next = dayjs().date(1).year(year).month(month).add(amount, 'month');
+  return isPeriodWithinBounds(next, 'month', constraints);
 };
 
 export const canNavigateYear = (year, amount, constraints = {}) => {
-  return isYearAllowed(year + amount, constraints);
+  const next = dayjs().date(1).year(year + amount);
+  return isPeriodWithinBounds(next, 'year', constraints);
 };
 
 export const moveFocusDate = (focusedIso, amount, unit, constraints = {}) => {

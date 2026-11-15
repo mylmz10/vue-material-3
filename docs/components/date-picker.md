@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 const filledDate = ref('2026-03-14');
 const outlinedDate = ref('2026-03-14');
+const dockedDate = ref('2026-03-14');
 const pickerOpen = ref(false);
 const pickerValue = ref('2026-03-14');
 </script>
@@ -10,7 +11,19 @@ const pickerValue = ref('2026-03-14');
 
 Date pickers let users enter or select dates.
 
-## Example
+## Docked Date Picker
+
+Click the calendar icon to open the picker below the field, or type a date directly.
+
+<div class="md-doc-preview">
+  <MdOutlinedDatePickerField v-model="dockedDate" class="md-doc-preview__field" label="Appointment date" picker-variant="docked" />
+</div>
+
+```vue
+<MdOutlinedDatePickerField v-model="date" label="Appointment date" picker-variant="docked" />
+```
+
+## Modal Date Picker
 
 <div class="md-doc-preview">
   <MdFilledDatePickerField v-model="filledDate" class="md-doc-preview__field" label="Filled date" picker-variant="modal" />
@@ -72,6 +85,8 @@ const value = ref('2026-03-14');
 | `pickerVariant`  | `'docked'` | Field wrapper picker presentation.                      |
 | `min / max`      | `''`       | ISO date bounds.                                        |
 | `isDateDisabled` | `null`     | Function that excludes dates.                           |
+
+Use `min` and `max` to limit month and year navigation. Within those bounds, you can browse months and years that contain only disabled dates. The `isDateDisabled` callback still prevents selecting those dates.
 
 ### Events
 

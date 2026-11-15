@@ -11,6 +11,7 @@
         :error="resolvedError"
         :error-text="resolvedErrorText"
         :readonly="resolvedReadonly"
+        :required="required"
         :disabled="disabled"
         @change="handleFieldChange"
       >
@@ -28,6 +29,7 @@
       </component>
     </div>
 
+    <MdRequiredSelection v-if="isModalVariant && required && !readonly" :form="$attrs.form" :has-selection="hasSelection" :disabled="disabled" @invalid="fieldEl?.focus()" />
     <transition name="fade-grow">
       <div v-if="showDockedPanel" class="md-date-picker-field__panel">
         <MdDatePicker
@@ -71,13 +73,25 @@ import MdDatePicker from './MdDatePicker.vue';
 import MdFilledTextField from '../text-field/MdFilledTextField.vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdOutlinedTextField from '../text-field/MdOutlinedTextField.vue';
-import { DEFAULT_DISPLAY_FORMAT, formatDisplayValue, formatRangeDisplayValue, isDateAllowed, isRangeAllowed, parseDisplayValue, parseRangeDisplayValue } from './datePickerUtils';
+import MdRequiredSelection from '../field/MdRequiredSelection.vue';
+import {
+  DEFAULT_DISPLAY_FORMAT,
+  formatDisplayValue,
+  formatRangeDisplayValue,
+  isDateAllowed,
+  isRangeAllowed,
+  parseDisplayValue,
+  parseModelValue,
+  parseRangeDisplayValue,
+  parseRangeModelValue,
+} from './datePickerUtils';
 
 import { getControlAttrs } from '../field/fieldAttrs';
 
 defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
+  required: Boolean,
   disabled: {
     type: Boolean,
     default: false,
@@ -153,6 +167,11 @@ const inputValue = ref('');
 const localError = ref(false);
 
 const isRangeSelection = computed(() => props.selectionMode === 'range');
+const hasSelection = computed(() => {
+  if (!isRangeSelection.value) return !!parseModelValue(props.modelValue);
+  const { start, end } = parseRangeModelValue(props.modelValue);
+  return !!start && !!end;
+});
 const defaultSupportingText = computed(() => (isRangeSelection.value ? `${props.displayFormat} - ${props.displayFormat}` : props.displayFormat));
 const isModalVariant = computed(() => props.pickerVariant === 'modal' || props.pickerVariant === 'modal-input');
 const showDockedPanel = computed(() => props.pickerVariant === 'docked' && isOpen.value);
@@ -322,8 +341,9 @@ useFormReset(
     // Let the nested field apply its reset before restoring the current display format.
     await nextTick();
     if (!fieldEl.value) return;
-    syncInputValue(value);
     emit('update:modelValue', value);
+    await nextTick();
+    if (fieldEl.value) syncInputValue();
   }
 );
 

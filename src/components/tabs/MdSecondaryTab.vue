@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import MdIcon from '../icon/MdIcon.vue';
 import MdRipple from '../ripple/MdRipple.vue';
 import { mdTabsContextKey } from './tabsContext';
@@ -64,7 +64,8 @@ const props = defineProps({
 const emit = defineEmits(['click', 'focus']);
 const tabsContext = inject(mdTabsContextKey, null);
 const tabEl = ref(null);
-const tabId = props.id || `md-secondary-tab-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
+const generatedId = useId();
+const tabId = props.id || `md-secondary-tab-${generatedId}`;
 
 const register = () => {
   tabsContext?.registerTab?.({

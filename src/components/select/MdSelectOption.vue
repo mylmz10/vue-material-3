@@ -23,9 +23,10 @@
 </template>
 
 <script setup>
-import { computed, inject, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue';
 
 const props = defineProps({
+  id: String,
   value: {
     type: [String, Number, Boolean, Object],
     default: '',
@@ -51,7 +52,8 @@ const props = defineProps({
 const emit = defineEmits(['select', 'request-selection', 'request-deselection']);
 const slots = useSlots();
 const optionEl = ref(null);
-const optionId = `md-select-option-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
+const generatedId = useId();
+const optionId = props.id || `md-select-option-${generatedId}`;
 const mounted = ref(false);
 const mdSelectContextKey = 'mdSelectContext';
 const selectContext = inject(mdSelectContextKey, null);
@@ -205,6 +207,7 @@ onBeforeUnmount(() => {
 $theme: tokens.md-comp-filled-select-values(theme.dependencies());
 
 .md-select-option {
+  position: relative;
   align-items: center;
   border-radius: 0;
   color: var(--md-select-option-label-text-color, #{map.get($theme, menu-list-item-label-text-color)});
@@ -227,8 +230,17 @@ $theme: tokens.md-comp-filled-select-values(theme.dependencies());
     background-color: var(--md-select-option-selected-container-color, #{map.get($theme, menu-list-item-selected-container-color)});
   }
 
-  &--active:not(&--selected) {
-    background-color: var(--md-select-option-container-color, #{map.get($theme, menu-container-color)});
+  &::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &:not(&--disabled):hover::after,
+  &--active:not(&--disabled)::after,
+  &:not(&--disabled):focus-visible::after {
+    content: '';
+    background-color: color-mix(in srgb, #{theme.value('on-surface')} 12%, transparent);
   }
 
   &--disabled {

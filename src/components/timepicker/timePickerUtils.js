@@ -1,13 +1,3 @@
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-
-import 'dayjs/locale/en';
-import 'dayjs/locale/tr';
-
-dayjs.extend(customParseFormat);
-
-export const MODEL_FORMAT = 'HH:mm';
-export const DEFAULT_DISPLAY_FORMAT = 'hh:mm A';
 export const DIAL_SIZE = 256;
 export const DIAL_HANDLE_SIZE = 48;
 export const DIAL_CENTER_SIZE = 8;
@@ -15,72 +5,37 @@ export const DIAL_LABEL_STEP = 5;
 export const HOUR_CYCLE_12 = 12;
 export const HOUR_CYCLE_24 = 24;
 
-const SUPPORTED_DAYJS_LOCALES = new Set(['en', 'tr']);
-
-export const resolveDayjsLocale = (locale = 'en-US') => {
-  const baseLocale = `${locale}`.toLowerCase().replace('_', '-').split('-')[0];
-  return SUPPORTED_DAYJS_LOCALES.has(baseLocale) ? baseLocale : 'en';
-};
-
 export const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 export const normalizeHourCycle = (hourCycle = HOUR_CYCLE_12) => (`${hourCycle}` === '24' ? HOUR_CYCLE_24 : HOUR_CYCLE_12);
 
 export const padTwo = (value) => `${value}`.padStart(2, '0');
 
 export const parseModelValue = (value) => {
-  if (!value) {
-    return null;
-  }
-
-  const parsed = dayjs(value, MODEL_FORMAT, true);
-  return parsed.isValid() ? parsed.second(0).millisecond(0) : null;
+  if (typeof value !== 'string' || value.length !== 5 || !/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/.test(value)) return null;
+  const [hour24, minute] = value.split(':').map(Number);
+  return { hour24, minute };
 };
 
 export const getDefaultTime = () => {
-  const now = dayjs().second(0).millisecond(0);
-  const roundedMinute = Math.round(now.minute() / 5) * 5;
-  const normalized = roundedMinute === 60 ? now.add(1, 'hour').minute(0) : now.minute(roundedMinute);
-  return normalized.second(0).millisecond(0);
+  const now = new Date();
+  const minutes = (now.getHours() * 60 + Math.round(now.getMinutes() / 5) * 5) % 1440;
+  return { hour24: Math.floor(minutes / 60), minute: minutes % 60 };
 };
 
 export const toModelValue = (value) => {
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
 
-  const hour = Number.isFinite(value.hour24) ? clamp(value.hour24, 0, 23) : 0;
-  const minute = Number.isFinite(value.minute) ? clamp(value.minute, 0, 59) : 0;
-  return dayjs().hour(hour).minute(minute).second(0).millisecond(0).format(MODEL_FORMAT);
+  const hour = Number.isFinite(value.hour24) ? Math.trunc(clamp(value.hour24, 0, 23)) : 0;
+  const minute = Number.isFinite(value.minute) ? Math.trunc(clamp(value.minute, 0, 59)) : 0;
+  return `${padTwo(hour)}:${padTwo(minute)}`;
 };
 
 export const toDisplayParts = (value) => {
-  if (value && typeof value === 'object' && Number.isFinite(value.hour24) && Number.isFinite(value.minute)) {
-    const hour24 = clamp(value.hour24, 0, 23);
-    const minute = clamp(value.minute, 0, 59);
-    const meridiem = hour24 >= 12 ? 'PM' : 'AM';
-    const hour12 = hour24 % 12 || 12;
-
-    return {
-      hour24,
-      hour12,
-      minute,
-      meridiem,
-    };
-  }
-
-  const parsedValue = typeof value === 'string' ? parseModelValue(value) : value;
-  const baseValue = parsedValue || getDefaultTime();
-  const hour24 = baseValue.hour();
-  const minute = baseValue.minute();
-  const meridiem = hour24 >= 12 ? 'PM' : 'AM';
-  const hour12 = hour24 % 12 || 12;
-
-  return {
-    hour24,
-    hour12,
-    minute,
-    meridiem,
-  };
+  const parsed = typeof value === 'string' ? parseModelValue(value) : value;
+  const parts = Number.isFinite(parsed?.hour24) && Number.isFinite(parsed?.minute) ? parsed : getDefaultTime();
+  const hour24 = clamp(parts.hour24, 0, 23);
+  const minute = clamp(parts.minute, 0, 59);
+  return { hour24, hour12: hour24 % 12 || 12, minute, meridiem: hour24 >= 12 ? 'PM' : 'AM' };
 };
 
 export const to24Hour = (hour12, meridiem = 'AM') => {
@@ -121,30 +76,32 @@ export const withMeridiem = (value, meridiem) => {
   };
 };
 
-export const formatDisplayValue = (value, locale = 'en-US', hourCycle = HOUR_CYCLE_12) => {
-  const parsedValue = typeof value === 'string' ? parseModelValue(value) : value;
-  const baseValue = parsedValue || getDefaultTime();
-  const resolvedHourCycle = normalizeHourCycle(hourCycle);
+// Intl needs a date. Use a UTC anchor to preserve the wall-clock time.
+const utcTime = (hour, minute = 0) => new Date(Date.UTC(2000, 0, 1, hour, minute));
 
+export const formatDisplayValue = (value, locale = 'en-US', hourCycle = HOUR_CYCLE_12) => {
+  const { hour24, minute } = toDisplayParts(value);
   return new Intl.DateTimeFormat(locale, {
+    timeZone: 'UTC',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: resolvedHourCycle === HOUR_CYCLE_12,
-  }).format(baseValue.toDate());
+    hour12: normalizeHourCycle(hourCycle) === HOUR_CYCLE_12,
+  }).format(utcTime(hour24, minute));
 };
 
 export const getDayPeriodLabels = (locale = 'en-US') => {
   const formatter = new Intl.DateTimeFormat(locale, {
+    timeZone: 'UTC',
     hour: 'numeric',
     hour12: true,
   });
 
-  const resolveLabel = (date) => formatter.formatToParts(date).find((part) => part.type === 'dayPeriod')?.value?.toUpperCase() || '';
-
-  return {
-    am: resolveLabel(new Date(2026, 0, 1, 9, 0)),
-    pm: resolveLabel(new Date(2026, 0, 1, 21, 0)),
-  };
+  const resolveLabel = (hour) =>
+    formatter
+      .formatToParts(utcTime(hour))
+      .find((part) => part.type === 'dayPeriod')
+      ?.value?.toUpperCase() || '';
+  return { am: resolveLabel(9), pm: resolveLabel(21) };
 };
 
 export const getHourDialOptions = (hourCycle = HOUR_CYCLE_12) => {

@@ -300,14 +300,20 @@ const bodyEl = ref(null);
 const getRangeAnchorDate = (rangeValue) => rangeValue.end || rangeValue.start || null;
 const getRangeFocusIso = (rangeValue) => toIso(rangeValue.end || rangeValue.start || null);
 
+const setDisplayedDate = (date) => {
+  const min = parseModelValue(props.min);
+  const max = parseModelValue(props.max);
+  const boundedDate = min && date.isBefore(min, 'month') ? min : max && date.isAfter(max, 'month') ? max : date;
+  displayedMonth.value = boundedDate.month();
+  displayedYear.value = boundedDate.year();
+};
+
 const syncFromModel = () => {
   if (isRangeSelection.value) {
     const normalizedRange = sortRangeDates(currentModelRange.value.start, currentModelRange.value.end);
     draftRange.value = normalizedRange;
     draftDate.value = null;
-    const baseDate = getRangeAnchorDate(normalizedRange) || dayjs().startOf('day');
-    displayedMonth.value = baseDate.month();
-    displayedYear.value = baseDate.year();
+    setDisplayedDate(getRangeAnchorDate(normalizedRange) || dayjs());
     focusedIso.value = findFirstFocusableDate({
       year: displayedYear.value,
       month: displayedMonth.value,
@@ -322,9 +328,7 @@ const syncFromModel = () => {
 
   draftDate.value = currentModelDate.value;
   draftRange.value = { start: null, end: null };
-  const baseDate = currentModelDate.value || dayjs().startOf('day');
-  displayedMonth.value = baseDate.month();
-  displayedYear.value = baseDate.year();
+  setDisplayedDate(currentModelDate.value || dayjs());
   focusedIso.value = findFirstFocusableDate({
     year: displayedYear.value,
     month: displayedMonth.value,
@@ -459,13 +463,17 @@ const goToNextMonth = async () => {
   await updateFocusedDate();
 };
 
+const updateDisplayedYear = (year) => {
+  setDisplayedDate(dayjs().date(1).year(year).month(displayedMonth.value));
+  emit('year-change', displayedYear.value);
+};
+
 const goToPreviousYear = async () => {
   if (!canPrevYear.value) {
     return;
   }
 
-  displayedYear.value -= 1;
-  emit('year-change', displayedYear.value);
+  updateDisplayedYear(displayedYear.value - 1);
   await updateFocusedDate();
 };
 
@@ -474,8 +482,7 @@ const goToNextYear = async () => {
     return;
   }
 
-  displayedYear.value += 1;
-  emit('year-change', displayedYear.value);
+  updateDisplayedYear(displayedYear.value + 1);
   await updateFocusedDate();
 };
 
@@ -487,8 +494,7 @@ const selectMonth = async (value) => {
 };
 
 const selectYear = async (value) => {
-  displayedYear.value = value;
-  emit('year-change', displayedYear.value);
+  updateDisplayedYear(value);
   setViewMode('day');
   await updateFocusedDate();
 };
@@ -773,6 +779,12 @@ watch(
   },
   { immediate: true }
 );
+
+watch([() => props.min, () => props.max], () => {
+  if (isDocked.value || dialogOpen.value) {
+    setDisplayedDate(dayjs().date(1).year(displayedYear.value).month(displayedMonth.value));
+  }
+});
 
 watch(
   () => [

@@ -1,6 +1,7 @@
 export const autocompleteProps = {
   disabled: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
+  required: { type: Boolean, default: false },
   modelValue: { type: [String, Number, Boolean, Object], default: null },
   label: { type: String, default: null },
   items: { type: Array, default: () => [] },

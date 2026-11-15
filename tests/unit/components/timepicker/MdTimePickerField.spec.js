@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import MdTimePickerField from '@/components/timepicker/MdTimePickerField.vue';
 import MdFilledTimePickerField from '@/components/timepicker/MdFilledTimePickerField.vue';
 import MdOutlinedTimePickerField from '@/components/timepicker/MdOutlinedTimePickerField.vue';
@@ -7,6 +8,39 @@ import MdOutlinedTimePickerField from '@/components/timepicker/MdOutlinedTimePic
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
 
 describe('MdTimePickerField', () => {
+  it('requires a committed time in the associated external form', async () => {
+    const form = document.createElement('form');
+    form.id = 'time-picker-required-form';
+    document.body.append(form);
+    const wrapper = mount(MdTimePickerField, {
+      attachTo: document.body,
+      props: { required: true },
+      attrs: { form: form.id, name: 'time' },
+    });
+    try {
+      expect(form.reportValidity()).toBe(false);
+      expect(document.activeElement).toBe(wrapper.get('input[name="time"]').element);
+      await wrapper.setProps({ modelValue: '00:00' });
+      expect(form.checkValidity()).toBe(true);
+      expect(new FormData(form).getAll('time')).toHaveLength(1);
+      const selectedTime = new FormData(form).get('time');
+      form.reset();
+      await nextTick();
+      await nextTick();
+      await nextTick();
+      await nextTick();
+      expect(wrapper.emitted('update:modelValue')).toEqual([[null]]);
+      expect(form.checkValidity()).toBe(true);
+      expect(new FormData(form).get('time')).toBe(selectedTime);
+      await wrapper.setProps({ modelValue: null, disabled: true });
+      expect(form.checkValidity()).toBe(true);
+      expect(new FormData(form).has('time')).toBe(false);
+    } finally {
+      wrapper.unmount();
+      form.remove();
+    }
+  });
+
   it('opens the modal and confirms a dial selection', async () => {
     const wrapper = mount(MdTimePickerField, {
       attachTo: document.body,

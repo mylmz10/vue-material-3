@@ -223,6 +223,33 @@ describe.each([
     expect(document.activeElement).toBe(input.element);
   });
 
+  it('validates the committed modal selection and submits its label once', async () => {
+    const input = render({
+      mode: 'modal',
+      required: true,
+      name: 'city',
+      clearable: true,
+      items: [{ value: 0, label: 'Paris' }],
+    });
+    expect(form.checkValidity()).toBe(false);
+    await nextTick();
+    expect(document.activeElement).toBe(input.element);
+    expect(input.attributes('aria-invalid')).toBe('true');
+
+    await input.trigger('click');
+    await settle();
+    await wrapper.get('dialog [role="option"]').trigger('click');
+    await settle();
+    expect(form.checkValidity()).toBe(true);
+    expect(new FormData(form).getAll('city')).toEqual(['Paris']);
+    expect(input.attributes('aria-invalid')).not.toBe('true');
+
+    await wrapper.get('button[aria-label="Clear selection"]').trigger('click');
+    expect(form.checkValidity()).toBe(false);
+    await wrapper.setProps({ disabled: true });
+    expect(form.checkValidity()).toBe(true);
+  });
+
   it('cancels pending work on disable and unmount', async () => {
     vi.useFakeTimers();
     const input = render({ items: ['Apple'], debounce: 100 });

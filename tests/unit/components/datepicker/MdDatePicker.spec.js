@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { enableAutoUnmount, mount } from '@vue/test-utils';
-import { buildMonthGrid, getWeekdayLabels } from '@/components/datepicker/datePickerUtils';
+import { buildMonthGrid, canNavigateYear, getWeekdayLabels, getYearOptions } from '@/components/datepicker/datePickerUtils';
 import MdDatePicker from '@/components/datepicker/MdDatePicker.vue';
 
 const findButtonByText = (wrapper, text) => wrapper.findAll('button').find((button) => button.text().includes(text));
@@ -143,6 +143,77 @@ describe('MdDatePicker', () => {
     const iconButtons = wrapper.findAllComponents({ name: 'MdIconButton' });
     expect(iconButtons.at(0)?.attributes('disabled')).toBeDefined();
     expect(iconButtons.at(2)?.attributes('disabled')).toBeDefined();
+  });
+
+  it('moves the open calendar inside updated bounds and preserves its draft', async () => {
+    const wrapper = mount(MdDatePicker, {
+      attachTo: document.body,
+      props: { modelValue: '2026-01-10', open: true, variant: 'modal' },
+    });
+
+    await wrapper.get('[data-iso="2026-01-15"]').trigger('click');
+    await wrapper.setProps({ min: '2026-03-15', max: '2026-05-15' });
+    expect(wrapper.get('[data-iso="2026-03-15"]').attributes('tabindex')).toBe('0');
+    expect(wrapper.get('button[aria-label="Previous month"]').element.disabled).toBe(true);
+    expect(findButtonByText(wrapper, 'OK').element.disabled).toBe(true);
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+    await wrapper.setProps({ min: '2026-01-01', max: '2026-01-31' });
+    expect(wrapper.get('[data-iso="2026-01-15"]').element.closest('[role="gridcell"]').getAttribute('aria-selected')).toBe('true');
+    expect(wrapper.get('button[aria-label="Next month"]').element.disabled).toBe(true);
+    await findButtonByText(wrapper, 'OK').trigger('click');
+    expect(wrapper.emitted('update:modelValue')).toEqual([['2026-01-15']]);
+  });
+
+  it('browses through an entirely disabled month while keeping its dates unavailable', async () => {
+    const wrapper = mount(MdDatePicker, {
+      props: {
+        modelValue: '2026-01-15',
+        min: '2026-01-02',
+        max: '2026-03-15',
+        isDateDisabled: (date) => date.startsWith('2026-02'),
+        variant: 'docked',
+      },
+    });
+
+    expect(wrapper.get('button[aria-label="Previous month"]').element.disabled).toBe(true);
+    await wrapper.get('button[aria-label="Next month"]').trigger('click');
+    expect(wrapper.get('[data-iso="2026-02-15"]').element.disabled).toBe(true);
+    await wrapper.get('button[aria-label="Next month"]').trigger('click');
+    expect(wrapper.get('[data-iso="2026-03-15"]').element.disabled).toBe(false);
+    expect(wrapper.get('button[aria-label="Next month"]').element.disabled).toBe(true);
+  });
+
+  it('lists and navigates years within the date bounds without checking individual days', () => {
+    const isDateDisabled = vi.fn(() => true);
+    expect(getYearOptions(2026, { isDateDisabled })).toHaveLength(201);
+    const constraints = { min: '2025-06-01', max: '2027-03-01', isDateDisabled };
+    expect(getYearOptions(2026, constraints)).toEqual([
+      { value: 2025, label: '2025', disabled: false },
+      { value: 2026, label: '2026', disabled: false },
+      { value: 2027, label: '2027', disabled: false },
+    ]);
+    expect(canNavigateYear(2025, 1, constraints)).toBe(true);
+    expect(canNavigateYear(2027, 1, constraints)).toBe(false);
+    expect(isDateDisabled).not.toHaveBeenCalled();
+  });
+
+  it('browses through a fully disabled year and lands within a partial boundary year', async () => {
+    const wrapper = mount(MdDatePicker, {
+      props: {
+        modelValue: '2025-12-12',
+        min: '2025-12-01',
+        max: '2027-06-15',
+        isDateDisabled: (date) => date.startsWith('2026'),
+        variant: 'docked',
+      },
+    });
+
+    await wrapper.get('button[aria-label="Next year"]').trigger('click');
+    expect(wrapper.get('[data-iso="2026-12-12"]').element.disabled).toBe(true);
+    await wrapper.get('button[aria-label="Next year"]').trigger('click');
+    expect(wrapper.get('[data-iso="2027-06-15"]').element.disabled).toBe(false);
+    expect(wrapper.get('button[aria-label="Next year"]').element.disabled).toBe(true);
   });
 
   it('commits a selected range when selectionMode is range', async () => {
