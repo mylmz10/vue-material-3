@@ -16,7 +16,6 @@ it('preserves 02:30 on a spring-forward day that skips 2 AM', () => {
     execFileSync(
       process.execPath,
       [
-        '--experimental-default-type=module',
         '--input-type=module',
         '--eval',
         `
