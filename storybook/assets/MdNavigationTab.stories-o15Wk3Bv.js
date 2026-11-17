@@ -1,0 +1,3 @@
+import{_ as t}from"./MdNavigationTab-BtGuWyGD.js";import"./iframe-CyhFqfr4.js";import"./preload-helper-PPVm8Dsz.js";import"./MdIcon-BEMmYXmO.js";import"./_plugin-vue_export-helper-DlAUqK2U.js";import"./MdRipple-C4lkPtii.js";const l={title:"Components/NavigationTab",component:t,args:{label:"Flights",activeIcon:"flight",selected:!1}},a=i=>({components:{MdNavigationTab:t},setup(){return{args:i}},template:`<div style="display: flex; max-width: 168px; background: #f3edf7; border-radius: 16px;">
+    <MdNavigationTab v-bind="args" />
+  </div>`}),c=a.bind({}),e=a.bind({});e.args={selected:!0};const m=["NavigationTab","SelectedNavigationTab"];export{c as NavigationTab,e as SelectedNavigationTab,m as __namedExportsOrder,l as default};
