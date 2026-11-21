@@ -1,0 +1,21 @@
+@use 'sass:string';
+
+// Scale is 0 at the default size and -1, -2, or -3 for denser containers.
+// Each step removes 4px. Positive values are ignored so controls never grow.
+@mixin scale {
+  --_md-density-scale: clamp(-3, var(--md-sys-density-scale, 0), 0);
+}
+
+@function size($default, $minimum) {
+  @return string.unquote('max(#{$minimum}, calc(#{$default} + var(--_md-density-scale) * 4px))');
+}
+
+@mixin height($default, $minimum) {
+  @include scale;
+  height: size($default, $minimum);
+}
+
+@mixin min-height($default, $minimum) {
+  @include scale;
+  min-height: size($default, $minimum);
+}

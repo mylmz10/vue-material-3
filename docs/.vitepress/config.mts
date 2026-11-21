@@ -29,6 +29,7 @@ export default defineConfig({
           { text: 'Installation', link: '/guide/installation' },
           { text: 'Quick Start', link: '/guide/quick-start' },
           { text: 'Theming', link: '/guide/theming' },
+          { text: 'Density', link: '/guide/density' },
         ],
       },
       {

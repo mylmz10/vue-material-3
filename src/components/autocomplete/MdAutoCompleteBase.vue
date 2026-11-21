@@ -354,6 +354,7 @@ onBeforeUnmount(cancelFilter);
     width: 100%;
   }
   .md-list {
+    --md-sys-density-scale: 0;
     width: 100%;
     min-width: 0;
     max-height: min(50dvh, 400px);

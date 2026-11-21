@@ -3,6 +3,7 @@
 
 :root {
   color-scheme: light;
+  --md-sys-density-scale: 0;
   @include theme.emit-theme(tokens.md-sys-color-values-light());
 }
 

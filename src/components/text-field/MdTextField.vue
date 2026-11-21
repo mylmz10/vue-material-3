@@ -247,7 +247,7 @@ useFormReset(() => textFieldEl.value?.getInputEl?.(), onFormReset);
   @include text-field('filled', tokens.md-comp-filled-text-field-values());
 
   .md-field--filled .md-field__content {
-    transform: translateY(6px);
+    transform: translateY(calc(6px + var(--md-field-density-shift)));
   }
 }
 

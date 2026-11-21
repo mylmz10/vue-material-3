@@ -136,6 +136,7 @@ const onFocus = (event) => {
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/density/density' as density;
 @use '../../styles/theme/md-sys-color' as theme;
 
 $theme: tokens.md-comp-secondary-navigation-tab-values();
@@ -150,7 +151,7 @@ $theme: tokens.md-comp-secondary-navigation-tab-values();
   cursor: pointer;
   display: flex;
   gap: 8px;
-  height: map.get($theme, container-height);
+  @include density.height(map.get($theme, container-height), 36px);
   justify-content: center;
   min-width: 96px;
   padding: 0 24px;

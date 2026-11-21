@@ -214,6 +214,7 @@ const handleClick = (event) => {
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/surface';
 @use '../ripple/ripple';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-icon-button-values(theme.dependencies());
 $filled-theme: tokens.md-comp-filled-icon-button-values(theme.dependencies());
@@ -231,8 +232,13 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values(theme.dependencies()
   background-color: transparent;
   @include surface.root-static-styles;
   @include icon-static-styles(state-layer-width, state-layer-height, state-layer-shape, unselected-icon-color);
+  @include density.scale;
+  --_md-icon-button-size: #{density.size(map.get($theme, state-layer-width), 28px)};
+  --_md-icon-button-target: #{density.size(48px, 36px)};
+  width: var(--_md-icon-button-size);
+  height: var(--_md-icon-button-size);
   border-radius: map.get($theme, state-layer-shape);
-  margin: max(0px, (48px - #{map.get($theme, state-layer-width)}) / 2);
+  margin: calc((var(--_md-icon-button-target) - var(--_md-icon-button-size)) / 2);
   align-items: center;
   border: none;
   box-sizing: border-box;
@@ -304,11 +310,8 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values(theme.dependencies()
   }
 
   &--filled {
-    width: map.get($filled-theme, container-width);
-    height: map.get($filled-theme, container-height);
     border-radius: map.get($filled-theme, container-shape);
     color: map.get($filled-theme, icon-color);
-    margin: max(0px, (48px - #{map.get($filled-theme, container-width)}) / 2);
 
     &::before {
       content: '';
@@ -399,11 +402,8 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values(theme.dependencies()
   }
 
   &--tonal {
-    width: map.get($tonal-theme, container-width);
-    height: map.get($tonal-theme, container-height);
     border-radius: map.get($tonal-theme, container-shape);
     color: map.get($tonal-theme, icon-color);
-    margin: max(0px, (48px - #{map.get($tonal-theme, container-width)}) / 2);
 
     &::before {
       content: '';
@@ -494,11 +494,8 @@ $outlined-theme: tokens.md-comp-outlined-icon-button-values(theme.dependencies()
   }
 
   &--outlined {
-    width: map.get($outlined-theme, container-width);
-    height: map.get($outlined-theme, container-height);
     border-radius: map.get($outlined-theme, container-shape);
     color: map.get($outlined-theme, unselected-icon-color);
-    margin: max(0px, (48px - #{map.get($outlined-theme, container-width)}) / 2);
     border-width: map.get($outlined-theme, unselected-outline-width);
     border-color: map.get($outlined-theme, unselected-outline-color);
     border-style: solid;

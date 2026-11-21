@@ -47,12 +47,13 @@ defineProps({
 @use '../elevation/surface';
 @use '../elevation/elevation';
 @use '../ripple/ripple';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-elevated-button-values(theme.dependencies());
 
 .md-elevated-button {
   @include surface.root-static-styles;
-  height: map.get($theme, container-height);
+  @include density.height(map.get($theme, container-height), 28px);
   border-radius: map.get($theme, container-shape);
   box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
   @include ripple.ripple($theme, null, 100px);
