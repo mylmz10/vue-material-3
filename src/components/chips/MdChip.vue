@@ -235,6 +235,7 @@ const handleKeydown = (event) => {
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../elevation/elevation';
 @use '../ripple/ripple';
+@use '../../styles/density/density' as density;
 
 $assist-theme: tokens.md-comp-assist-chip-values(theme.dependencies());
 $filter-theme: tokens.md-comp-filter-chip-values(theme.dependencies());
@@ -243,7 +244,11 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
 
 .md-chip {
   $this: &;
-  --md-chip-container-height: 32px;
+  @include density.scale;
+  --md-chip-painted-height: #{density.size(32px, 24px)};
+  --md-chip-outer-height: #{density.size(48px, 36px)};
+  --md-chip-inset: calc((var(--md-chip-outer-height) - var(--md-chip-painted-height)) / 2);
+  --md-chip-container-height: var(--md-chip-painted-height);
   --md-chip-container-shape: 8px;
   --md-chip-label-color: currentcolor;
   --md-chip-label-disabled-color: currentcolor;
@@ -270,7 +275,7 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
   cursor: pointer;
   display: inline-flex;
   gap: 8px;
-  height: max(48px, var(--md-chip-container-height));
+  height: var(--md-chip-outer-height);
   min-width: 48px;
   outline: none;
   overflow: hidden;
@@ -280,13 +285,13 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
   vertical-align: middle;
 
   > .md-ripple {
-    inset-block: 8px;
+    inset-block: var(--md-chip-inset);
   }
 
   &__outline,
   &__background {
     border-radius: var(--md-chip-container-shape);
-    inset: 8px 0;
+    inset: var(--md-chip-inset) 0;
     position: absolute;
   }
 
@@ -353,11 +358,11 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
     cursor: inherit;
     display: inline-flex;
     justify-content: center;
-    margin-block: -8px;
+    margin-block: calc(var(--md-chip-inset) * -1);
     margin-inline-end: -12px;
     padding: 0;
-    inline-size: 48px;
-    block-size: 48px;
+    inline-size: var(--md-chip-outer-height);
+    block-size: var(--md-chip-outer-height);
     flex-shrink: 0;
     z-index: 1;
 
@@ -414,7 +419,6 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
   }
 
   &--assist {
-    --md-chip-container-height: #{map.get($assist-theme, container-height)};
     --md-chip-container-shape: #{map.get($assist-theme, container-shape)};
     --md-chip-label-color: #{theme.value('on-surface')};
     --md-chip-label-disabled-color: #{theme.value('on-surface')};
@@ -449,7 +453,6 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
   }
 
   &--suggestion {
-    --md-chip-container-height: #{map.get($suggestion-theme, container-height)};
     --md-chip-container-shape: #{map.get($suggestion-theme, container-shape)};
     --md-chip-label-color: #{theme.value('on-surface-variant')};
     --md-chip-label-disabled-color: #{theme.value('on-surface')};
@@ -483,7 +486,6 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
   }
 
   &--filter {
-    --md-chip-container-height: #{map.get($filter-theme, container-height)};
     --md-chip-container-shape: #{map.get($filter-theme, container-shape)};
     --md-chip-label-color: #{theme.value('on-surface-variant')};
     --md-chip-label-disabled-color: #{theme.value('on-surface')};
@@ -533,7 +535,6 @@ $suggestion-theme: tokens.md-comp-suggestion-chip-values(theme.dependencies());
   }
 
   &--input {
-    --md-chip-container-height: #{map.get($input-theme, container-height)};
     --md-chip-container-shape: #{map.get($input-theme, container-shape)};
     --md-chip-label-color: #{theme.value('on-surface-variant')};
     --md-chip-label-disabled-color: #{theme.value('on-surface')};

@@ -46,6 +46,22 @@ import { MdFilledButton } from 'vue-material-3';
 
 Use each component reference for its documented sizing or color variables. Check contrast and disabled/focus states when changing colors.
 
+## Density
+
+[`--md-sys-density-scale`](/guide/density) tightens the containers that are meant to compress. `0` is the default size. `-1`, `-2`, and `-3` each remove 4px of height. Text size, icon size, and horizontal padding stay the same. Set it on any ancestor, the same way as a color override. The library clamps the value to the range `-3` through `0`. The [density guide](/guide/density) shows the four scales side by side.
+
+```html
+<section style="--md-sys-density-scale: -2">
+  <!-- Buttons, fields, lists, tabs, chips, and icon buttons inside are two steps denser. -->
+</section>
+```
+
+These components follow the scale: buttons, segmented buttons, lists, single-line text fields, selects, autocomplete, date and time fields, search, tabs, icon buttons, and chips. A component stops at its own minimum when another step would clip its content. Search does not go below 48px, because its leading icon is a 48px target.
+
+Menus, select options, snackbars, dialogs, sheets, banners, date and time picker dialogs, FABs, navigation bars, rails, drawers, and top app bars stay at their default size.
+
+Density is opt-in. A denser control can be shorter than the 48px target. Keep the control that changes this setting at scale `0`.
+
 ## Repository token sources
 
 Contributors can inspect SCSS sources such as:

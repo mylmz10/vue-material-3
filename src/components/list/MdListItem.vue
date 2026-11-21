@@ -101,6 +101,7 @@ const renderSupportingText = computed(() => {
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 @use '../elevation/surface';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-list-values(theme.dependencies());
 
@@ -117,18 +118,18 @@ $theme: tokens.md-comp-list-values(theme.dependencies());
   padding-inline-start: map.get($theme, list-item-leading-space);
   padding-inline-end: map.get($theme, list-item-trailing-space);
   list-style: none;
-  min-height: map.get($theme, list-item-one-line-container-height);
+  @include density.min-height(map.get($theme, list-item-one-line-container-height), 44px);
   border-radius: map.get($theme, list-item-container-shape);
   --line: 1;
   cursor: default;
 
   &--two-line {
     --line: 2;
-    min-height: map.get($theme, list-item-two-line-container-height);
+    min-height: density.size(map.get($theme, list-item-two-line-container-height), 64px);
   }
   &--three-line {
     --line: 3;
-    min-height: map.get($theme, list-item-three-line-container-height);
+    min-height: density.size(map.get($theme, list-item-three-line-container-height), 76px);
   }
 
   $ripple-tokens: (

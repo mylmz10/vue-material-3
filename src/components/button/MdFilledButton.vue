@@ -45,11 +45,12 @@ defineProps({
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-filled-button-values(theme.dependencies());
 
 .md-filled-button {
-  height: map.get($theme, container-height);
+  @include density.height(map.get($theme, container-height), 28px);
   border-radius: map.get($theme, container-shape);
   box-shadow: none;
   @include ripple.ripple($theme, null, 100px);

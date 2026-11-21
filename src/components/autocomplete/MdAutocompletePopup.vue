@@ -117,6 +117,7 @@ onBeforeUnmount(stop);
   box-shadow: 0 2px 6px rgb(0 0 0 / 18%);
 
   .md-list {
+    --md-sys-density-scale: 0;
     min-width: 0;
     max-height: none;
     overflow: visible;

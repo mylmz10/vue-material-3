@@ -102,6 +102,7 @@ const handleTrailingClick = () => {
 @use 'sass:map';
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-search-bar-values();
 
@@ -121,7 +122,7 @@ $theme: tokens.md-comp-search-bar-values();
   display: flex;
   align-items: center;
   gap: 4px;
-  min-height: map.get($theme, container-height);
+  @include density.min-height(map.get($theme, container-height), 48px);
   padding-inline: 4px;
   background: var(--md-search-container-color);
   border-radius: map.get($theme, container-shape);

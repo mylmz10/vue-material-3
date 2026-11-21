@@ -76,6 +76,7 @@ watch(
 <style lang="scss">
 @use 'sass:map';
 @use '../../styles/tokens';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-outlined-segmented-button-values();
 .md-segmented-button-set {
@@ -84,6 +85,6 @@ $theme: tokens.md-comp-outlined-segmented-button-values();
   grid-auto-flow: column;
   grid-auto-rows: auto;
   width: 100%;
-  height: map.get($theme, container-height);
+  @include density.height(map.get($theme, container-height), 28px);
 }
 </style>

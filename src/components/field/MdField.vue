@@ -95,7 +95,12 @@ const onFocusout = () => {
 </script>
 
 <style lang="scss">
+@use '../../styles/density/density' as density;
+
 .md-field {
+  @include density.scale;
+  --md-field-container-height: max(44px, calc(var(--md-filled-field-container-height, 56px) + var(--_md-density-scale) * 4px));
+  --md-field-density-shift: calc((var(--md-field-container-height) - 56px) / 2);
   display: inline-flex;
   flex-direction: column;
   // Allow the use of block/inline reflexive RTL properties without impacting
@@ -108,7 +113,7 @@ const onFocusout = () => {
     display: flex;
     flex: 1;
     position: relative;
-    flex-basis: var(--md-filled-field-container-height, 56px);
+    flex-basis: var(--md-field-container-height);
   }
 
   $this: &;
@@ -180,7 +185,7 @@ const onFocusout = () => {
   &--populated {
     #{$this}__middle {
       #{$this}__label {
-        transform: translateY(-27px) translateX(-15%) scale(0.75);
+        transform: translateY(calc(-27px - var(--md-field-density-shift))) translateX(-15%) scale(0.75);
       }
       #{$this}__content {
       }
@@ -192,11 +197,11 @@ const onFocusout = () => {
     &#{$this}--filled {
       #{$this}__middle {
         #{$this}__label {
-          transform: translateY(-13px) translateX(-21%) scale(0.75);
+          transform: translateY(calc(-13px - var(--md-field-density-shift))) translateX(-21%) scale(0.75);
           background: none;
         }
         #{$this}__content {
-          transform: translateY(6px) translateX(0);
+          transform: translateY(calc(6px + var(--md-field-density-shift))) translateX(0);
         }
       }
     }

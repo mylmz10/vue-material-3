@@ -46,11 +46,12 @@ defineProps({
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
 @use '../elevation/elevation';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-filled-tonal-button-values(theme.dependencies());
 
 .md-filled-tonal-button {
-  height: map.get($theme, container-height);
+  @include density.height(map.get($theme, container-height), 28px);
   border-radius: map.get($theme, container-shape);
   box-shadow: elevation.resolve-box-shadow(map.get($theme, container-elevation), map.get($theme, container-shadow-color));
   @include ripple.ripple($theme, null, 100px);

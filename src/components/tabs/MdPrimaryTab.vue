@@ -145,6 +145,7 @@ const onFocus = (event) => {
 @use 'sass:map';
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-primary-navigation-tab-values();
 
@@ -157,7 +158,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   color: #{theme.value('on-surface-variant')};
   cursor: pointer;
   display: flex;
-  height: map.get($theme, with-icon-and-label-text-container-height);
+  @include density.height(map.get($theme, with-icon-and-label-text-container-height), 52px);
   justify-content: center;
   min-width: 96px;
   padding: 0 12px;
@@ -233,7 +234,7 @@ $theme: tokens.md-comp-primary-navigation-tab-values();
   }
 
   &:not(&--with-icon) {
-    height: map.get($theme, container-height);
+    height: density.size(map.get($theme, container-height), 36px);
 
     .md-primary-tab__content {
       gap: 0;

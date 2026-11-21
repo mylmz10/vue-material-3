@@ -57,6 +57,7 @@ $theme: tokens.md-comp-navigation-drawer-values();
 $sys-color: theme.values();
 
 .md-navigation-drawer {
+  --md-sys-density-scale: 0;
   --md-navigation-drawer-container-color: #{theme.value('surface')};
   --md-navigation-drawer-modal-container-color: #{theme.value('surface-container-low')};
   --md-navigation-drawer-item-color: #{theme.value('on-surface-variant')};

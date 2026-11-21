@@ -47,6 +47,7 @@ const handlePointerRelease = (event) => {
 @use '../../styles/tokens';
 @use '../../styles/theme/md-sys-color' as theme;
 @use '../ripple/ripple';
+@use '../../styles/density/density' as density;
 
 $theme: tokens.md-comp-outlined-segmented-button-values(theme.dependencies());
 .md-segmented-button {
@@ -58,7 +59,7 @@ $theme: tokens.md-comp-outlined-segmented-button-values(theme.dependencies());
   display: flex;
   align-items: center;
   justify-content: center;
-  height: map.get($theme, container-height);
+  @include density.height(map.get($theme, container-height), 28px);
   min-width: 100px;
   $this: &;
 
